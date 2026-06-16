@@ -2008,7 +2008,12 @@ function parseESPNEvents(events, target) {
 // stored in liveGames[key].scoringEvents by parseESPNEvents.
 function aggregateGoalScorers() {
   const goals = {};
-  for (const game of Object.values(liveGames)) {
+  const seen = new Set();
+  for (const [key, game] of Object.entries(liveGames)) {
+    // Skip keyRev duplicates: normalise key to sorted team names
+    const canonical = key.split('-').sort().join('-');
+    if (seen.has(canonical)) continue;
+    seen.add(canonical);
     for (const evt of (game.scoringEvents||[])) {
       const name = evt.athleteName;
       if (name) goals[name] = (goals[name]||0) + 1;
