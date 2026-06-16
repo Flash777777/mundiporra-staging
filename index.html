@@ -2048,6 +2048,8 @@ const SCORER_ALIASES = {
   'l. yamal':        'lamine yamal',
   'oyarzabal':       'mikel oyarzabal',
   'm. oyarzabal':    'mikel oyarzabal',
+  'j. alvarez':     'julian alvarez',
+  'julian alvarez': 'julian alvarez',
 };
 
 // Get goals for a player by name (fuzzy match with alias resolution)
@@ -2070,17 +2072,22 @@ function getPlayerGoals(playerName) {
     if (normEspn === resolvedPick || resolved === resolvedPick) return goals;
 
     // 4) Partial: ESPN name includes the full pick (or vice versa)
-    if (normEspn.includes(normPick) || normPick.includes(normEspn)) return goals;
+    // Guard: second clause only fires if normEspn has a space (first+last name),
+    // to avoid a bare last name like "Alvarez" matching "Julian Alvarez"
+    if (normEspn.includes(normPick) || (normEspn.includes(' ') && normPick.includes(normEspn))) return goals;
 
     // 5) Last-name match (at least 4 chars to avoid false positives)
+    // Guard: first character of each name must also agree (J≠D, etc.)
     const lastNamePick = normPick.split(' ').pop();
     const lastNameEspn = normEspn.split(' ').pop();
-    if (lastNamePick.length >= 4 && lastNamePick === lastNameEspn) return goals;
+    if (lastNamePick.length >= 4 && lastNamePick === lastNameEspn && normPick[0] === normEspn[0]) return goals;
 
     // 6) First-name match for single-name stars ("Vinicius", "Mbappe" etc.)
+    // Guard: only when ESPN returns a single-word name (no space), to prevent
+    // "Julian Böttger" or other "Julian X" players matching "Julian Álvarez"
     const firstNamePick = normPick.split(' ')[0];
     const firstNameEspn = normEspn.split(' ')[0];
-    if (firstNamePick.length >= 5 && firstNamePick === firstNameEspn) return goals;
+    if (firstNamePick.length >= 5 && firstNamePick === firstNameEspn && !normEspn.includes(' ')) return goals;
   }
   return 0;
 }
