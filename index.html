@@ -671,7 +671,7 @@
     <button class="tab-btn" data-tab="champions" onclick="switchTab('champions')">⭐ Campeones</button>
     <button class="tab-btn" data-tab="stats" onclick="switchTab('stats')">📊 Statistiken</button>
     <button class="tab-btn" data-tab="search" onclick="switchTab('search')">🔍 Suche</button>
-    <button class="tab-btn" data-tab="database" onclick="switchTab('database')">🗄️ Datenbasis</button>
+    <button class="tab-btn" data-tab="database" onclick="switchTab('database')" data-i18n="tab_database">🗄️ Datenbasis</button>
     <button class="tab-btn" data-tab="changelog" onclick="switchTab('changelog')">📝 Changelog</button>
   </div>
   <!-- Mobile Bottom Nav -->
@@ -684,7 +684,7 @@
     <button class="mobile-nav-btn" onclick="switchTab('champions')" data-tab="champions"><span class="nav-icon">⭐</span><span class="nav-label">Campeones</span></button>
     <button class="mobile-nav-btn" onclick="switchTab('stats')" data-tab="stats"><span class="nav-icon">📊</span><span class="nav-label">Statistiken</span></button>
     <button class="mobile-nav-btn" onclick="switchTab('search')" data-tab="search"><span class="nav-icon">🔍</span><span class="nav-label">Suche</span></button>
-    <button class="mobile-nav-btn" onclick="switchTab('database')" data-tab="database"><span class="nav-icon">🗄️</span><span class="nav-label">Datenbasis</span></button>
+    <button class="mobile-nav-btn" onclick="switchTab('database')" data-tab="database"><span class="nav-icon">🗄️</span><span class="nav-label" data-i18n="tab_database">Datenbasis</span></button>
     <button class="mobile-nav-btn" onclick="switchTab('changelog')" data-tab="changelog"><span class="nav-icon">📝</span><span class="nav-label">Changelog</span></button>
   </nav>
 </header>
@@ -1121,6 +1121,7 @@ const TRANSLATIONS = {
     tab_games: '⚽ Games',
     tab_champions: '🌟 Champions',
     tab_stats: '📈 Stats',
+    tab_database: '🗄️ Data',
     tab_search: '🔍 Search',
     tab_changelog: '📝 Changelog',
     // KPIs
@@ -1312,6 +1313,7 @@ const TRANSLATIONS = {
     tab_games: '⚽ Spiele',
     tab_champions: '🌟 Champions',
     tab_stats: '📈 Statistiken',
+    tab_database: '🗄️ Datenbasis',
     tab_search: '🔍 Suche',
     tab_changelog: '📝 Changelog',
     kpi_players: 'Spieler',
@@ -1496,6 +1498,7 @@ const TRANSLATIONS = {
     tab_games: '⚽ Partidos',
     tab_champions: '🌟 Campeones',
     tab_stats: '📈 Estadísticas',
+    tab_database: '🗄️ Datos',
     tab_search: '🔍 Buscar',
     tab_changelog: '📝 Changelog',
     kpi_players: 'Jugadores',
@@ -1671,6 +1674,12 @@ function T(key) {
 }
 
 function applyLang() {
+  // Update all elements with data-i18n attribute
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    const t = T(key);
+    if (t) el.textContent = t;
+  });
   // Localize setup modal placeholders
   const pn = document.getElementById('setupPlayerPlaceholder');
   if (pn) pn.textContent = T('setup_select_name');
@@ -4588,25 +4597,5 @@ window.addEventListener('resize',_chkLandscape);
   </div>
 </div>
 
-
-<script>
-// ── STAGING BANNER ──
-(function() {
-  if (!window.location.hostname.includes('mundiporra-staging') && !window.location.href.includes('staging')) return;
-  const badge = document.createElement('div');
-  badge.id = 'staging-badge';
-  badge.textContent = '🚧 STAGING';
-  badge.style.cssText = [
-    'position:fixed', 'top:0', 'left:0', 'right:0', 'z-index:99999',
-    'background:#dc2626', 'color:#fff', 'text-align:center',
-    'font-size:0.75rem', 'font-weight:800', 'letter-spacing:.12em',
-    'padding:3px 0', 'pointer-events:none',
-    'box-shadow:0 2px 6px rgba(220,38,38,0.5)'
-  ].join(';');
-  document.body.prepend(badge);
-  // Push body content down so banner doesn't overlap
-  document.body.style.paddingTop = '22px';
-})();
-</script>
 </body>
 </html>
