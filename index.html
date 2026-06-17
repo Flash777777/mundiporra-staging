@@ -4597,5 +4597,24 @@ window.addEventListener('resize',_chkLandscape);
   </div>
 </div>
 
+
+<script>
+// ── STAGING BANNER ──
+(function() {
+  if (!window.location.hostname.includes('mundiporra-staging') && !window.location.href.includes('staging')) return;
+  const badge = document.createElement('div');
+  badge.id = 'staging-badge';
+  badge.textContent = '🚧 STAGING';
+  badge.style.cssText = [
+    'position:fixed','top:0','left:0','right:0','z-index:99999',
+    'background:#dc2626','color:#fff','text-align:center',
+    'font-size:0.75rem','font-weight:800','letter-spacing:.12em',
+    'padding:3px 0','pointer-events:none',
+    'box-shadow:0 2px 6px rgba(220,38,38,0.5)'
+  ].join(';');
+  document.body.prepend(badge);
+  document.body.style.paddingTop = '22px';
+})();
+</script>
 </body>
 </html>
