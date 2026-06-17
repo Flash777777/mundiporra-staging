@@ -971,6 +971,13 @@
   <div class="section-title">📝 Changelog</div>
 
     <div class="card" style="margin-bottom:14px;">
+  <div class="card-title">v1.17.9 — 17. Juni 2026 (Fix)</div>
+  <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
+    <li>⚽ <strong>Live-Card Torschützen-Fix</strong> — <code>scoringEvents</code>-Parser befüllt jetzt <code>side</code>, <code>min</code>, <code>evtType</code>, <code>isOG</code>, <code>isPen</code>; vorher nur Name gespeichert → Anzeige war leer trotz vorhandenem Renderer</li>
+    <li>🟥 <strong>Rote Karten in Live-Card</strong> — Rote Karten ebenfalls in <code>scoringEvents</code> gepusht und TV-Style angezeigt</li>
+  </ul>
+</div>
+<div class="card" style="margin-bottom:14px;">
   <div class="card-title">v1.17.8 — 18. Juni 2026 (Fix)</div>
   <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
     <li>⚽ <strong>Scorer-Fix (Root Cause)</strong> — <code>fetchESPNStatistics()</code> suchte in <code>data.leaders</code> statt <code>data.stats[].goalsLeaders</code> → 0 Scorer-Punkte trotz ESPN-Daten</li>
@@ -2330,6 +2337,10 @@ function parseESPNEvents(events, target) {
       if (txt.includes('red')) {
         const detTeam = normalizeTeam(det.team?.displayName||'');
         if (detTeam===name1) rc1++; else if (detTeam===name2) rc2++;
+        const rcAthlete = det.athletesInvolved?.[0]?.displayName || det.athlete?.displayName || null;
+        const rcMin  = det.clock?.displayValue || null;
+        const rcSide = detTeam === name1 ? 1 : detTeam === name2 ? 2 : 0;
+        if (rcAthlete) scoringEvents.push({ athleteName: rcAthlete, side: rcSide, min: rcMin, evtType: 'rc' });
       }
       // Goals (exclude own goals / penalties from shootout for scorer tracking)
       if (txt.includes('goal') && !txt.includes('shootout')) {
@@ -2338,7 +2349,14 @@ function parseESPNEvents(events, target) {
                          || det.athlete?.displayName
                          || det.athlete?.fullName
                          || null;
-        if (athleteName) scoringEvents.push({athleteName});
+        if (athleteName) {
+          const detTeam = normalizeTeam(det.team?.displayName || '');
+          const side  = detTeam === name1 ? 1 : detTeam === name2 ? 2 : 0;
+          const min   = det.clock?.displayValue || null;
+          const isOG  = txt.includes('own goal');
+          const isPen = txt.includes('penalty') || txt.includes('pen');
+          scoringEvents.push({ athleteName, side, min, evtType: 'goal', isOG, isPen });
+        }
       }
     }
 
@@ -4802,8 +4820,8 @@ function switchTab(tabId) {
 }
 
 // ═══════ WHAT'S NEW ═══════
-const BUILD_VERSION = 'v1.17.8';
-const BUILD_DATE = '18.06.2026 03:00';
+const BUILD_VERSION = 'v1.17.9';
+const BUILD_DATE = '17.06.2026 22:45';
 (function(){ var _hb = document.getElementById('headerVersionBadge'); if(_hb) _hb.textContent = BUILD_VERSION; })();
 const WN_VERSION = 'v1.17';
 const WN_STORAGE_KEY = window.location.pathname.includes('staging') ? 'wnSeen_staging' : 'wnSeen_live';
