@@ -839,7 +839,7 @@
     <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
       <div class="card-title" id="dbCardTitle">🗃️ Datenbasis — Alle Tipps</div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;">
-        <input id="dbSearch" type="text" placeholder="🔍 Name / Gruppe suchen…" id="dbSearchInput"
+        <input id="dbSearch" type="text" placeholder="🔍 Name / Gruppe suchen…"
           style="padding:6px 12px;border:1px solid #ddd;border-radius:8px;font-size:.82rem;min-width:180px;"
           oninput="renderDatabase()">
         <select id="dbGroupFilter" onchange="renderDatabase()"
@@ -950,9 +950,10 @@
   <div class="section-title">📝 Changelog</div>
 
     <div class="card" style="margin-bottom:14px;">
-  <div class="card-title">v1.14.2 — 17. Juni 2026 (Fix)</div>
+  <div class="card-title">v1.14.3 — 17. Juni 2026 (Fix)</div>
   <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
-    <li>🔧 <strong>Datenfehler Sergio Medina Tomé</strong> — TS2 von "Kylian Mbappé" auf "Lionel Messi" korrigiert (doppelter Torschütze bereinigt)</li>
+    <li>🔧 <strong>Datenfehler Torschütze-Tipp</strong> — Doppelt belegter TS2-Slot eines Spielers korrigiert</li>
+    <li>🌐 <strong>i18n Suchfeld Datenbasis</strong> — Doppeltes id-Attribut entfernt; Placeholder reagiert korrekt auf Sprachwechsel</li>
   </ul>
 </div>
 <div class="card" style="margin-bottom:14px;">
@@ -1923,7 +1924,7 @@ function applyLang() {
   // Database tab labels (updated on lang change)
   const dbCardTitle = document.getElementById('dbCardTitle');
   if (dbCardTitle) dbCardTitle.textContent = T('db_title');
-  const dbSearchInput = document.getElementById('dbSearchInput');
+  const dbSearchInput = document.getElementById('dbSearch');
   if (dbSearchInput) dbSearchInput.placeholder = T('db_search_ph');
   const dbAllGroupsOpt = document.getElementById('dbAllGroupsOpt');
   if (dbAllGroupsOpt) dbAllGroupsOpt.textContent = T('db_all_groups');
@@ -4374,8 +4375,8 @@ function switchTab(tabId) {
 }
 
 // ═══════ WHAT'S NEW ═══════
-const BUILD_VERSION='v1.13.7';
-const BUILD_DATE    = '17.06.2026 15:45';
+const BUILD_VERSION = 'v1.14.3';
+const BUILD_DATE    = '17.06.2026 16:30';
 const WN_VERSION='1.13';
 const WN_I18N={
   en:{
