@@ -951,6 +951,13 @@
   <div class="section-title">📝 Changelog</div>
 
     <div class="card" style="margin-bottom:14px;">
+  <div class="card-title">v1.16.6 — 17. Juni 2026 (Fix)</div>
+  <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
+    <li>🔧 <strong>Sanity Badge Fix</strong> — USER.player statt USER.name für Don-Patricio-Guard</li>
+  </ul>
+</div>
+
+    <div class="card" style="margin-bottom:14px;">
   <div class="card-title">v1.16.5 — 17. Juni 2026 (Fix)</div>
   <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
     <li>🔍 <strong>Sanity Check Badge</strong> — Header-Indikator (🟢/🟡/🔴) exklusiv für Don Patricio; 8 Checks (Daten, ESPN API, TS1=TS2, Champion leer, _rev-Keys, Scorer-Match); Klick öffnet Detail-Modal</li>
@@ -2410,7 +2417,7 @@ async function fetchESPN() {
 
 // ══════════════ SANITY CHECKS (Don Patricio only) ══════════════
 function runSanityChecks() {
-  if (USER?.name !== 'Don Patricio de la Porra') return;
+  if (USER?.player !== 'Don Patricio de la Porra') return;
   const checks = [];
 
   // 1. Build Version
@@ -4614,8 +4621,8 @@ function switchTab(tabId) {
 }
 
 // ═══════ WHAT'S NEW ═══════
-const BUILD_VERSION = 'v1.16.5';
-const BUILD_DATE = '17.06.2026 13:00';
+const BUILD_VERSION = 'v1.16.6';
+const BUILD_DATE = '17.06.2026 13:15';
 (function(){ var _hb = document.getElementById('headerVersionBadge'); if(_hb) _hb.textContent = BUILD_VERSION; })();
 const WN_VERSION = 'v1.16';
 const WN_STORAGE_KEY = window.location.pathname.includes('staging') ? 'wnSeen_staging' : 'wnSeen_live';
