@@ -971,6 +971,12 @@
   <div class="section-title">📝 Changelog</div>
 
     <div class="card" style="margin-bottom:14px;">
+  <div class="card-title">v1.17.3 — 17. Juni 2026 (Fix)</div>
+  <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
+    <li>🔢 <strong>API-Button Zählung (Root Fix)</strong> — <code>parseESPNEvents</code> setzt <code>_rev:true</code> direkt beim Schreiben des Reverse-Keys → ESPN-Ergebnisse werden korrekt als unique Spiele gezählt</li>
+  </ul>
+</div>
+<div class="card" style="margin-bottom:14px;">
   <div class="card-title">v1.17.2 — 17. Juni 2026 (Fix)</div>
   <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
     <li>🔢 <strong>API-Button Zählung</strong> — Hardcoded Ergebnisse markieren jetzt korrekt Reverse-Keys (<code>_rev:true</code>) → API-Button zeigt korrekte Anzahl unique Spiele</li>
@@ -2316,7 +2322,7 @@ function parseESPNEvents(events, target) {
     if (keyRev !== key) {
       if ((target[keyRev]?.status === 'FT' || target[keyRev]?.status === 'LIVE') && st === 'NS') {} 
       else if (target[keyRev]?.status === 'FT' && st === 'LIVE') {}
-      else target[keyRev] = {s1: s2, s2: s1, status: st, clock, statusLabel, date: ev.date || comp.date || null, pos1: pos2, pos2: pos1, rc1: rc2, rc2: rc1, ht1: ht2, ht2: ht1, scoringEvents};
+      else target[keyRev] = {s1: s2, s2: s1, status: st, clock, statusLabel, date: ev.date || comp.date || null, pos1: pos2, pos2: pos1, rc1: rc2, rc2: rc1, ht1: ht2, ht2: ht1, scoringEvents, _rev: true};
     }
   }
 }
@@ -4743,8 +4749,8 @@ function switchTab(tabId) {
 }
 
 // ═══════ WHAT'S NEW ═══════
-const BUILD_VERSION = 'v1.17.2';
-const BUILD_DATE = '17.06.2026 23:00';
+const BUILD_VERSION = 'v1.17.3';
+const BUILD_DATE = '17.06.2026 23:30';
 (function(){ var _hb = document.getElementById('headerVersionBadge'); if(_hb) _hb.textContent = BUILD_VERSION; })();
 const WN_VERSION = 'v1.17';
 const WN_STORAGE_KEY = window.location.pathname.includes('staging') ? 'wnSeen_staging' : 'wnSeen_live';
