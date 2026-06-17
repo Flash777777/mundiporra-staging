@@ -797,10 +797,10 @@
 <div class="page">
   <div class="section-title" id="gamesSectionTitle">⚽ All Matches</div>
   <div class="games-filter">
-    <button class="filter-btn active" onclick="filterGames('all',this)">All</button>
-    <button class="filter-btn" onclick="filterGames('live',this)">🔴 Live</button>
-    <button class="filter-btn" onclick="filterGames('finished',this)">✅ Finished</button>
-    <button class="filter-btn" onclick="filterGames('upcoming',this)">⏳ Upcoming</button>
+    <button class="filter-btn active" onclick="filterGames('all',this)" data-i18n="games_filter_all">All</button>
+    <button class="filter-btn" onclick="filterGames('live',this)" data-i18n="games_filter_live">🔴 Live</button>
+    <button class="filter-btn" onclick="filterGames('finished',this)" data-i18n="games_filter_finished">✅ Finished</button>
+    <button class="filter-btn" onclick="filterGames('upcoming',this)" data-i18n="games_filter_upcoming">⏳ Upcoming</button>
   </div>
   <div class="games-grid" id="gamesGrid"></div>
   <div id="gameDetailPanel" style="margin-top:18px; display:none;">
@@ -837,23 +837,23 @@
 <div class="page">
   <div class="card">
     <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
-      <div class="card-title">🗃️ Datenbasis — Alle Tipps</div>
+      <div class="card-title" id="dbCardTitle">🗃️ Datenbasis — Alle Tipps</div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;">
-        <input id="dbSearch" type="text" placeholder="🔍 Name / Gruppe suchen…"
+        <input id="dbSearch" type="text" placeholder="🔍 Name / Gruppe suchen…" id="dbSearchInput"
           style="padding:6px 12px;border:1px solid #ddd;border-radius:8px;font-size:.82rem;min-width:180px;"
           oninput="renderDatabase()">
         <select id="dbGroupFilter" onchange="renderDatabase()"
           style="padding:6px 12px;border:1px solid #ddd;border-radius:8px;font-size:.82rem;">
-          <option value="">Alle Gruppen</option>
+          <option value="" id="dbAllGroupsOpt">Alle Gruppen</option>
         </select>
         <select id="dbGameFilter" onchange="renderDatabase()"
           style="padding:6px 12px;border:1px solid #ddd;border-radius:8px;font-size:.82rem;">
-          <option value="all">📋 Alle Tipps</option>
-          <option value="champion">🏆 Champion-Tipp</option>
-          <option value="ts1">⚽ Torschütze 1</option>
-          <option value="ts2">⚽ Torschütze 2</option>
-          <option value="tips">📋 Spiel-Tipp (1 Spiel)</option>
-          <option value="all_tips">📊 Alle Spiel-Tipps (Matrix)</option>
+          <option value="all" id="dbOptAll">📋 Alle Tipps</option>
+          <option value="champion" id="dbOptChampion">🏆 Champion-Tipp</option>
+          <option value="ts1" id="dbOptTs1">⚽ Torschütze 1</option>
+          <option value="ts2" id="dbOptTs2">⚽ Torschütze 2</option>
+          <option value="tips" id="dbOptGame">📋 Spiel-Tipp (1 Spiel)</option>
+          <option value="all_tips" id="dbOptMatrix">📊 Alle Spiel-Tipps (Matrix)</option>
         </select>
         <select id="dbGameSelect" onchange="renderDatabase()"
           style="padding:6px 12px;border:1px solid #ddd;border-radius:8px;font-size:.82rem;display:none;">
@@ -933,7 +933,7 @@
     <div style="margin-top:10px;">
       <button id="h2hAddBtn" onclick="h2hAddPlayer()"
         style="background:#e8f0fe;border:none;border-radius:8px;padding:6px 14px;font-size:0.82rem;cursor:pointer;color:var(--blue);font-weight:600;">
-        + Spieler hinzufügen
+        <span data-i18n="h2h_add_player">+ Spieler hinzufügen</span>
       </button>
       <span id="h2hPlayerCount" style="font-size:0.75rem;color:var(--muted);margin-left:10px;"></span>
     </div>
@@ -950,6 +950,15 @@
   <div class="section-title">📝 Changelog</div>
 
     <div class="card" style="margin-bottom:14px;">
+  <div class="card-title">v1.14.0 — 17. Juni 2026 (Fix)</div>
+  <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
+    <li>🌐 <strong>i18n — Datenbasis-Tab</strong> — Alle Labels, Filter-Optionen, Tabellen-Header und Legende vollständig übersetzt (EN/DE/ES)</li>
+    <li>🌐 <strong>i18n — Spiele-Tab Filter-Buttons</strong> — All / Live / Abgeschlossen / Anstehend über <code>data-i18n</code></li>
+    <li>🌐 <strong>i18n — H2H Spieler-Button</strong> — "+ Spieler hinzufügen" reagiert auf Sprachauswahl</li>
+    <li>🌐 <strong>i18n — Übersicht Live/Upcoming-Header</strong> — "Nächste Spiele" und "Live" Header aus Übersetzungssystem</li>
+  </ul>
+</div>
+<div class="card" style="margin-bottom:14px;">
     <div class="card-title">v1.13.9 — 17. Juni 2026 (Fix)</div>
     <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
       <li>🔗 <strong>ESPN API Range-Key Fix</strong> — fehlender Bindestrich in <code>YYYYMMDD-YYYYMMDD</code> führte dazu, dass nur die letzten 3 Spiele geladen wurden; jetzt korrekt</li>
@@ -1125,6 +1134,37 @@ for (const [gname, members] of Object.entries(GROUP_DATA)) {
 // ══════════════ i18n TRANSLATIONS ══════════════
 const TRANSLATIONS = {
   en: {
+    // Database tab
+    db_title: '🗃️ Database — All Tips',
+    db_search_ph: '🔍 Search name / group…',
+    db_all_groups: 'All Groups',
+    db_filter_all: '📋 All Tips',
+    db_filter_champion: '🏆 Champion Pick',
+    db_filter_ts1: '⚽ Top Scorer 1',
+    db_filter_ts2: '⚽ Top Scorer 2',
+    db_filter_game: '📋 Single Game Tips',
+    db_filter_matrix: '📊 All Game Tips (Matrix)',
+    db_participants: 'participants',
+    db_player_col: 'Player',
+    db_champion_col: 'Champion Pick',
+    db_legend_exact: 'Green=Exact',
+    db_legend_trend: 'Yellow=Trend',
+    db_legend_wrong: 'Red=Wrong',
+    db_result_row: '✅ Result',
+    db_no_game: 'No game selected.',
+    db_no_tip: 'no tip',
+    db_tips_label: 'tips',
+    db_result_label: '✅ Result',
+    db_no_result: 'no result yet',
+    games_filter_all: 'All',
+    games_filter_live: '🔴 Live',
+    games_filter_finished: '✅ Finished',
+    games_filter_upcoming: '⏳ Upcoming',
+    h2h_add_player: '+ Add Player',
+    live_header: '🔴 Live',
+    upcoming_header: '⏰ Upcoming Games',
+    last_game_header: '📋 Latest Game',
+    lb_provisional_pts: 'Provisional points from live games',
     // Setup Modal
     setup_title: '⚽ Welcome to Mundiporra 2026',
     setup_subtitle: 'Pick your name & group to personalise your dashboard',
@@ -1319,6 +1359,37 @@ const TRANSLATIONS = {
     tab_my_groups: '👥 My Groups',
   },
   de: {
+    // Database tab
+    db_title: '🗃️ Datenbasis — Alle Tipps',
+    db_search_ph: '🔍 Name / Gruppe suchen…',
+    db_all_groups: 'Alle Gruppen',
+    db_filter_all: '📋 Alle Tipps',
+    db_filter_champion: '🏆 Champion-Tipp',
+    db_filter_ts1: '⚽ Torschütze 1',
+    db_filter_ts2: '⚽ Torschütze 2',
+    db_filter_game: '📋 Spiel-Tipp (1 Spiel)',
+    db_filter_matrix: '📊 Alle Spiel-Tipps (Matrix)',
+    db_participants: 'Teilnehmer',
+    db_player_col: 'Spieler',
+    db_champion_col: 'Weltmeister-Tipp',
+    db_legend_exact: 'Grün=Exakt',
+    db_legend_trend: 'Gelb=Tendenz',
+    db_legend_wrong: 'Rot=Falsch',
+    db_result_row: '✅ Ergebnis',
+    db_no_game: 'Kein Spiel ausgewählt.',
+    db_no_tip: 'ohne Tipp',
+    db_tips_label: 'Tipps',
+    db_result_label: '✅ Ergebnis',
+    db_no_result: 'noch kein Ergebnis',
+    games_filter_all: 'Alle',
+    games_filter_live: '🔴 Live',
+    games_filter_finished: '✅ Abgeschlossen',
+    games_filter_upcoming: '⏳ Anstehend',
+    h2h_add_player: '+ Spieler hinzufügen',
+    live_header: '🔴 Live',
+    upcoming_header: '⏰ Nächste Spiele',
+    last_game_header: '📋 Letztes Spiel',
+    lb_provisional_pts: 'Vorläufige Punkte aus laufenden Spielen',
     setup_title: '⚽ Willkommen bei Mundiporra 2026',
     setup_subtitle: 'Wähle deinen Namen & deine Gruppe für ein personalisiertes Dashboard',
     setup_player: '👤 Dein Spielername',
@@ -1504,6 +1575,37 @@ const TRANSLATIONS = {
     whatsnew_title: '✨ Neuigkeiten', whatsnew_got_it: 'Verstanden ✓', whatsnew_full_log: '📝 Changelog',
   },
   es: {
+    // Database tab
+    db_title: '🗃️ Base de Datos — Todos los Pronósticos',
+    db_search_ph: '🔍 Buscar nombre / grupo…',
+    db_all_groups: 'Todos los Grupos',
+    db_filter_all: '📋 Todos los Pronósticos',
+    db_filter_champion: '🏆 Campeón',
+    db_filter_ts1: '⚽ Goleador 1',
+    db_filter_ts2: '⚽ Goleador 2',
+    db_filter_game: '📋 Pronóstico de Partido',
+    db_filter_matrix: '📊 Todos los Pronósticos (Matriz)',
+    db_participants: 'participantes',
+    db_player_col: 'Jugador',
+    db_champion_col: 'Campeón Elegido',
+    db_legend_exact: 'Verde=Exacto',
+    db_legend_trend: 'Amarillo=Tendencia',
+    db_legend_wrong: 'Rojo=Fallo',
+    db_result_row: '✅ Resultado',
+    db_no_game: 'Ningún partido seleccionado.',
+    db_no_tip: 'sin pronóstico',
+    db_tips_label: 'pronósticos',
+    db_result_label: '✅ Resultado',
+    db_no_result: 'sin resultado aún',
+    games_filter_all: 'Todos',
+    games_filter_live: '🔴 En Vivo',
+    games_filter_finished: '✅ Finalizados',
+    games_filter_upcoming: '⏳ Próximos',
+    h2h_add_player: '+ Añadir Jugador',
+    live_header: '🔴 En Vivo',
+    upcoming_header: '⏰ Próximos Partidos',
+    last_game_header: '📋 Último Partido',
+    lb_provisional_pts: 'Puntos provisionales de partidos en vivo',
     setup_title: '⚽ Bienvenido a Mundiporra 2026',
     setup_subtitle: 'Elige tu nombre y grupo para personalizar tu panel',
     setup_player: '👤 Tu Nombre',
@@ -1812,6 +1914,28 @@ function applyLang() {
     const g = o.dataset.group;
     if (g && GROUP_DATA[g]) o.textContent = `${g} (${GROUP_DATA[g].length} ${T('members_dropdown')})`;
   });
+  // Database tab labels (updated on lang change)
+  const dbCardTitle = document.getElementById('dbCardTitle');
+  if (dbCardTitle) dbCardTitle.textContent = T('db_title');
+  const dbSearchInput = document.getElementById('dbSearchInput');
+  if (dbSearchInput) dbSearchInput.placeholder = T('db_search_ph');
+  const dbAllGroupsOpt = document.getElementById('dbAllGroupsOpt');
+  if (dbAllGroupsOpt) dbAllGroupsOpt.textContent = T('db_all_groups');
+  const dbOptAll = document.getElementById('dbOptAll');
+  if (dbOptAll) dbOptAll.textContent = T('db_filter_all');
+  const dbOptChampion = document.getElementById('dbOptChampion');
+  if (dbOptChampion) dbOptChampion.textContent = T('db_filter_champion');
+  const dbOptTs1 = document.getElementById('dbOptTs1');
+  if (dbOptTs1) dbOptTs1.textContent = T('db_filter_ts1');
+  const dbOptTs2 = document.getElementById('dbOptTs2');
+  if (dbOptTs2) dbOptTs2.textContent = T('db_filter_ts2');
+  const dbOptGame = document.getElementById('dbOptGame');
+  if (dbOptGame) dbOptGame.textContent = T('db_filter_game');
+  const dbOptMatrix = document.getElementById('dbOptMatrix');
+  if (dbOptMatrix) dbOptMatrix.textContent = T('db_filter_matrix');
+  const h2hAddBtnSpan = document.querySelector('#h2hAddBtn span[data-i18n]');
+  if (h2hAddBtnSpan) h2hAddBtnSpan.textContent = T('h2h_add_player');
+  if (document.getElementById('tab-database')?.classList.contains('active')) renderDatabase();
 }
 
 
@@ -3584,11 +3708,11 @@ function renderDatabase() {
         <td style="padding:5px 10px;font-size:.78rem;color:var(--muted);">${m.ts2||'—'}</td>
       </tr>`;
     }).join('');
-    container.innerHTML = `<div style="font-size:.75rem;color:var(--muted);margin-bottom:8px;">${names.length} Teilnehmer</div>
+    container.innerHTML = `<div style="font-size:.75rem;color:var(--muted);margin-bottom:8px;">${names.length} ${T('db_participants')}</div>
       <table style="width:100%;border-collapse:collapse;font-size:.84rem;">
       <thead><tr style="background:var(--bg2);position:sticky;top:0;">
-        <th style="padding:8px 10px;text-align:left;">Spieler</th>
-        <th style="padding:8px 10px;text-align:left;">🏆 Champion</th>
+        <th style="padding:8px 10px;text-align:left;">${T('db_player_col')}</th>
+        <th style="padding:8px 10px;text-align:left;">🏆 ${T('champ_label')}</th>
         <th style="padding:8px 10px;text-align:left;">⚽ TS1</th>
         <th style="padding:8px 10px;text-align:left;">⚽ TS2</th>
       </tr></thead>
@@ -3615,12 +3739,12 @@ function renderDatabase() {
       return `<tr><td style="padding:6px 10px;font-weight:700;">🏆 ${ch}</td><td style="padding:6px 10px;text-align:center;">${cnt}</td><td style="padding:6px 10px;font-size:.78rem;color:var(--muted);">${participantList}</td></tr>`;
     }).join('');
     container.innerHTML = `<table style="width:100%;border-collapse:collapse;font-size:.84rem;">
-      <thead><tr style="background:var(--bg2);"><th style="padding:8px 10px;text-align:left;">Weltmeister-Tipp</th><th style="padding:8px 10px;text-align:center;">#</th><th style="padding:8px 10px;text-align:left;">Teilnehmer</th></tr></thead>
+      <thead><tr style="background:var(--bg2);"><th style="padding:8px 10px;text-align:left;">${T('db_champion_col')}</th><th style="padding:8px 10px;text-align:center;">#</th><th style="padding:8px 10px;text-align:left;">${T('db_participants')}</th></tr></thead>
       <tbody>${tableRows}</tbody></table>`;
 
   } else if (mode === 'ts1' || mode === 'ts2') {
     const field = mode;
-    const label = mode === 'ts1' ? 'Torschütze 1' : 'Torschütze 2';
+    const label = mode === 'ts1' ? T('db_filter_ts1') : T('db_filter_ts2');
     const counts = {};
     const nameLists = {};
     names.forEach(n => {
@@ -3643,7 +3767,7 @@ function renderDatabase() {
       return `<tr><td style="padding:6px 10px;font-weight:700;">⚽ ${player}${goalsStr}</td><td style="padding:6px 10px;text-align:center;">${cnt}</td><td style="padding:6px 10px;font-size:.78rem;color:var(--muted);">${participantList}</td></tr>`;
     }).join('');
     container.innerHTML = `<table style="width:100%;border-collapse:collapse;font-size:.84rem;">
-      <thead><tr style="background:var(--bg2);"><th style="padding:8px 10px;text-align:left;">${label}</th><th style="padding:8px 10px;text-align:center;">#</th><th style="padding:8px 10px;text-align:left;">Teilnehmer</th></tr></thead>
+      <thead><tr style="background:var(--bg2);"><th style="padding:8px 10px;text-align:left;">${label}</th><th style="padding:8px 10px;text-align:center;">#</th><th style="padding:8px 10px;text-align:left;">${T('db_participants')}</th></tr></thead>
       <tbody>${tableRows}</tbody></table>`;
 
   } else if (mode === 'all_tips') {
@@ -3690,22 +3814,22 @@ function renderDatabase() {
       return `<td style="padding:3px 4px;text-align:center;font-size:.68rem;font-weight:700;background:#e8f5e9;">${a.s1}:${a.s2}</td>`;
     }).join('');
 
-    container.innerHTML = `<div style="font-size:.75rem;color:var(--muted);margin-bottom:8px;">${names.length} Spieler · ${games.length} Spiele · <span style="background:#c8e6c9;padding:1px 5px;border-radius:3px;">Grün=Exakt</span> <span style="background:#fff9c4;padding:1px 5px;border-radius:3px;">Gelb=Tendenz</span> <span style="background:#ffcdd2;padding:1px 5px;border-radius:3px;">Rot=Falsch</span></div>
+    container.innerHTML = `<div style="font-size:.75rem;color:var(--muted);margin-bottom:8px;">${names.length} ${T('db_player_col')} · ${games.length} ${T('tab_games')} · <span style="background:#c8e6c9;padding:1px 5px;border-radius:3px;">${T('db_legend_exact')}</span> <span style="background:#fff9c4;padding:1px 5px;border-radius:3px;">${T('db_legend_trend')}</span> <span style="background:#ffcdd2;padding:1px 5px;border-radius:3px;">${T('db_legend_wrong')}</span></div>
       <div style="overflow-x:auto;max-height:70vh;overflow-y:auto;border:1px solid #eee;border-radius:8px;">
       <table style="border-collapse:collapse;font-size:.75rem;">
       <thead style="position:sticky;top:0;z-index:2;background:var(--bg2);">
-        <tr><th style="padding:4px 8px;text-align:left;position:sticky;left:0;background:var(--bg2);z-index:3;white-space:nowrap;min-width:140px;">Spieler</th>${headerCells}</tr>
-        <tr style="background:#e8f5e9;"><td style="padding:3px 8px;font-size:.68rem;font-weight:700;position:sticky;left:0;background:#e8f5e9;z-index:3;">✅ Ergebnis</td>${resultRow}</tr>
+        <tr><th style="padding:4px 8px;text-align:left;position:sticky;left:0;background:var(--bg2);z-index:3;white-space:nowrap;min-width:140px;">${T('db_player_col')}</th>${headerCells}</tr>
+        <tr style="background:#e8f5e9;"><td style="padding:3px 8px;font-size:.68rem;font-weight:700;position:sticky;left:0;background:#e8f5e9;z-index:3;">${T('db_result_row')}</td>${resultRow}</tr>
       </thead>
       <tbody>${rows}</tbody></table></div>`;
 
   } else if (mode === 'tips') {
     const gameId = parseInt(document.getElementById('dbGameSelect')?.value) || ALL_GAMES[0]?.id;
     const game = ALL_GAMES.find(g=>g.id===gameId);
-    if (!game) { container.innerHTML='<div>Kein Spiel ausgewählt.</div>'; return; }
+    if (!game) { container.innerHTML='<div>' + T('db_no_game') + '</div>'; return; }
     const allPreds = {...AICOMP_PREDICTIONS, ...ALL_PREDICTIONS};
     const actual = getActual(game);
-    const scoreLabel = actual?.status === 'FT' ? `✅ Ergebnis: ${actual.s1}:${actual.s2}` : '';
+    const scoreLabel = actual?.status === 'FT' ? `${T('db_result_label')}: ${actual.s1}:${actual.s2}` : '';
 
     // Group by tip
     const tipGroups = {};
@@ -3731,10 +3855,10 @@ function renderDatabase() {
       return `<tr style="${rowStyle}"><td style="padding:6px 10px;font-weight:700;font-size:.9rem;">${score}${exactBadge}</td><td style="padding:6px 10px;text-align:center;">${pickers.length}</td><td style="padding:6px 10px;font-size:.78rem;color:var(--muted);">${pickerHtml}</td></tr>`;
     }).join('');
     container.innerHTML = `<div style="margin-bottom:8px;font-size:.82rem;color:var(--muted);">
-      <strong>${game.team1} vs ${game.team2}</strong> — ${withTip} Tipps${scoreLabel?' · '+scoreLabel:''}${noTip?' · '+noTip+' ohne Tipp':''}
+      <strong>${game.team1} vs ${game.team2}</strong> — ${withTip} ${T('db_tips_label')}${scoreLabel?' · '+scoreLabel:''}${noTip?' · '+noTip+' '+T('db_no_tip'):''}
     </div>
     <table style="width:100%;border-collapse:collapse;font-size:.84rem;">
-      <thead><tr style="background:var(--bg2);"><th style="padding:8px 10px;text-align:left;">Tipp</th><th style="padding:8px 10px;text-align:center;">#</th><th style="padding:8px 10px;text-align:left;">Teilnehmer</th></tr></thead>
+      <thead><tr style="background:var(--bg2);"><th style="padding:8px 10px;text-align:left;">${T('tip_col')}</th><th style="padding:8px 10px;text-align:center;">#</th><th style="padding:8px 10px;text-align:left;">${T('db_participants')}</th></tr></thead>
       <tbody>${tableRows}</tbody></table>`;
   }
 }
@@ -4245,7 +4369,7 @@ function switchTab(tabId) {
 
 // ═══════ WHAT'S NEW ═══════
 const BUILD_VERSION='v1.13.7';
-const BUILD_DATE='14.06.2026 18:00';
+const BUILD_DATE    = '17.06.2026 14:00';
 const WN_VERSION='1.13';
 const WN_I18N={
   en:{
