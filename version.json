@@ -2,5 +2,9 @@
   "version": "v1.18.4",
   "notify": true,
   "force": true,
-  "message": "Live-Tore wurden nicht richtig im Ranking berücksichtigt. Bitte neu laden."
+  "message": {
+    "de": "Live-Tore wurden nicht richtig im Ranking berücksichtigt. Bitte neu laden.",
+    "en": "Live goals were not correctly reflected in the rankings. Please reload.",
+    "es": "Los goles en vivo no se reflejaron correctamente en la clasificación. Por favor, recarga."
+  }
 }
