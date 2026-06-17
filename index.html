@@ -950,6 +950,12 @@
   <div class="section-title">📝 Changelog</div>
 
     <div class="card" style="margin-bottom:14px;">
+  <div class="card-title">v1.16.2 — 17. Juni 2026 (Fix)</div>
+  <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
+    <li>🔧 <strong>What's New localStorage-Key</strong> — Staging und Live nutzen jetzt getrennte Keys (<code>wnSeen_staging</code> vs. <code>wnSeen_live</code>), damit das Modal beim Live-Release immer erscheint</li>
+  </ul>
+</div>
+<div class="card" style="margin-bottom:14px;">
   <div class="card-title">v1.16.1 — 17. Juni 2026 (Fix)</div>
   <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
     <li>📊 <strong>Simulator Punkteverteilung</strong> — Box-Style vereinheitlicht: gleiche Farben, farbige Border, %-Anzeige wie Live-Karte</li>
@@ -4456,10 +4462,11 @@ function switchTab(tabId) {
 }
 
 // ═══════ WHAT'S NEW ═══════
-const BUILD_VERSION = 'v1.16.1';
-const BUILD_DATE    = '17.06.2026 22:00';
+const BUILD_VERSION = 'v1.16.2';
+const BUILD_DATE    = '17.06.2026 22:30';
 (function(){ var _hb = document.getElementById('headerVersionBadge'); if(_hb) _hb.textContent = BUILD_VERSION; })();
 const WN_VERSION = 'v1.16';
+const WN_STORAGE_KEY = window.location.pathname.includes('staging') ? 'wnSeen_staging' : 'wnSeen_live';
 const WN_I18N={
   en:{
     // v1.16
@@ -4543,10 +4550,10 @@ const WN_ITEMS = [
 function openWhatsNew(){
   document.getElementById('whatsNewOverlay').classList.add('active');
   document.getElementById('wnDot').classList.remove('visible');
-  localStorage.setItem('wnSeen', WN_VERSION);
+  localStorage.setItem(WN_STORAGE_KEY, WN_VERSION);
   _applyWnLang();
 }
-function closeWhatsNew(){document.getElementById('whatsNewOverlay').classList.remove('active');localStorage.setItem('wnSeen',WN_VERSION);document.getElementById('wnDot').classList.remove('visible');}
+function closeWhatsNew(){document.getElementById('whatsNewOverlay').classList.remove('active');localStorage.setItem(WN_STORAGE_KEY,WN_VERSION);document.getElementById('wnDot').classList.remove('visible');}
 function _applyWnLang(){
   const d = WN_I18N[USER.lang||'en'] || WN_I18N.en;
   const titleEl   = document.getElementById('wnTitle');
@@ -4585,7 +4592,7 @@ function _applyWnLang(){
   }
 }
 function checkWhatsNew(){
-  if(localStorage.getItem('wnSeen')!==WN_VERSION){
+  if(localStorage.getItem(WN_STORAGE_KEY)!==WN_VERSION){
     document.getElementById('wnDot').classList.add('visible');
     setTimeout(()=>{if(!document.getElementById('whatsNewOverlay').classList.contains('active'))openWhatsNew();},1200);
   }
