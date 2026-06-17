@@ -1807,8 +1807,6 @@ function T(key) {
 }
 
 function applyLang() {
-  const _hb = document.getElementById('headerVersionBadge');
-  if (_hb) _hb.textContent = BUILD_VERSION;
   // Update all elements with data-i18n attribute
   document.querySelectorAll('[data-i18n]').forEach(el => {
     const key = el.getAttribute('data-i18n');
@@ -4381,6 +4379,7 @@ function switchTab(tabId) {
 // ═══════ WHAT'S NEW ═══════
 const BUILD_VERSION = 'v1.14.4';
 const BUILD_DATE    = '17.06.2026 17:15';
+(function(){ var _hb = document.getElementById('headerVersionBadge'); if(_hb) _hb.textContent = BUILD_VERSION; })();
 const WN_VERSION='1.13';
 const WN_I18N={
   en:{
