@@ -949,6 +949,28 @@
 <div class="page">
   <div class="section-title">📝 Changelog</div>
 
+    <div class="card" style="margin-bottom:14px;">
+    <div class="card-title">v1.13.9 — 17. Juni 2026 (Fix)</div>
+    <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
+      <li>🔗 <strong>ESPN API Range-Key Fix</strong> — fehlender Bindestrich in <code>YYYYMMDD-YYYYMMDD</code> führte dazu, dass nur die letzten 3 Spiele geladen wurden; jetzt korrekt</li>
+    </ul>
+  </div>
+
+  <div class="card" style="margin-bottom:14px;">
+    <div class="card-title">v1.13.8 — 16. Juni 2026 (Fix)</div>
+    <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
+      <li>⚽ <strong>Torschützen-Doppelzählung behoben</strong> — <code>aggregateGoalScorers()</code> verarbeitete <code>FRA-MAR</code> und <code>MAR-FRA</code> doppelt; Fix via <code>Set</code> für kanonische Spielschlüssel</li>
+    </ul>
+  </div>
+
+  <div class="card" style="margin-bottom:14px;">
+    <div class="card-title">v1.13.7 — 15. Juni 2026 (Fix)</div>
+    <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
+      <li>🐛 <strong>Illegal return statement</strong> — Syntax-Fehler in <code>buildLeaderboard()</code> durch Inline-Kommentar in for-Schleife behoben</li>
+      <li>🐛 <strong>saveSetup nicht definiert</strong> — fehlende Funktionsreferenz im Setup-Modal behoben</li>
+    </ul>
+  </div>
+
   <div class="card" style="margin-bottom:14px;">
     <div class="card-title">v1.13 — 14. Juni 2026</div>
     <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
