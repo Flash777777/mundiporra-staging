@@ -527,7 +527,25 @@
   #simOverlay{display:none;position:fixed;inset:0;z-index:2000;background:#f0f4f8;color:#1a2340;overflow:auto;flex-direction:column;}
   #simOverlay.active{display:flex;}
   .sim-header{display:flex;align-items:center;gap:12px;padding:12px 16px;background:#1a2340;color:white;border-bottom:2px solid #2c3e6b;flex-shrink:0;}
-  .sim-header h2{font-size:1rem;font-weight:800;margin:0;flex:1;color:white;}
+  .sim-header h2{font-size:1rem;font-weight:800;margin:0;color:white;}
+  .sim-header-left{display:flex;flex-direction:column;align-items:center;gap:6px;flex:1;min-width:0;}
+  .sim-rank-pills{display:flex;align-items:center;gap:6px;flex-wrap:wrap;justify-content:center;}
+  .sim-pill{display:flex;align-items:center;gap:5px;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);border-radius:20px;padding:3px 10px 3px 8px;white-space:nowrap;}
+  .sim-pill.active-pill{background:rgba(248,197,109,0.1);border-color:rgba(248,197,109,0.35);}
+  .sim-pill-label{font-size:0.55rem;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:.07em;font-weight:600;}
+  .sim-pill-val{font-size:0.82rem;font-weight:800;}
+  .sim-rank-from{font-size:0.78rem;font-weight:700;color:rgba(255,255,255,0.6);}
+  .sim-rank-sep{font-size:0.7rem;color:rgba(255,255,255,0.3);}
+  .sim-rank-to{font-size:0.88rem;font-weight:800;color:#fff;}
+  .sim-rank-delta{font-size:0.6rem;font-weight:800;padding:1px 5px;border-radius:8px;margin-left:1px;}
+  .sim-rank-delta.up{background:rgba(46,204,113,0.25);color:#2ecc71;border:1px solid rgba(46,204,113,0.4);}
+  .sim-rank-delta.down{background:rgba(231,76,60,0.25);color:#ff8a7a;border:1px solid rgba(231,76,60,0.4);}
+  .sim-rank-delta.same{background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.4);border:1px solid rgba(255,255,255,0.15);}
+  .sim-pts-pos{color:#2ecc71;}.sim-pts-neg{color:#ff8a7a;}.sim-pts-zero{color:rgba(255,255,255,0.4);}
+  .sim-gap-val{color:#f8c56d;}
+  .sim-active-dot{width:5px;height:5px;background:#f8c56d;border-radius:50%;animation:simDot 1.2s infinite;}
+  @keyframes simDot{0%,100%{opacity:1}50%{opacity:.3}}
+  .sim-active-val{color:#f8c56d;}
   .sim-close-btn{background:rgba(255,255,255,0.2);border:none;color:white;padding:6px 12px;border-radius:8px;cursor:pointer;font-size:0.82rem;}
   .sim-body{display:flex;flex:1;min-height:0;}
   .sim-col-side{flex:1;min-width:0;padding:12px;overflow-y:auto;border-right:1px solid #d0d8e8;background:#f7f9fc;}
@@ -972,6 +990,12 @@
   <div class="section-title">📝 Changelog</div>
 
     <div class="card" style="margin-bottom:14px;">
+  <div class="card-title">v1.17.16 — 17. Juni 2026 (Feature)</div>
+  <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
+    <li>📊 <strong>Simulator Rang-Anzeige</strong> — Header zeigt Rang aktuell → simuliert (↑/↓), Punkte-Delta, Abstand zum nächsten Rang und Anzahl aktiver Simulationen (DE/EN/ES)</li>
+  </ul>
+</div>
+<div class="card" style="margin-bottom:14px;">
   <div class="card-title">v1.17.15 — 17. Juni 2026 (Fix)</div>
   <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
     <li>🔀 <strong>Live-Card Reihenfolge</strong> — Torschützen → Ballbesitz → Punkteverteilung → Venue</li>
@@ -1479,6 +1503,7 @@ const TRANSLATIONS = {
     sim_title: '⚡ Score Simulator', sim_btn: '⚡ Simulator', sim_crowd_pick: 'Crowd Pick',
     sim_reset: 'Reset', sim_winners: '😊 Winners', sim_losers: '😬 Losers',
     sim_no_live: 'No live or upcoming games', pts_dist_label: 'Point distribution at', sim_pts_gain: 'pts gain',
+    sim_rank_lbl: 'Rank', sim_pts_lbl: 'Points', sim_active_lbl: 'Simulated', sim_active_unit: 'games', sim_active_unit1: 'game',
     sim_close: '✕ Close', rank_abbr: '#',
     whatsnew_title: "✨ What's New", whatsnew_got_it: 'Got it ✓', whatsnew_full_log: '📝 Full Changelog',
     live_multi: '🔴 Live (×',
@@ -1786,6 +1811,7 @@ const TRANSLATIONS = {
     sim_title: '⚡ Score-Simulator', sim_btn: '⚡ Simulator', sim_crowd_pick: 'Mehrheitstipp',
     sim_reset: 'Reset', sim_winners: '😊 Gewinner', sim_losers: '😬 Verlierer',
     sim_no_live: 'Keine Live- oder kommenden Spiele', pts_dist_label: 'Punkteverteilung bei', sim_pts_gain: 'Pkt Gewinn',
+    sim_rank_lbl: 'Rang', sim_pts_lbl: 'Punkte', sim_active_lbl: 'Simuliert', sim_active_unit: 'Spiele', sim_active_unit1: 'Spiel',
     sim_close: '✕ Schließen', rank_abbr: '#',
     whatsnew_title: '✨ Neuigkeiten', whatsnew_got_it: 'Verstanden ✓', whatsnew_full_log: '📝 Changelog',
   },
@@ -1945,6 +1971,7 @@ const TRANSLATIONS = {
     sim_title: '⚡ Simulador', sim_btn: '⚡ Simulador', sim_crowd_pick: 'Pronóstico Mayoría',
     sim_reset: 'Reset', sim_winners: '😊 Ganadores', sim_losers: '😬 Perdedores',
     sim_no_live: 'Sin partidos en vivo ni próximos', pts_dist_label: 'Distribución de puntos en', sim_pts_gain: 'pts ganados',
+    sim_rank_lbl: 'Puesto', sim_pts_lbl: 'Puntos', sim_active_lbl: 'Simulado', sim_active_unit: 'partidos', sim_active_unit1: 'partido',
     sim_close: '✕ Cerrar', rank_abbr: '#',
     whatsnew_title: '✨ Novedades', whatsnew_got_it: 'Entendido ✓', whatsnew_full_log: '📝 Registro',
     won_word: 'ganó',
@@ -4869,7 +4896,7 @@ function switchTab(tabId) {
 }
 
 // ═══════ WHAT'S NEW ═══════
-const BUILD_VERSION = 'v1.17.15';
+const BUILD_VERSION = 'v1.17.16';
 const BUILD_DATE = '17.06.2026 22:45';
 (function(){ var _hb = document.getElementById('headerVersionBadge'); if(_hb) _hb.textContent = BUILD_VERSION; })();
 const WN_VERSION = 'v1.17';
@@ -5283,6 +5310,69 @@ function _renderSimulator(){
   const losers=deltas.filter(d=>d.rankDelta<0).sort((a,b)=>a.rankDelta-b.rankDelta); // most negative first = biggest drop
   document.getElementById('simWinnersList').innerHTML=winners.length?winners.map(mkRow).join(''):`<div style="opacity:.4;font-size:.75rem;padding:8px;">—</div>`;
   document.getElementById('simLosersList').innerHTML=losers.length?losers.map(mkRow).join(''):`<div style="opacity:.4;font-size:.75rem;padding:8px;">—</div>`;
+
+  // ── Rank-Pills im Header ──────────────────────────────────────────────
+  const _me = allDeltas.find(d => d.name === USER.player);
+  const _pillEl = document.getElementById('simRankPills');
+  if (_me && _pillEl && activeGames.length > 0) {
+    const _br = _me.baseRank || 999;
+    const _sr = _me.rank || _br;
+    const _rd = _br - _sr; // positiv = gestiegen
+    const _delta = _me.delta || 0;
+    const _activeCount = activeGames.length;
+
+    // Abstand zum nächsten Rang über dem sim-Rang
+    const _aboveRank = _sr - 1;
+    const _abovePlayer = _aboveRank > 0 ? simTotals.find(p => p.rank === _aboveRank) : null;
+    const _mySimTotal = simTotals.find(p => p.name === USER.player);
+    const _aboveTotal = _abovePlayer ? simTotals.find(p => p.name === _abovePlayer.name) : null;
+    const _gapPts = _aboveTotal && _mySimTotal ? (_aboveTotal.total - _mySimTotal.total) : null;
+
+    // Rang delta CSS class
+    const _dc = _rd > 0 ? 'up' : _rd < 0 ? 'down' : 'same';
+    const _darrow = _rd > 0 ? `↑ ${_rd}` : _rd < 0 ? `↓ ${Math.abs(_rd)}` : '= 0';
+    const _rankToColor = _rd === 0 ? 'rgba(255,255,255,0.45)' : '#fff';
+
+    // Pts class
+    const _ptsClass = _delta > 0 ? 'sim-pts-pos' : _delta < 0 ? 'sim-pts-neg' : 'sim-pts-zero';
+    const _ptsStr = _delta > 0 ? `+${_delta}` : _delta < 0 ? `${_delta}` : '±0';
+
+    // Active unit
+    const _unit = _activeCount === 1 ? T('sim_active_unit1') : T('sim_active_unit');
+
+    let pillsHtml = `
+      <div class="sim-pill">
+        <span class="sim-pill-label">${T('sim_rank_lbl')}</span>
+        <span class="sim-rank-from">#${_br}</span>
+        <span class="sim-rank-sep">→</span>
+        <span class="sim-rank-to" style="color:${_rankToColor}">#${_sr}</span>
+        <span class="sim-rank-delta ${_dc}">${_darrow}</span>
+      </div>
+      <div class="sim-pill">
+        <span class="sim-pill-label">${T('sim_pts_lbl')}</span>
+        <span class="sim-pill-val ${_ptsClass}">${_ptsStr} Pts</span>
+      </div>`;
+
+    if (_gapPts !== null && _aboveRank > 0) {
+      pillsHtml += `
+      <div class="sim-pill">
+        <span class="sim-pill-label">${T('rank_abbr')}${_aboveRank}</span>
+        <span class="sim-pill-val sim-gap-val">−${_gapPts} Pts</span>
+      </div>`;
+    }
+
+    pillsHtml += `
+      <div class="sim-pill active-pill">
+        <span class="sim-active-dot"></span>
+        <span class="sim-pill-label">${T('sim_active_lbl')}</span>
+        <span class="sim-pill-val sim-active-val">${_activeCount} ${_unit}</span>
+      </div>`;
+
+    _pillEl.innerHTML = pillsHtml;
+    _pillEl.style.display = 'flex';
+  } else if (_pillEl) {
+    _pillEl.style.display = 'none';
+  }
 }
 let _lastLandscape=window.innerWidth>window.innerHeight;
 function _chkLandscape(){
@@ -5314,9 +5404,9 @@ window.addEventListener('resize',_chkLandscape);
 <!-- SIMULATOR -->
 <div id="simOverlay">
   <div class="sim-header">
-    <div style="display:flex;flex-direction:column;gap:2px;">
+    <div class="sim-header-left">
       <h2 id="simTitle" style="margin:0;">⚡ Simulator</h2>
-      <div id="simSubtitle" style="font-size:0.65rem;opacity:0.5;font-weight:400;">Spiel aktivieren → Score setzen → Gewinner/Verlierer erscheinen</div>
+      <div id="simRankPills" class="sim-rank-pills" style="display:none;"></div>
     </div>
     <button class="sim-close-btn" id="simCloseBtn" onclick="closeSimulator()">✕ Close</button>
   </div>
