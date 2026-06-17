@@ -950,6 +950,17 @@
   <div class="section-title">📝 Changelog</div>
 
     <div class="card" style="margin-bottom:14px;">
+  <div class="card-title">v1.16.0 — 17. Juni 2026 (Release)</div>
+  <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
+    <li>📊 <strong>Punkteverteilung</strong> — Live- &amp; Simulator-Karten zeigen farbige Mini-Boxen mit 3/2/1/0 Punkte-Verteilung, farbigem Füllbalken und Punkt-Label</li>
+    <li>🔧 <strong>Header-Versions-Badge</strong> — Doppelte ID entfernt, Badge korrekt angezeigt (v1.14.5)</li>
+    <li>🔧 <strong>Live-Karte Gruppenfilter</strong> — Nur noch Mitglieder der eigenen Gruppe (v1.15.1)</li>
+    <li>🔧 <strong>Scoring-Guard</strong> — <code>calcPointDist</code> nutzt <code>_calcScore()</code> statt <code>scoreGame()</code> (v1.15.2)</li>
+    <li>🌍 <strong>Übersetzungen</strong> — Diverse i18n-Strings ergänzt</li>
+    <li>✨ <strong>What's New Modal</strong> — Dreisprachig (DE/EN/ES) mit allen v1.16-Highlights</li>
+  </ul>
+</div>
+<div class="card" style="margin-bottom:14px;">
   <div class="card-title">v1.15.2 — 17. Juni 2026 (Fix)</div>
   <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
     <li>📊 <strong>Punkteverteilung Fix</strong> — <code>calcPointDist</code> nutzte <code>scoreGame()</code> (nur für FT-Spiele), jetzt <code>_calcScore()</code> direkt → korrekte Verteilung auch im Simulator</li>
@@ -3296,7 +3307,7 @@ function renderGameTipBlock(game, actual, contextPlayers, isLive, lb) {
   if (actual && (actual.status === 'LIVE' || actual.status === 'FT') && actual.s1 != null && actual.s2 != null) {
     const _dist = calcPointDist(game.id, actual.s1, actual.s2);
     const _sl = actual.s1 + ':' + actual.s2;
-    _ptDistHtml = `<hr style="border:none;border-top:1px solid #f0f0f0;margin:10px 0 8px;"><div style="font-size:.6rem;color:#ccc;font-weight:700;text-transform:uppercase;letter-spacing:.07em;text-align:center;margin-bottom:6px;">${T('pts_dist_label')} ${_sl}</div><div style="display:flex;gap:5px;">${[{l:'3 Pkt',n:_dist.p3,p:_dist.pct3,c:'#00c853'},{l:'2 Pkt',n:_dist.p2,p:_dist.pct2,c:'#ffab00'},{l:'1 Pkt',n:_dist.p1,p:_dist.pct1,c:'#2979ff'},{l:'0 Pkt',n:_dist.p0,p:_dist.pct0,c:'#e74c3c'}].map(({l,n,p,c})=>`<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;background:#f7f8fa;border-radius:8px;padding:6px 4px 5px;position:relative;overflow:hidden;"><div style="position:absolute;bottom:0;left:0;right:0;border-radius:0 0 8px 8px;background:${c};opacity:.15;height:${p*.6}%;"></div><span style="font-size:.58rem;font-weight:700;color:#bbb;text-transform:uppercase;letter-spacing:.04em;position:relative;">${l}</span><span style="font-size:.95rem;font-weight:900;line-height:1;color:${c};position:relative;">${n}</span><span style="font-size:.57rem;color:#bbb;position:relative;">${p}%</span></div>`).join('')}</div>`;
+    _ptDistHtml = `<hr style="border:none;border-top:1px solid #f0f0f0;margin:10px 0 8px;"><div style="font-size:.6rem;color:#ccc;font-weight:700;text-transform:uppercase;letter-spacing:.07em;text-align:center;margin-bottom:6px;">${T('pts_dist_label')} ${_sl}</div><div style="display:flex;gap:5px;">${[{l:'3 Pkt',n:_dist.p3,p:_dist.pct3,c:'#00c853'},{l:'2 Pkt',n:_dist.p2,p:_dist.pct2,c:'#ff8c00'},{l:'1 Pkt',n:_dist.p1,p:_dist.pct1,c:'#2979ff'},{l:'0 Pkt',n:_dist.p0,p:_dist.pct0,c:'#e74c3c'}].map(({l,n,p,c})=>`<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;border:1.5px solid ${c};border-radius:8px;padding:6px 4px 5px;position:relative;overflow:hidden;"><div style="position:absolute;bottom:0;left:0;right:0;background:${c};opacity:.18;height:${Math.min(p*.8,80)}%;border-radius:0 0 6px 6px;"></div><span style="font-size:.6rem;font-weight:800;color:${c};text-transform:uppercase;letter-spacing:.03em;position:relative;">${l}</span><span style="font-size:.95rem;font-weight:900;line-height:1;color:${c};position:relative;">${n}</span><span style="font-size:.57rem;color:var(--muted);position:relative;">${p}%</span></div>`).join('')}</div>`;
   }
   return `<div style="margin-bottom:${isLive?'0':'12px'};">
     <div style="font-size:0.85rem; font-weight:700; margin-bottom:6px; ${isLive?'color:var(--red);':''}">
@@ -4439,12 +4450,15 @@ function switchTab(tabId) {
 }
 
 // ═══════ WHAT'S NEW ═══════
-const BUILD_VERSION = 'v1.15.2';
-const BUILD_DATE    = '17.06.2026 20:30';
+const BUILD_VERSION = 'v1.16.0';
+const BUILD_DATE    = '17.06.2026 21:30';
 (function(){ var _hb = document.getElementById('headerVersionBadge'); if(_hb) _hb.textContent = BUILD_VERSION; })();
-const WN_VERSION='1.13';
+const WN_VERSION = 'v1.16';
 const WN_I18N={
   en:{
+    // v1.16
+    wn_ptdist:'📊 <strong>Point Distribution</strong>: live &amp; simulator cards now show how many players score 3, 2, 1 or 0 pts — with color-coded mini-bars.',
+    wn_fixes16:'🔧 <strong>Fixes &amp; Translations</strong>: header version badge restored, live card group filter fixed (only your group members shown), scoring guard corrected, translations added throughout.',
     // v1.13
     wn_form:'💹 <strong>My Form</strong>: new KPI — consistency (equal-weighted hit rate, since all tips were pre-submitted), strength calibration (tougher matches weighted higher) and future outlook.',
     wn_momentum:'📈 <strong>Momentum</strong>: rank positions gained/lost over your last 5 completed matches. <strong>▲+8</strong> climbing · <strong>▼-3</strong> slipping.',
@@ -4460,6 +4474,9 @@ const WN_I18N={
     wn_fetch:'⚡ <strong>8× faster reload</strong>: weekly batch fetching replaces 38 daily requests. Scorer data straight from match events.',
   },
   de:{
+    // v1.16
+    wn_ptdist:'📊 <strong>Punkteverteilung</strong>: Live- &amp; Simulator-Karten zeigen jetzt, wie viele Spieler 3, 2, 1 oder 0 Punkte erzielen — mit farbigen Mini-Balken.',
+    wn_fixes16:'🔧 <strong>Fixes &amp; Übersetzungen</strong>: Header-Versions-Badge wiederhergestellt, Live-Karten-Gruppenfilter korrigiert (nur eigene Gruppe), Scoring-Guard behoben, Übersetzungen an diversen Stellen ergänzt.',
     // v1.13
     wn_form:'💹 <strong>Meine Form</strong>: neuer KPI — Konsistenz (gleichgewichtet, alle Tipps vor Turnier abgegeben), Stärke-Kalibrierung (schwierigere Spiele höher gewichtet) und Ausblick.',
     wn_momentum:'📈 <strong>Momentum</strong>: Rang-Veränderung über die letzten 5 abgeschlossenen Spiele. <strong>▲+8</strong> steigend · <strong>▼-3</strong> fallend.',
@@ -4475,6 +4492,9 @@ const WN_I18N={
     wn_fetch:'⚡ <strong>8× schnellerer Reload</strong>: Wöchentliche Batches statt 38 täglicher Requests. Torschützen direkt aus Match-Events.',
   },
   es:{
+    // v1.16
+    wn_ptdist:'📊 <strong>Distribución de Puntos</strong>: las tarjetas en vivo y del simulador ahora muestran cuántos jugadores consiguen 3, 2, 1 o 0 pts — con mini-barras en color.',
+    wn_fixes16:'🔧 <strong>Correcciones y Traducciones</strong>: badge de versión en cabecera restaurado, filtro de grupo en tarjeta en vivo corregido (solo miembros de tu grupo), guard de puntuación solucionado, traducciones añadidas en distintos lugares.',
     // v1.13
     wn_form:'💹 <strong>Mi Forma</strong>: nuevo KPI — consistencia (peso igual, todos los pronósticos enviados antes del torneo), calibración de dificultad y perspectiva futura.',
     wn_momentum:'📈 <strong>Momentum</strong>: posiciones de ranking ganadas/perdidas en tus últimos 5 partidos completados.',
@@ -4492,6 +4512,11 @@ const WN_I18N={
 };
 // Icon map für WN-Keys — Reihenfolge & Icons für v1.12
 const WN_ITEMS = [
+  // v1.16 items
+  { key: 'wn_ptdist',      icon: '📊', highlight: true },
+  { key: 'wn_fixes16',     icon: '🔧' },
+  // divider
+  { divider: true },
   // v1.13 items
   { key: 'wn_form',        icon: '💹' },
   { key: 'wn_momentum',    icon: '📈' },
