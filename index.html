@@ -971,6 +971,12 @@
   <div class="section-title">📝 Changelog</div>
 
     <div class="card" style="margin-bottom:14px;">
+  <div class="card-title">v1.17.4 — 18. Juni 2026 (Fix)</div>
+  <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
+    <li>📅 <strong>ESPN Date-Range Fix</strong> — Weekly Batches werden nur noch generiert wenn ihr End-Datum vor <code>today-1</code> (HC-Cutoff) liegt → kein doppelter Fetch hardcodierter Spiele mehr</li>
+  </ul>
+</div>
+<div class="card" style="margin-bottom:14px;">
   <div class="card-title">v1.17.3 — 17. Juni 2026 (Fix)</div>
   <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
     <li>🔢 <strong>API-Button Zählung (Root Fix)</strong> — <code>parseESPNEvents</code> setzt <code>_rev:true</code> direkt beim Schreiben des Reverse-Keys → ESPN-Ergebnisse werden korrekt als unique Spiele gezählt</li>
@@ -2209,14 +2215,14 @@ function getESPNDateParams() {
   const added = new Set();
   const toKey = d => d.toISOString().slice(0,10).replace(/-/g,'');
 
-  // ── 1) Weekly batches: only FULLY completed 7-day blocks (no clamping) ──
-  // A block = WM_START, WM_START+7, WM_START+14, …
-  // Only batch a block if its END day is strictly before today → no mini-ranges
+  // ── 1) Weekly batches: only blocks whose END is strictly before today-1 ──
+  // Blocks overlapping hardcoded results window (today-1) are skipped entirely
+  const hcCutoff = new Date(now); hcCutoff.setDate(hcCutoff.getDate() - 1);
   let blockStart = new Date(WM_START);
   while (true) {
     const blockEnd = new Date(blockStart);
     blockEnd.setDate(blockEnd.getDate() + 6);
-    if (blockEnd >= now) break; // block not yet complete → stop
+    if (blockEnd >= hcCutoff) break; // overlaps hardcoded range → stop
     const rangeKey = `${toKey(blockStart)}-${toKey(blockEnd)}`;
     if (!added.has(rangeKey)) { params.push(rangeKey); added.add(rangeKey); }
     blockStart.setDate(blockStart.getDate() + 7);
@@ -2226,7 +2232,6 @@ function getESPNDateParams() {
   // blockStart is now the first day of the current (incomplete) week
   const dayEnd = new Date(now);
   dayEnd.setDate(dayEnd.getDate() + 2); // +2 upcoming
-  const hcCutoff = new Date(now); hcCutoff.setDate(hcCutoff.getDate() - 1);
   if (blockStart < hcCutoff) blockStart = hcCutoff;
   const d = new Date(blockStart);
   while (d <= dayEnd) {
@@ -4749,8 +4754,8 @@ function switchTab(tabId) {
 }
 
 // ═══════ WHAT'S NEW ═══════
-const BUILD_VERSION = 'v1.17.3';
-const BUILD_DATE = '17.06.2026 23:30';
+const BUILD_VERSION = 'v1.17.4';
+const BUILD_DATE = '18.06.2026 00:00';
 (function(){ var _hb = document.getElementById('headerVersionBadge'); if(_hb) _hb.textContent = BUILD_VERSION; })();
 const WN_VERSION = 'v1.17';
 const WN_STORAGE_KEY = window.location.pathname.includes('staging') ? 'wnSeen_staging' : 'wnSeen_live';
