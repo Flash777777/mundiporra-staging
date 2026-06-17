@@ -950,6 +950,13 @@
   <div class="section-title">📝 Changelog</div>
 
     <div class="card" style="margin-bottom:14px;">
+  <div class="card-title">v1.15.0 — 17. Juni 2026</div>
+  <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
+    <li>👥 <strong>Gruppen-Tipps in Live-Karte</strong> — <code>game.id</code> (Number) vs. <code>ALL_PREDICTIONS</code>-Keys (String) verursachte leere Spieler-Cards; Fix: <code>String(game.id)</code> in <code>renderGameTipBlock</code></li>
+    <li>📊 <strong>Punkteverteilung</strong> — Live- und Simulator-Karte zeigen wie viele Mitspieler 3 / 2 / 1 / 0 Punkte beim aktuellen Stand bekommen würden</li>
+  </ul>
+</div>
+<div class="card" style="margin-bottom:14px;">
   <div class="card-title">v1.14.5 — 17. Juni 2026 (Fix)</div>
   <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
     <li>🏷️ <strong>Header-Badge doppeltes id-Attribut</strong> — Span hatte zwei id-Attribute (<code>dashVersion</code> + <code>headerVersionBadge</code>); Browser parste nur das erste → IIFE fand Element nicht → Version blieb unsichtbar. Nur <code>headerVersionBadge</code> behalten.</li>
@@ -1278,7 +1285,7 @@ const TRANSLATIONS = {
     live_extra_time: 'Extra Time', live_shootout: 'Penalties', live_delayed: 'Delayed',
     sim_title: '⚡ Score Simulator', sim_btn: '⚡ Simulator', sim_crowd_pick: 'Crowd Pick',
     sim_reset: 'Reset', sim_winners: '😊 Winners', sim_losers: '😬 Losers',
-    sim_no_live: 'No live or upcoming games', sim_pts_gain: 'pts gain',
+    sim_no_live: 'No live or upcoming games', pts_dist_label: 'Point distribution at', sim_pts_gain: 'pts gain',
     sim_close: '✕ Close', rank_abbr: '#',
     whatsnew_title: "✨ What's New", whatsnew_got_it: 'Got it ✓', whatsnew_full_log: '📝 Full Changelog',
     live_multi: '🔴 Live (×',
@@ -1585,7 +1592,7 @@ const TRANSLATIONS = {
     live_extra_time: 'Verlängerung', live_shootout: 'Elfmeter', live_delayed: 'Verzögert',
     sim_title: '⚡ Score-Simulator', sim_btn: '⚡ Simulator', sim_crowd_pick: 'Mehrheitstipp',
     sim_reset: 'Reset', sim_winners: '😊 Gewinner', sim_losers: '😬 Verlierer',
-    sim_no_live: 'Keine Live- oder kommenden Spiele', sim_pts_gain: 'Pkt Gewinn',
+    sim_no_live: 'Keine Live- oder kommenden Spiele', pts_dist_label: 'Punkteverteilung bei', sim_pts_gain: 'Pkt Gewinn',
     sim_close: '✕ Schließen', rank_abbr: '#',
     whatsnew_title: '✨ Neuigkeiten', whatsnew_got_it: 'Verstanden ✓', whatsnew_full_log: '📝 Changelog',
   },
@@ -1744,7 +1751,7 @@ const TRANSLATIONS = {
     live_extra_time: 'Prórroga', live_shootout: 'Penaltis', live_delayed: 'Retrasado',
     sim_title: '⚡ Simulador', sim_btn: '⚡ Simulador', sim_crowd_pick: 'Pronóstico Mayoría',
     sim_reset: 'Reset', sim_winners: '😊 Ganadores', sim_losers: '😬 Perdedores',
-    sim_no_live: 'Sin partidos en vivo ni próximos', sim_pts_gain: 'pts ganados',
+    sim_no_live: 'Sin partidos en vivo ni próximos', pts_dist_label: 'Distribución de puntos en', sim_pts_gain: 'pts ganados',
     sim_close: '✕ Cerrar', rank_abbr: '#',
     whatsnew_title: '✨ Novedades', whatsnew_got_it: 'Entendido ✓', whatsnew_full_log: '📝 Registro',
     won_word: 'ganó',
@@ -3191,6 +3198,25 @@ function getContextPlayers(lb) {
 }
 
 // Renders one tip-grid block for a single game (used across all 3 summary blocks)
+
+// Calculates point distribution for all 154 players for a given game result
+function calcPointDist(gameId, s1, s2) {
+  const gidStr = String(gameId);
+  let p3 = 0, p2 = 0, p1 = 0, p0 = 0;
+  const total = ALL_PLAYERS.length;
+  for (const name of ALL_PLAYERS) {
+    const tip = ALL_PREDICTIONS[name]?.[gidStr];
+    if (!tip) { p0++; continue; }
+    const pts = scoreGame(tip, { s1, s2 });
+    if (pts === 3) p3++;
+    else if (pts === 2) p2++;
+    else if (pts === 1) p1++;
+    else p0++;
+  }
+  const pct = (n) => total > 0 ? Math.round(n / total * 100) : 0;
+  return { p3, p2, p1, p0, pct3: pct(p3), pct2: pct(p2), pct1: pct(p1), pct0: pct(p0) };
+}
+
 function renderGameTipBlock(game, actual, contextPlayers, isLive, lb) {
   const allPreds = ALL_PREDICTIONS;
   const myGroups = getMyGroups();
@@ -3205,7 +3231,7 @@ function renderGameTipBlock(game, actual, contextPlayers, isLive, lb) {
 
   const sortedCtx = lb ? [...contextPlayers].sort((a,b)=>{const ra=lb.findIndex(p=>p.name===a),rb=lb.findIndex(p=>p.name===b);return(ra<0?9999:ra)-(rb<0?9999:rb);}) : contextPlayers;
   const cards = sortedCtx.map(name => {
-    const tip = allPreds[name]?.[game.id];
+    const tip = allPreds[name]?.[String(game.id)];
     if (!tip) return '';
     const isYou = name === USER.player;
     const isGroup = groupMemberSet.has(name);
@@ -3252,11 +3278,19 @@ function renderGameTipBlock(game, actual, contextPlayers, isLive, lb) {
       _tipRowHtml = `<div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;font-size:.75rem;flex-wrap:wrap;padding:4px 8px;background:rgba(0,82,204,.06);border-radius:6px;">${_myHtml}${_sep}${_crowdHtml}</div>`;
     }
   }
+  // Punkteverteilung
+  let _ptDistHtml = '';
+  if (actual && (actual.status === 'LIVE' || actual.status === 'FT') && actual.s1 != null && actual.s2 != null) {
+    const _dist = calcPointDist(game.id, actual.s1, actual.s2);
+    const _sl = actual.s1 + ':' + actual.s2;
+    _ptDistHtml = `<hr style="border:none;border-top:1px solid #f0f0f0;margin:10px 0 8px;"><div style="font-size:.6rem;color:#ccc;font-weight:700;text-transform:uppercase;letter-spacing:.07em;text-align:center;margin-bottom:6px;">${T('pts_dist_label')} ${_sl}</div><div style="display:flex;gap:5px;">${[{l:'3 Pkt',n:_dist.p3,p:_dist.pct3,c:'#00c853'},{l:'2 Pkt',n:_dist.p2,p:_dist.pct2,c:'#ffab00'},{l:'1 Pkt',n:_dist.p1,p:_dist.pct1,c:'#2979ff'},{l:'0 Pkt',n:_dist.p0,p:_dist.pct0,c:'#e74c3c'}].map(({l,n,p,c})=>`<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;background:#f7f8fa;border-radius:8px;padding:6px 4px 5px;position:relative;overflow:hidden;"><div style="position:absolute;bottom:0;left:0;right:0;border-radius:0 0 8px 8px;background:${c};opacity:.15;height:${p*.6}%;"></div><span style="font-size:.58rem;font-weight:700;color:#bbb;text-transform:uppercase;letter-spacing:.04em;position:relative;">${l}</span><span style="font-size:.95rem;font-weight:900;line-height:1;color:${c};position:relative;">${n}</span><span style="font-size:.57rem;color:#bbb;position:relative;">${p}%</span></div>`).join('')}</div>`;
+  }
   return `<div style="margin-bottom:${isLive?'0':'12px'};">
     <div style="font-size:0.85rem; font-weight:700; margin-bottom:6px; ${isLive?'color:var(--red);':''}">
       Game ${game.id} · ${scoreLabel}
     </div>
     ${_tipRowHtml}<div class="game-sum-grid">${cards || '<div style="color:var(--muted);font-size:.8rem;">Keine Tipps gefunden</div>'}</div>
+    ${_ptDistHtml}
   </div>`;
 }
 
@@ -4383,8 +4417,8 @@ function switchTab(tabId) {
 }
 
 // ═══════ WHAT'S NEW ═══════
-const BUILD_VERSION = 'v1.14.5';
-const BUILD_DATE    = '17.06.2026 18:00';
+const BUILD_VERSION = 'v1.15.0';
+const BUILD_DATE    = '17.06.2026 19:30';
 (function(){ var _hb = document.getElementById('headerVersionBadge'); if(_hb) _hb.textContent = BUILD_VERSION; })();
 const WN_VERSION='1.13';
 const WN_I18N={
