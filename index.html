@@ -950,6 +950,13 @@
   <div class="section-title">📝 Changelog</div>
 
     <div class="card" style="margin-bottom:14px;">
+  <div class="card-title">v1.15.1 — 17. Juni 2026 (Fix)</div>
+  <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
+    <li>👥 <strong>Live-Karte: nur Gruppen-Mitglieder</strong> — Ranking-Nachbarn (±5) werden in der Live-Karte nicht mehr angezeigt; reduziert Unübersichtlichkeit</li>
+    <li>📊 <strong>Punkteverteilung im Simulator</strong> — jede Simulator-Karte zeigt jetzt wie viele Mitspieler 3 / 2 / 1 / 0 Punkte beim simulierten Stand bekommen würden</li>
+  </ul>
+</div>
+<div class="card" style="margin-bottom:14px;">
   <div class="card-title">v1.15.0 — 17. Juni 2026</div>
   <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
     <li>👥 <strong>Gruppen-Tipps in Live-Karte</strong> — <code>game.id</code> (Number) vs. <code>ALL_PREDICTIONS</code>-Keys (String) verursachte leere Spieler-Cards; Fix: <code>String(game.id)</code> in <code>renderGameTipBlock</code></li>
@@ -3319,7 +3326,16 @@ function renderLiveGamesSummary(lb) {
   const liveGamesNow = ALL_GAMES.filter(g => getActual(g)?.status === 'LIVE');
   if (!liveGamesNow.length) { block.style.display = 'none'; return; }
   block.style.display = '';
-  const ctx = getContextPlayers(lb);
+  // Live-Karte: nur Gruppen-Mitglieder anzeigen (kein ±5 Ranking-Umfeld)
+  const _myGroupsLive = getMyGroups();
+  const _groupCtxSeen = new Set();
+  const ctx = [];
+  for (const g of _myGroupsLive) {
+    for (const m of (GROUP_DATA[g] || [])) {
+      if (!_groupCtxSeen.has(m)) { ctx.push(m); _groupCtxSeen.add(m); }
+    }
+  }
+  if (USER.player && !_groupCtxSeen.has(USER.player)) ctx.push(USER.player);
   document.getElementById('liveGamesSummaryContent').innerHTML =
     liveGamesNow.map((g, i) => {
       const a = getActual(g);
@@ -4417,8 +4433,8 @@ function switchTab(tabId) {
 }
 
 // ═══════ WHAT'S NEW ═══════
-const BUILD_VERSION = 'v1.15.0';
-const BUILD_DATE    = '17.06.2026 19:30';
+const BUILD_VERSION = 'v1.15.1';
+const BUILD_DATE    = '17.06.2026 20:00';
 (function(){ var _hb = document.getElementById('headerVersionBadge'); if(_hb) _hb.textContent = BUILD_VERSION; })();
 const WN_VERSION='1.13';
 const WN_I18N={
@@ -4688,7 +4704,14 @@ function _renderSimulator(){
         const crowdHtml=crowd?(crowd.score
           ?`<div style="font-size:.7rem;opacity:${isActive?0.65:0.35};">👥 <b>${crowd.score}</b> <span style="opacity:.65">(${crowd.pct}%)</span></div>`
           :`<div style="font-size:.7rem;opacity:${isActive?0.65:0.35};">👥 ${crowd.label} ${crowd.pct}%</div>`):'';
-        return myHtml+crowdHtml;
+        // Punkteverteilung
+        let ptDistHtml = '';
+        if (isActive && (isLive || st.dirty || st.s1 > 0 || st.s2 > 0)) {
+          const _dist = calcPointDist(g.id, st.s1, st.s2);
+          const _sl = st.s1 + ':' + st.s2;
+          ptDistHtml = `<div style="margin-top:7px;"><div style="font-size:.55rem;color:rgba(255,255,255,.35);font-weight:700;text-transform:uppercase;letter-spacing:.07em;text-align:center;margin-bottom:5px;">${T('pts_dist_label')} ${_sl}</div><div style="display:flex;gap:4px;">${[{l:'3',n:_dist.p3,p:_dist.pct3,c:'#4ade80'},{l:'2',n:_dist.p2,p:_dist.pct2,c:'#facc15'},{l:'1',n:_dist.p1,p:_dist.pct1,c:'#60a5fa'},{l:'0',n:_dist.p0,p:_dist.pct0,c:'#f87171'}].map(({l,n,p,c})=>`<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:1px;background:rgba(255,255,255,.07);border-radius:6px;padding:5px 3px 4px;position:relative;overflow:hidden;"><div style="position:absolute;bottom:0;left:0;right:0;border-radius:0 0 6px 6px;background:${c};opacity:.18;height:${p*.65}%;"></div><span style="font-size:.52rem;font-weight:700;color:rgba(255,255,255,.35);text-transform:uppercase;position:relative;">${l} Pkt</span><span style="font-size:.9rem;font-weight:900;line-height:1;color:${c};position:relative;">${n}</span><span style="font-size:.52rem;color:rgba(255,255,255,.3);position:relative;">${p}%</span></div>`).join('')}</div></div>`;
+        }
+        return myHtml+crowdHtml+ptDistHtml;
       })()}
       ${isLive?`<div class="sim-live-score">🔴 Live: ${a.s1}–${a.s2} ${fmtLiveStatus(a)}</div>`:''}
       ${st.dirty?`<button class="sim-reset-btn" onclick="_simRst(${g.id})">${T('sim_reset')} → ${isLive?(a.s1+':'+a.s2):(()=>{const mp=ALL_PREDICTIONS[USER.player]||{};const t=mp[String(g.id)];return t?t.goals1+':'+t.goals2:'0:0';})()}</button>`:''}
