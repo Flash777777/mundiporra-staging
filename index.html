@@ -971,6 +971,12 @@
   <div class="section-title">📝 Changelog</div>
 
     <div class="card" style="margin-bottom:14px;">
+  <div class="card-title">v1.17.6 — 18. Juni 2026 (Fix)</div>
+  <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
+    <li>📅 <strong>ESPN Date-Range Fix III</strong> — Weekly Batch Break-Bedingung korrigiert: <code>blockEndNext > hcCutoff</code> statt <code>blockEnd >= hcCutoff</code> → letzter Tag des Blocks wird korrekt mit today verglichen</li>
+  </ul>
+</div>
+<div class="card" style="margin-bottom:14px;">
   <div class="card-title">v1.17.5 — 18. Juni 2026 (Fix)</div>
   <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
     <li>📅 <strong>ESPN Date-Range Fix II</strong> — <code>hcCutoff</code> auf Beginn des heutigen Tages (UTC) gesetzt → tägliche Fetches starten erst ab heute; keine Vergangenheitsdaten mehr von ESPN</li>
@@ -2229,7 +2235,8 @@ function getESPNDateParams() {
   while (true) {
     const blockEnd = new Date(blockStart);
     blockEnd.setDate(blockEnd.getDate() + 6);
-    if (blockEnd >= hcCutoff) break; // overlaps hardcoded range → stop
+    const blockEndNext = new Date(blockEnd); blockEndNext.setDate(blockEndNext.getDate() + 1);
+    if (blockEndNext > hcCutoff) break; // last day of block >= hcCutoff → overlaps → stop
     const rangeKey = `${toKey(blockStart)}-${toKey(blockEnd)}`;
     if (!added.has(rangeKey)) { params.push(rangeKey); added.add(rangeKey); }
     blockStart.setDate(blockStart.getDate() + 7);
@@ -4761,8 +4768,8 @@ function switchTab(tabId) {
 }
 
 // ═══════ WHAT'S NEW ═══════
-const BUILD_VERSION = 'v1.17.5';
-const BUILD_DATE = '18.06.2026 00:30';
+const BUILD_VERSION = 'v1.17.6';
+const BUILD_DATE = '18.06.2026 01:00';
 (function(){ var _hb = document.getElementById('headerVersionBadge'); if(_hb) _hb.textContent = BUILD_VERSION; })();
 const WN_VERSION = 'v1.17';
 const WN_STORAGE_KEY = window.location.pathname.includes('staging') ? 'wnSeen_staging' : 'wnSeen_live';
