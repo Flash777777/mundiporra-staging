@@ -971,6 +971,12 @@
   <div class="section-title">📝 Changelog</div>
 
     <div class="card" style="margin-bottom:14px;">
+  <div class="card-title">v1.17.5 — 18. Juni 2026 (Fix)</div>
+  <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
+    <li>📅 <strong>ESPN Date-Range Fix II</strong> — <code>hcCutoff</code> auf Beginn des heutigen Tages (UTC) gesetzt → tägliche Fetches starten erst ab heute; keine Vergangenheitsdaten mehr von ESPN</li>
+  </ul>
+</div>
+<div class="card" style="margin-bottom:14px;">
   <div class="card-title">v1.17.4 — 18. Juni 2026 (Fix)</div>
   <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
     <li>📅 <strong>ESPN Date-Range Fix</strong> — Weekly Batches werden nur noch generiert wenn ihr End-Datum vor <code>today-1</code> (HC-Cutoff) liegt → kein doppelter Fetch hardcodierter Spiele mehr</li>
@@ -2217,7 +2223,8 @@ function getESPNDateParams() {
 
   // ── 1) Weekly batches: only blocks whose END is strictly before today-1 ──
   // Blocks overlapping hardcoded results window (today-1) are skipped entirely
-  const hcCutoff = new Date(now); hcCutoff.setDate(hcCutoff.getDate() - 1);
+  // hcCutoff = Beginn des heutigen Tages (UTC) → alles davor ist hardcoded
+  const hcCutoff = new Date(now.toISOString().slice(0,10)+'T00:00:00Z');
   let blockStart = new Date(WM_START);
   while (true) {
     const blockEnd = new Date(blockStart);
@@ -4754,8 +4761,8 @@ function switchTab(tabId) {
 }
 
 // ═══════ WHAT'S NEW ═══════
-const BUILD_VERSION = 'v1.17.4';
-const BUILD_DATE = '18.06.2026 00:00';
+const BUILD_VERSION = 'v1.17.5';
+const BUILD_DATE = '18.06.2026 00:30';
 (function(){ var _hb = document.getElementById('headerVersionBadge'); if(_hb) _hb.textContent = BUILD_VERSION; })();
 const WN_VERSION = 'v1.17';
 const WN_STORAGE_KEY = window.location.pathname.includes('staging') ? 'wnSeen_staging' : 'wnSeen_live';
