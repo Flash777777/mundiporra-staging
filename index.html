@@ -990,6 +990,14 @@
   <div class="section-title">📝 Changelog</div>
 
     <div class="card" style="margin-bottom:14px;">
+  <div class="card-title">v1.18.1 — 17. Juni 2026 (Fix)</div>
+  <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
+    <li>⭐ <strong>Champions-Tab Scorer Fix</strong> — <code>fetchESPNStatistics()</code> überschrieb <code>playerGoals</code> direkt ohne den scoringEvents-Merge → live Tore fehlten im Champions-Tab; <code>_mergeLiveGoals()</code>-Helper extrahiert und in beiden Code-Pfaden aufgerufen</li>
+    <li>🔄 <strong>Champions-Tab Re-render</strong> — Tab wird nach ESPN-Daten-Load automatisch neu gerendert wenn er aktiv ist</li>
+  </ul>
+</div>
+
+    <div class="card" style="margin-bottom:14px;">
   <div class="card-title">v1.18.0 — 17. Juni 2026 (Fix)</div>
   <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
     <li>⚽ <strong>Penalty-Scored Fix</strong> — ESPN-Typ "Penalty - Scored" enthielt kein "goal" → Kane-Elfmeter & ähnliche Tore fehlten in Live Cards und Champions-Tab</li>
@@ -2509,7 +2517,7 @@ async function fetchESPNStatistics() {
           if (pn && v > 0) goals[pn] = (goals[pn]||0) + v;
         }
       }
-      if (Object.keys(goals).length > 0) { playerGoals = goals; return; }
+      if (Object.keys(goals).length > 0) { playerGoals = goals; _mergeLiveGoals(); return; }
     }
   } catch(e) { /* fallthrough */ }
   aggregateGoalScorers_legacy();
@@ -2535,8 +2543,8 @@ function aggregateGoalScorers_legacy() {
     console.log('[GoalScorers] legacy comp.details:', goals);
   }
 }
-function aggregateGoalScorers(){
-  aggregateGoalScorers_legacy();
+// Merge live scoringEvents into playerGoals using max() — shared helper
+function _mergeLiveGoals() {
   const liveGoals = {};
   for (const [key, game] of Object.entries(liveGames)) {
     if (key.endsWith('_rev') || game._rev) continue;
@@ -2551,6 +2559,10 @@ function aggregateGoalScorers(){
   for (const [name, liveCount] of Object.entries(liveGoals)) {
     if (liveCount > (playerGoals[name] || 0)) playerGoals[name] = liveCount;
   }
+}
+function aggregateGoalScorers(){
+  aggregateGoalScorers_legacy();
+  _mergeLiveGoals();
 }
 
 // Normalize player name for fuzzy matching (remove accents, lowercase)
@@ -2671,6 +2683,10 @@ async function fetchESPN() {
 
   updateAPIHealth();
   try { renderLastNextMatch(); } catch(e) { console.error('[ESPN] renderLastNextMatch final:', e); }
+  // Re-render Champions tab if currently active (playerGoals may have changed)
+  try {
+    if (document.querySelector('.tab-btn.active')?.dataset?.tab === 'champions') renderChampions();
+  } catch(e) {}
 }
 
 
@@ -4933,8 +4949,8 @@ function switchTab(tabId) {
 }
 
 // ═══════ WHAT'S NEW ═══════
-const BUILD_VERSION = 'v1.18.0';
-const BUILD_DATE    = '17.06.2026 23:00';
+const BUILD_VERSION = 'v1.18.1';
+const BUILD_DATE    = '17.06.2026 23:30';
 (function(){ var _hb = document.getElementById('headerVersionBadge'); if(_hb) _hb.textContent = BUILD_VERSION; })();
 const WN_VERSION = 'v1.17';
 const WN_STORAGE_KEY = window.location.pathname.includes('staging') ? 'wnSeen_staging' : 'wnSeen_live';
