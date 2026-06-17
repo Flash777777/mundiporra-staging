@@ -833,7 +833,7 @@
 </div>
 
 <!-- ══════════════ STATS TAB ══════════════ -->
-<div id="tab-stats" class="tab-content">
+<div id="tab-database" class="tab-content">
 <div class="page">
   <div class="stats-section">
     <div class="stats-section-title" id="statsTipAccTitle">🎯 Tip Accuracy (all played games)</div>
@@ -3943,6 +3943,7 @@ function switchTab(tabId) {
   // Tab-specific init
   if (tabId === 'h2h') initH2HTab();
   if (tabId === 'group' && _lastLb) renderGroupTab(_lastLb);
+  if (tabId === 'database' && _lastLb) renderStats(_lastLb);
   // Scroll to top on mobile
   if (window.innerWidth <= 600) window.scrollTo({top: 0, behavior: 'smooth'});
 }
