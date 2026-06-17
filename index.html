@@ -990,6 +990,13 @@
   <div class="section-title">📝 Changelog</div>
 
     <div class="card" style="margin-bottom:14px;">
+  <div class="card-title">v1.18.2 — 17. Juni 2026 (Fix)</div>
+  <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
+    <li>🎯 <strong>Simulator Scorer-Punkte</strong> — <code>simTotals</code> rechnete <code>scorerPts</code> nicht ein → Simulator-Rang wich vom echten Rang ab; fix: <code>p.scorerPts</code> in Basis-Total des Simulators addiert</li>
+  </ul>
+</div>
+
+    <div class="card" style="margin-bottom:14px;">
   <div class="card-title">v1.18.1 — 17. Juni 2026 (Fix)</div>
   <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
     <li>⭐ <strong>Champions-Tab Scorer Fix</strong> — <code>fetchESPNStatistics()</code> überschrieb <code>playerGoals</code> direkt ohne den scoringEvents-Merge → live Tore fehlten im Champions-Tab; <code>_mergeLiveGoals()</code>-Helper extrahiert und in beiden Code-Pfaden aufgerufen</li>
@@ -4949,8 +4956,8 @@ function switchTab(tabId) {
 }
 
 // ═══════ WHAT'S NEW ═══════
-const BUILD_VERSION = 'v1.18.1';
-const BUILD_DATE    = '17.06.2026 23:30';
+const BUILD_VERSION = 'v1.18.2';
+const BUILD_DATE    = '17.06.2026 23:45';
 (function(){ var _hb = document.getElementById('headerVersionBadge'); if(_hb) _hb.textContent = BUILD_VERSION; })();
 const WN_VERSION = 'v1.17';
 const WN_STORAGE_KEY = window.location.pathname.includes('staging') ? 'wnSeen_staging' : 'wnSeen_live';
@@ -5318,7 +5325,7 @@ function _renderSimulator(){
   // so simulator base-rank matches the leaderboard rank exactly.
   { let _r=1; const _sorted=[...lb].sort((a,b)=>(b.total||b.pts||0)-(a.total||a.pts||0)||b.pts-a.pts||b.exact-a.exact);
     _sorted.forEach((p,idx)=>{ if(idx>0&&((p.total||p.pts||0)<(_sorted[idx-1].total||_sorted[idx-1].pts||0)||p.pts<_sorted[idx-1].pts||p.exact<_sorted[idx-1].exact))_r=idx+1; baseRankMap[p.name]=_r; }); }
-  const simTotals=lb.map(p=>({name:p.name,total:(p.pts||0)+(p.livePts||0)+_simDelta(p.name,simGames).delta}));
+  const simTotals=lb.map(p=>({name:p.name,total:(p.pts||0)+(p.livePts||0)+(p.scorerPts||0)+_simDelta(p.name,simGames).delta}));
   simTotals.sort((a,b)=>b.total-a.total);
   assignRanks(simTotals);
   const simRankMap={}; simTotals.forEach(p=>simRankMap[p.name]=p.rank);
