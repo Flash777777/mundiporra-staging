@@ -971,6 +971,12 @@
   <div class="section-title">📝 Changelog</div>
 
     <div class="card" style="margin-bottom:14px;">
+  <div class="card-title">v1.17.10 — 17. Juni 2026 (Fix)</div>
+  <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
+    <li>🔗 <strong>ESPN Endpoint Fix</strong> — <code>fifa.world</code> → <code>fifa.worldcup</code>; falscher League-Slug verhinderte <code>comp.details</code> → Torschützen & Rote Karten fehlten in Live-Card</li>
+  </ul>
+</div>
+<div class="card" style="margin-bottom:14px;">
   <div class="card-title">v1.17.9 — 17. Juni 2026 (Fix)</div>
   <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
     <li>⚽ <strong>Live-Card Torschützen-Fix</strong> — <code>scoringEvents</code>-Parser befüllt jetzt <code>side</code>, <code>min</code>, <code>evtType</code>, <code>isOG</code>, <code>isPen</code>; vorher nur Name gespeichert → Anzeige war leer trotz vorhandenem Renderer</li>
@@ -2522,7 +2528,7 @@ function getPlayerGoals(playerName) {
 }
 
 async function fetchESPN() {
-  const BASE = 'https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard';
+  const BASE = 'https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.worldcup/scoreboard';
   const collected = {};
   let anyOk = false;
 
@@ -4820,7 +4826,7 @@ function switchTab(tabId) {
 }
 
 // ═══════ WHAT'S NEW ═══════
-const BUILD_VERSION = 'v1.17.9';
+const BUILD_VERSION = 'v1.17.10';
 const BUILD_DATE = '17.06.2026 22:45';
 (function(){ var _hb = document.getElementById('headerVersionBadge'); if(_hb) _hb.textContent = BUILD_VERSION; })();
 const WN_VERSION = 'v1.17';
