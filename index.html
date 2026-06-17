@@ -2768,6 +2768,35 @@ function matchCardLive(g, a) {
   const htHtml = (a?.ht1 != null && a?.ht2 != null)
     ? `<span style="font-size:0.7rem;color:#888;margin-left:6px;">(HZ: ${a.ht1}:${a.ht2})</span>` : '';
 
+  // Goal scorers TV-style: left team left-aligned, right team right-aligned
+  let scorersHtml = '';
+  const evts = a?.scoringEvents || [];
+  if (evts.length > 0) {
+    const parseMin = m => {
+      if (!m) return 999;
+      const clean = m.replace(/'/g,'').replace(/\s/g,'');
+      const parts = clean.split('+');
+      return (parseInt(parts[0])||0) + (parseInt(parts[1])||0) * 0.01;
+    };
+    const sorted = [...evts].sort((a,b) => parseMin(a.min) - parseMin(b.min));
+    const rows = sorted.map(e => {
+      const isGoal = !e.evtType || e.evtType === 'goal';
+      const isRC   = e.evtType === 'rc';
+      const isYC   = e.evtType === 'yc';
+      const icon   = isGoal ? '⚽' : isRC ? '🟥' : '🟨';
+      const badge  = isGoal && e.isOG  ? '<span style="color:#b91c1c;font-size:0.65rem;"> (OG)</span>'
+                   : isGoal && e.isPen ? '<span style="color:#b45309;font-size:0.65rem;"> (P)</span>' : '';
+      const minStr = e.min ? `<span style="color:#999;font-size:0.65rem;"> ${e.min}'</span>` : '';
+      const nameColor = isGoal ? '#155724' : isRC ? '#7f1d1d' : '#78350f';
+      const left  = e.side === 1
+        ? `<span style="color:${nameColor};">${icon} ${e.athleteName}${minStr}${badge}</span>` : '';
+      const right = e.side === 2
+        ? `<span style="color:${nameColor};">${badge}${minStr} ${e.athleteName} ${icon}</span>` : '';
+      return `<div>${left}</div><div style="text-align:right;">${right}</div>`;
+    }).join('');
+    scorersHtml = `<div style="display:grid;grid-template-columns:1fr 1fr;gap:1px 8px;font-size:0.71rem;font-weight:500;margin-top:6px;padding:5px 8px;background:rgba(39,174,96,0.08);border-radius:6px;line-height:1.8;">${rows}</div>`;
+  }
+
   // Possession bar
   let possHtml = '';
   const p1 = a?.pos1 || 0, p2 = a?.pos2 || 0;
@@ -2803,6 +2832,7 @@ function matchCardLive(g, a) {
       </div>
     </div>
     ${possHtml}
+    ${scorersHtml}
     ${venue ? `<div class="match-meta" style="margin-top:4px;">📍 ${venue}${kickoff ? ' · '+kickoff : ''}</div>` : ''}
   </div>`;
 }
