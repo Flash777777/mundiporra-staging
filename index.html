@@ -2504,6 +2504,9 @@ async function fetchESPN() {
   if (anyOk) liveGames = collected;
 
   // ── Step 3: Inject hardcoded past results, then fetch /statistics ──
+  // Markiere jede zweite Entry als _rev (Reverse-Key) → korrekte Zählung in updateAPIHealth
+  const _hcKeys = Object.keys(HARDCODED_RESULTS);
+  for(let _i=1;_i<_hcKeys.length;_i+=2) HARDCODED_RESULTS[_hcKeys[_i]]._rev=true;
   for(const[k,v] of Object.entries(HARDCODED_RESULTS)){if(!liveGames[k])liveGames[k]=v;}
   await fetchESPNStatistics();
 
