@@ -3400,7 +3400,7 @@ function renderChampions() {
     const g = getPlayerGoals(player);
     if (!hasLiveGoals) return `<span style="background:#f3f4f6; color:#aaa; padding:1px 6px; border-radius:10px; font-size:0.7rem; margin-left:4px;">⏳ ${T('scorer_no_goals')}</span>`;
     return g > 0
-      ? `<span style="background:#e8f5e9; color:#2e7d32; padding:1px 6px; border-radius:10px; font-size:0.75rem; margin-left:4px; font-weight:700;">⚽ ${g} ${T('goals_zero').replace('0',g)}</span>`
+      ? `<span style="background:#e8f5e9; color:#2e7d32; padding:1px 6px; border-radius:10px; font-size:0.75rem; margin-left:4px; font-weight:700;">⚽ ${T('goals_zero').replace('0',g)}</span>`
       : `<span style="background:#f5f5f5; color:#999; padding:1px 6px; border-radius:10px; font-size:0.75rem; margin-left:4px;">${T('goals_zero')}</span>`;
   };
 
