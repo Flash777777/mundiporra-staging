@@ -971,6 +971,13 @@
   <div class="section-title">📝 Changelog</div>
 
     <div class="card" style="margin-bottom:14px;">
+  <div class="card-title">v1.17.12 — 17. Juni 2026 (Fix)</div>
+  <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
+    <li>⚽ <strong>Live-Card Torschützen side-Fix</strong> — <code>det.team.id</code> (String) vs. <code>t1.team.id</code> (Number) Type-Mismatch behoben via <code>String()</code>; <code>isOG</code>/<code>isPen</code> jetzt über ESPN Boolean-Felder statt Text-Parsing</li>
+    <li>🟥 <strong>Rote Karten</strong> — ebenfalls auf ESPN Boolean <code>det.redCard</code> umgestellt</li>
+  </ul>
+</div>
+<div class="card" style="margin-bottom:14px;">
   <div class="card-title">v1.17.11 — 17. Juni 2026 (Hotfix)</div>
   <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
     <li>🔥 <strong>Hotfix</strong> — ESPN Endpoint auf <code>fifa.world</code> reverted; <code>fifa.worldcup</code> nicht erreichbar → API-Crash</li>
@@ -2346,12 +2353,12 @@ function parseESPNEvents(events, target) {
     for (const det of (comp.details||[])) {
       const txt = (det.type?.text||det.type?.name||'').toLowerCase();
       // Red cards
-      if (txt.includes('red')) {
-        const detTeam = normalizeTeam(det.team?.displayName||'');
-        if (detTeam===name1) rc1++; else if (detTeam===name2) rc2++;
-        const rcAthlete = det.athletesInvolved?.[0]?.displayName || det.athlete?.displayName || null;
-        const rcMin  = det.clock?.displayValue || null;
-        const rcSide = detTeam === name1 ? 1 : detTeam === name2 ? 2 : 0;
+      if (det.redCard) {
+        const detTeamId = String(det.team?.id || '');
+        const rcSide = detTeamId === String(t1.team?.id) ? 1 : detTeamId === String(t2.team?.id) ? 2 : 0;
+        if (rcSide === 1) rc1++; else if (rcSide === 2) rc2++;
+        const rcAthlete = det.athletesInvolved?.[0]?.displayName || null;
+        const rcMin = det.clock?.displayValue || null;
         if (rcAthlete) scoringEvents.push({ athleteName: rcAthlete, side: rcSide, min: rcMin, evtType: 'rc' });
       }
       // Goals (exclude own goals / penalties from shootout for scorer tracking)
@@ -2362,11 +2369,11 @@ function parseESPNEvents(events, target) {
                          || det.athlete?.fullName
                          || null;
         if (athleteName) {
-          const detTeam = normalizeTeam(det.team?.displayName || '');
-          const side  = detTeam === name1 ? 1 : detTeam === name2 ? 2 : 0;
+          const detTeamId = String(det.team?.id || '');
+          const side  = detTeamId === String(t1.team?.id) ? 1 : detTeamId === String(t2.team?.id) ? 2 : 0;
           const min   = det.clock?.displayValue || null;
-          const isOG  = txt.includes('own goal');
-          const isPen = txt.includes('penalty') || txt.includes('pen');
+          const isOG  = !!det.ownGoal;
+          const isPen = !!det.penaltyKick;
           scoringEvents.push({ athleteName, side, min, evtType: 'goal', isOG, isPen });
         }
       }
@@ -4832,7 +4839,7 @@ function switchTab(tabId) {
 }
 
 // ═══════ WHAT'S NEW ═══════
-const BUILD_VERSION = 'v1.17.11';
+const BUILD_VERSION = 'v1.17.12';
 const BUILD_DATE = '17.06.2026 22:45';
 (function(){ var _hb = document.getElementById('headerVersionBadge'); if(_hb) _hb.textContent = BUILD_VERSION; })();
 const WN_VERSION = 'v1.17';
