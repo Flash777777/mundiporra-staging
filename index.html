@@ -971,6 +971,12 @@
   <div class="section-title">📝 Changelog</div>
 
     <div class="card" style="margin-bottom:14px;">
+  <div class="card-title">v1.17.2 — 17. Juni 2026 (Fix)</div>
+  <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
+    <li>🔢 <strong>API-Button Zählung</strong> — Hardcoded Ergebnisse markieren jetzt korrekt Reverse-Keys (<code>_rev:true</code>) → API-Button zeigt korrekte Anzahl unique Spiele</li>
+  </ul>
+</div>
+<div class="card" style="margin-bottom:14px;">
   <div class="card-title">v1.17.1 — 17. Juni 2026 (Fix)</div>
   <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
     <li>🔢 <strong>KPI „Gespielt"</strong> — zeigt jetzt korrekt <code>X ✓ / 72</code> statt falscher Restanzeige</li>
@@ -4734,8 +4740,8 @@ function switchTab(tabId) {
 }
 
 // ═══════ WHAT'S NEW ═══════
-const BUILD_VERSION = 'v1.17.1';
-const BUILD_DATE = '17.06.2026 22:00';
+const BUILD_VERSION = 'v1.17.2';
+const BUILD_DATE = '17.06.2026 23:00';
 (function(){ var _hb = document.getElementById('headerVersionBadge'); if(_hb) _hb.textContent = BUILD_VERSION; })();
 const WN_VERSION = 'v1.17';
 const WN_STORAGE_KEY = window.location.pathname.includes('staging') ? 'wnSeen_staging' : 'wnSeen_live';
