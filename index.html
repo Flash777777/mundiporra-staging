@@ -1894,7 +1894,7 @@ function getESPNDateParams() {
     const blockEnd = new Date(blockStart);
     blockEnd.setDate(blockEnd.getDate() + 6);
     if (blockEnd >= now) break; // block not yet complete → stop
-    const rangeKey = `${toKey(blockStart)}${toKey(blockEnd)}`;
+    const rangeKey = `${toKey(blockStart)}-${toKey(blockEnd)}`;
     if (!added.has(rangeKey)) { params.push(rangeKey); added.add(rangeKey); }
     blockStart.setDate(blockStart.getDate() + 7);
   }
