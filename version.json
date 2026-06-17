@@ -1,9 +1,9 @@
 {
   "v": "1.17.1",
-  "force": false,
+  "force": true,
   "msg": {
-    "de": "",
-    "en": "",
-    "es": ""
+    "de": "Test: Force-Reload Modal — alles funktioniert! 🎉",
+    "en": "Test: Force-Reload Modal works! 🎉",
+    "es": "Test: ¡El modal de recarga forzada funciona! 🎉"
   }
 }
