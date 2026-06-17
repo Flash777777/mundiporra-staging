@@ -835,6 +835,38 @@
 <!-- ══════════════ STATS TAB ══════════════ -->
 <div id="tab-database" class="tab-content">
 <div class="page">
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+      <div class="card-title">🗃️ Datenbasis — Alle Tipps</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <input id="dbSearch" type="text" placeholder="🔍 Name / Gruppe suchen…"
+          style="padding:6px 12px;border:1px solid #ddd;border-radius:8px;font-size:.82rem;min-width:180px;"
+          oninput="renderDatabase()">
+        <select id="dbGroupFilter" onchange="renderDatabase()"
+          style="padding:6px 12px;border:1px solid #ddd;border-radius:8px;font-size:.82rem;">
+          <option value="">Alle Gruppen</option>
+        </select>
+        <select id="dbGameFilter" onchange="renderDatabase()"
+          style="padding:6px 12px;border:1px solid #ddd;border-radius:8px;font-size:.82rem;">
+          <option value="all">📋 Alle Tipps</option>
+          <option value="champion">🏆 Champion-Tipp</option>
+          <option value="ts1">⚽ Torschütze 1</option>
+          <option value="ts2">⚽ Torschütze 2</option>
+          <option value="tips">📋 Spiel-Tipp (1 Spiel)</option>
+          <option value="all_tips">📊 Alle Spiel-Tipps (Matrix)</option>
+        </select>
+        <select id="dbGameSelect" onchange="renderDatabase()"
+          style="padding:6px 12px;border:1px solid #ddd;border-radius:8px;font-size:.82rem;display:none;">
+        </select>
+      </div>
+    </div>
+    <div id="databaseContent" style="margin-top:16px;overflow-x:auto;"></div>
+  </div>
+</div>
+</div>
+
+<div id="tab-stats" class="tab-content">
+<div class="page">
   <div class="stats-section">
     <div class="stats-section-title" id="statsTipAccTitle">🎯 Tip Accuracy (all played games)</div>
     <div class="grid-2">
@@ -3475,6 +3507,207 @@ function renderChampions() {
   document.getElementById('scorerGrid').innerHTML = scorerHtml;
 }
 
+function renderDatabase() {
+  const searchVal = (document.getElementById('dbSearch')?.value || '').toLowerCase().trim();
+  const groupFilter = document.getElementById('dbGroupFilter')?.value || '';
+  const mode = document.getElementById('dbGameFilter')?.value || 'all';
+  const gameSel = document.getElementById('dbGameSelect');
+  // Show/hide game selector
+  if (gameSel) gameSel.style.display = mode === 'tips' ? '' : 'none';
+
+  const allParts = {...AICOMP_META, ...ALL_PARTICIPANTS};
+  // Filter by name/group
+  let names = Object.keys(allParts);
+  if (searchVal) {
+    names = names.filter(n => {
+      if (n.toLowerCase().includes(searchVal)) return true;
+      // Check if any group of this person matches
+      const myGroups = Object.entries(GROUP_DATA||{}).filter(([g,ms])=>ms.includes(n)).map(([g])=>g);
+      return myGroups.some(g => g.toLowerCase().includes(searchVal));
+    });
+  }
+  if (groupFilter && GROUP_DATA?.[groupFilter]) {
+    names = names.filter(n => (GROUP_DATA[groupFilter]||[]).includes(n));
+  }
+  names = names.sort((a,b) => a.localeCompare(b));
+
+  const isMe = n => n === (USER.player || '');
+  const myGroups = USER.player ? Object.entries(GROUP_DATA||{}).filter(([g,ms])=>ms.includes(USER.player)).map(([g])=>g) : [];
+  const isMyGroup = n => myGroups.some(g => (GROUP_DATA[g]||[]).includes(n));
+
+  const container = document.getElementById('databaseContent');
+  if (!container) return;
+  if (names.length === 0) { container.innerHTML = '<div style="color:var(--muted);text-align:center;padding:20px;">Keine Ergebnisse.</div>'; return; }
+
+  if (mode === 'all') {
+    // Default view: compact table — all players with Champion, TS1, TS2
+    const tableRows = names.map(n => {
+      const m = allParts[n] || {};
+      const duTag = isMe(n) ? ' <span style="background:var(--blue);color:#fff;border-radius:3px;padding:0 4px;font-size:.6rem;">DU</span>' : '';
+      const grpTag = !isMe(n) && isMyGroup(n) ? ' <span style="background:#edf6ff;color:var(--blue);border-radius:3px;padding:0 4px;font-size:.6rem;">GRP</span>' : '';
+      const bg = isMe(n) ? 'background:rgba(52,152,219,.06);' : (isMyGroup(n) ? 'background:rgba(52,152,219,.03);' : '');
+      return `<tr style="border-bottom:1px solid #f0f0f0;${bg}">
+        <td style="padding:5px 10px;font-size:.82rem;white-space:nowrap;">${n}${duTag}${grpTag}</td>
+        <td style="padding:5px 10px;font-size:.8rem;font-weight:600;">${m.champion||'—'}</td>
+        <td style="padding:5px 10px;font-size:.78rem;color:var(--muted);">${m.ts1||'—'}</td>
+        <td style="padding:5px 10px;font-size:.78rem;color:var(--muted);">${m.ts2||'—'}</td>
+      </tr>`;
+    }).join('');
+    container.innerHTML = `<div style="font-size:.75rem;color:var(--muted);margin-bottom:8px;">${names.length} Teilnehmer</div>
+      <table style="width:100%;border-collapse:collapse;font-size:.84rem;">
+      <thead><tr style="background:var(--bg2);position:sticky;top:0;">
+        <th style="padding:8px 10px;text-align:left;">Spieler</th>
+        <th style="padding:8px 10px;text-align:left;">🏆 Champion</th>
+        <th style="padding:8px 10px;text-align:left;">⚽ TS1</th>
+        <th style="padding:8px 10px;text-align:left;">⚽ TS2</th>
+      </tr></thead>
+      <tbody>${tableRows}</tbody></table>`;
+
+  } else if (mode === 'champion') {
+    // Summary: count by champion
+    const counts = {};
+    const nameLists = {};
+    names.forEach(n => {
+      const ch = allParts[n]?.champion;
+      if (ch) {
+        counts[ch] = (counts[ch]||0)+1;
+        if (!nameLists[ch]) nameLists[ch]=[];
+        nameLists[ch].push(n);
+      }
+    });
+    const sorted = Object.entries(counts).sort((a,b)=>b[1]-a[1]);
+    const tableRows = sorted.map(([ch, cnt]) => {
+      const participantList = nameLists[ch].map(n => {
+        const tag = isMe(n) ? ' <span style="background:var(--blue);color:#fff;border-radius:3px;padding:0 4px;font-size:.65rem;">DU</span>' : (isMyGroup(n)?'<span style="background:#edf6ff;color:var(--blue);border-radius:3px;padding:0 4px;font-size:.65rem;">GRP</span>':'');
+        return `<span style="white-space:nowrap;">${n}${tag}</span>`;
+      }).join(', ');
+      return `<tr><td style="padding:6px 10px;font-weight:700;">🏆 ${ch}</td><td style="padding:6px 10px;text-align:center;">${cnt}</td><td style="padding:6px 10px;font-size:.78rem;color:var(--muted);">${participantList}</td></tr>`;
+    }).join('');
+    container.innerHTML = `<table style="width:100%;border-collapse:collapse;font-size:.84rem;">
+      <thead><tr style="background:var(--bg2);"><th style="padding:8px 10px;text-align:left;">Weltmeister-Tipp</th><th style="padding:8px 10px;text-align:center;">#</th><th style="padding:8px 10px;text-align:left;">Teilnehmer</th></tr></thead>
+      <tbody>${tableRows}</tbody></table>`;
+
+  } else if (mode === 'ts1' || mode === 'ts2') {
+    const field = mode;
+    const label = mode === 'ts1' ? 'Torschütze 1' : 'Torschütze 2';
+    const counts = {};
+    const nameLists = {};
+    names.forEach(n => {
+      const val = allParts[n]?.[field];
+      if (val) {
+        counts[val] = (counts[val]||0)+1;
+        if (!nameLists[val]) nameLists[val]=[];
+        nameLists[val].push(n);
+      }
+    });
+    const sorted = Object.entries(counts).sort((a,b)=>b[1]-a[1]);
+    const goals = window._goalLeaders || {};
+    const tableRows = sorted.map(([player, cnt]) => {
+      const g = getPlayerGoals(player);
+      const goalsStr = g > 0 ? `<span style="color:var(--green);font-weight:700;"> ⚽${g}</span>` : '';
+      const participantList = nameLists[player].map(n => {
+        const tag = isMe(n) ? ' <span style="background:var(--blue);color:#fff;border-radius:3px;padding:0 4px;font-size:.65rem;">DU</span>' : (isMyGroup(n)?'<span style="background:#edf6ff;color:var(--blue);border-radius:3px;padding:0 4px;font-size:.65rem;">GRP</span>':'');
+        return `<span style="white-space:nowrap;">${n}${tag}</span>`;
+      }).join(', ');
+      return `<tr><td style="padding:6px 10px;font-weight:700;">⚽ ${player}${goalsStr}</td><td style="padding:6px 10px;text-align:center;">${cnt}</td><td style="padding:6px 10px;font-size:.78rem;color:var(--muted);">${participantList}</td></tr>`;
+    }).join('');
+    container.innerHTML = `<table style="width:100%;border-collapse:collapse;font-size:.84rem;">
+      <thead><tr style="background:var(--bg2);"><th style="padding:8px 10px;text-align:left;">${label}</th><th style="padding:8px 10px;text-align:center;">#</th><th style="padding:8px 10px;text-align:left;">Teilnehmer</th></tr></thead>
+      <tbody>${tableRows}</tbody></table>`;
+
+  } else if (mode === 'all_tips') {
+    // Matrix: Spieler × alle 72 Spiele
+    const allPreds = {...AICOMP_PREDICTIONS, ...ALL_PREDICTIONS};
+    // Build headers: Game 1…72 with short team names
+    const games = ALL_GAMES.slice(0, 72);
+    const actuals = {};
+    games.forEach(g => { const a = getActual(g); if (a) actuals[g.id] = a; });
+
+    const headerCells = games.map(g => {
+      const a = actuals[g.id];
+      const label = `G${g.id}`;
+      const tooltip = `${g.team1} vs ${g.team2}`;
+      const bg = a?.status === 'FT' ? 'background:#e8f5e9;' : '';
+      return `<th style="padding:3px 4px;font-size:.65rem;white-space:nowrap;text-align:center;min-width:36px;${bg}" title="${tooltip}">${label}</th>`;
+    }).join('');
+
+    const rows = names.map(n => {
+      const duTag = isMe(n) ? '<span style="background:var(--blue);color:#fff;border-radius:3px;padding:0 3px;font-size:.58rem;margin-left:2px;">DU</span>' : '';
+      const grpTag = !isMe(n) && isMyGroup(n) ? '<span style="background:#edf6ff;color:var(--blue);border-radius:3px;padding:0 3px;font-size:.58rem;margin-left:2px;">G</span>' : '';
+      const rowBg = isMe(n) ? 'background:rgba(52,152,219,.05);' : (isMyGroup(n) ? 'background:rgba(52,152,219,.02);' : '');
+      const cells = games.map(g => {
+        const pred = allPreds[n]?.[String(g.id)];
+        const a = actuals[g.id];
+        if (!pred) return `<td style="padding:3px 4px;text-align:center;font-size:.68rem;color:#ccc;">—</td>`;
+        const score = `${pred.goals1}:${pred.goals2}`;
+        let bg = '', fw = '';
+        if (a?.status === 'FT') {
+          const exact = pred.goals1 === a.s1 && pred.goals2 === a.s2;
+          const tendency = (pred.goals1 > pred.goals2) === (a.s1 > a.s2) || (pred.goals1 === pred.goals2) === (a.s1 === a.s2);
+          bg = exact ? 'background:#c8e6c9;' : (tendency ? 'background:#fff9c4;' : 'background:#ffcdd2;');
+          fw = exact ? 'font-weight:700;' : '';
+        }
+        return `<td style="padding:3px 4px;text-align:center;font-size:.68rem;${bg}${fw}white-space:nowrap;">${score}</td>`;
+      }).join('');
+      return `<tr style="${rowBg}"><td style="padding:4px 8px;font-size:.75rem;white-space:nowrap;position:sticky;left:0;background:${isMe(n)?'rgba(219,234,254,.8)':isMyGroup(n)?'rgba(239,246,255,.8)':'#fff'};z-index:1;">${n}${duTag}${grpTag}</td>${cells}</tr>`;
+    }).join('');
+
+    // Footer: actual results
+    const resultRow = games.map(g => {
+      const a = actuals[g.id];
+      if (!a || a.status !== 'FT') return `<td style="padding:3px 4px;text-align:center;font-size:.65rem;color:var(--muted);">?</td>`;
+      return `<td style="padding:3px 4px;text-align:center;font-size:.68rem;font-weight:700;background:#e8f5e9;">${a.s1}:${a.s2}</td>`;
+    }).join('');
+
+    container.innerHTML = `<div style="font-size:.75rem;color:var(--muted);margin-bottom:8px;">${names.length} Spieler · ${games.length} Spiele · <span style="background:#c8e6c9;padding:1px 5px;border-radius:3px;">Grün=Exakt</span> <span style="background:#fff9c4;padding:1px 5px;border-radius:3px;">Gelb=Tendenz</span> <span style="background:#ffcdd2;padding:1px 5px;border-radius:3px;">Rot=Falsch</span></div>
+      <div style="overflow-x:auto;max-height:70vh;overflow-y:auto;border:1px solid #eee;border-radius:8px;">
+      <table style="border-collapse:collapse;font-size:.75rem;">
+      <thead style="position:sticky;top:0;z-index:2;background:var(--bg2);">
+        <tr><th style="padding:4px 8px;text-align:left;position:sticky;left:0;background:var(--bg2);z-index:3;white-space:nowrap;min-width:140px;">Spieler</th>${headerCells}</tr>
+        <tr style="background:#e8f5e9;"><td style="padding:3px 8px;font-size:.68rem;font-weight:700;position:sticky;left:0;background:#e8f5e9;z-index:3;">✅ Ergebnis</td>${resultRow}</tr>
+      </thead>
+      <tbody>${rows}</tbody></table></div>`;
+
+  } else if (mode === 'tips') {
+    const gameId = parseInt(document.getElementById('dbGameSelect')?.value) || ALL_GAMES[0]?.id;
+    const game = ALL_GAMES.find(g=>g.id===gameId);
+    if (!game) { container.innerHTML='<div>Kein Spiel ausgewählt.</div>'; return; }
+    const allPreds = {...AICOMP_PREDICTIONS, ...ALL_PREDICTIONS};
+    const actual = getActual(game);
+    const scoreLabel = actual?.status === 'FT' ? `✅ Ergebnis: ${actual.s1}:${actual.s2}` : '';
+
+    // Group by tip
+    const tipGroups = {};
+    names.forEach(n => {
+      const pred = allPreds[n]?.[String(game.id)];
+      if (!pred) return;
+      const key = `${pred.goals1}:${pred.goals2}`;
+      if (!tipGroups[key]) tipGroups[key] = [];
+      tipGroups[key].push(n);
+    });
+    const withTip = Object.values(tipGroups).flat().length;
+    const noTip = names.filter(n => !allPreds[n]?.[String(game.id)]).length;
+
+    const sortedTips = Object.entries(tipGroups).sort((a,b)=>b[1].length-a[1].length);
+    const tableRows = sortedTips.map(([score, pickers]) => {
+      const isExact = actual?.status==='FT' && score===`${actual.s1}:${actual.s2}`;
+      const rowStyle = isExact ? 'background:rgba(39,174,96,.08);' : '';
+      const pickerHtml = pickers.map(n => {
+        const tag = isMe(n) ? ' <span style="background:var(--blue);color:#fff;border-radius:3px;padding:0 4px;font-size:.65rem;">DU</span>' : (isMyGroup(n)?'<span style="background:#edf6ff;color:var(--blue);border-radius:3px;padding:0 4px;font-size:.65rem;">GRP</span>':'');
+        return `<span style="white-space:nowrap;">${n}${tag}</span>`;
+      }).join(', ');
+      const exactBadge = isExact ? ' ✅' : '';
+      return `<tr style="${rowStyle}"><td style="padding:6px 10px;font-weight:700;font-size:.9rem;">${score}${exactBadge}</td><td style="padding:6px 10px;text-align:center;">${pickers.length}</td><td style="padding:6px 10px;font-size:.78rem;color:var(--muted);">${pickerHtml}</td></tr>`;
+    }).join('');
+    container.innerHTML = `<div style="margin-bottom:8px;font-size:.82rem;color:var(--muted);">
+      <strong>${game.team1} vs ${game.team2}</strong> — ${withTip} Tipps${scoreLabel?' · '+scoreLabel:''}${noTip?' · '+noTip+' ohne Tipp':''}
+    </div>
+    <table style="width:100%;border-collapse:collapse;font-size:.84rem;">
+      <thead><tr style="background:var(--bg2);"><th style="padding:8px 10px;text-align:left;">Tipp</th><th style="padding:8px 10px;text-align:center;">#</th><th style="padding:8px 10px;text-align:left;">Teilnehmer</th></tr></thead>
+      <tbody>${tableRows}</tbody></table>`;
+  }
+}
+
 function renderStats(lb) {
   // 1. Accuracy distribution (all played games)
   let tot3=0, tot2=0, tot1=0, tot0=0, totGames=0;
@@ -3973,7 +4206,8 @@ function switchTab(tabId) {
   // Tab-specific init
   if (tabId === 'h2h') initH2HTab();
   if (tabId === 'group' && _lastLb) renderGroupTab(_lastLb);
-  if (tabId === 'database' && _lastLb) renderStats(_lastLb);
+  if (tabId === 'stats' && _lastLb) renderStats(_lastLb);
+  if (tabId === 'database') renderDatabase();
   // Scroll to top on mobile
   if (window.innerWidth <= 600) window.scrollTo({top: 0, behavior: 'smooth'});
 }
