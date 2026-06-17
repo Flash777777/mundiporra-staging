@@ -990,6 +990,16 @@
   <div class="section-title">📝 Changelog</div>
 
     <div class="card" style="margin-bottom:14px;">
+  <div class="card-title">v1.18.0 — 17. Juni 2026 (Fix)</div>
+  <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
+    <li>⚽ <strong>Penalty-Scored Fix</strong> — ESPN-Typ "Penalty - Scored" enthielt kein "goal" → Kane-Elfmeter & ähnliche Tore fehlten in Live Cards und Champions-Tab</li>
+    <li>📅 <strong>7-Tage Rolling Lookback</strong> — <code>getESPNDateParams()</code> holt automatisch die letzten 7 Tage → kein manuelles Hardcoding für kürzliche Spiele mehr nötig</li>
+    <li>🔢 <strong>scoringEvents→playerGoals Merge</strong> — Live-Torschützen via <code>max()</code> mit /statistics zusammengeführt → vollständige Abdeckung ohne Doppelzählung</li>
+    <li>🛡️ <strong>Error-Handling fetchESPN</strong> — <code>renderLastNextMatch()</code> außerhalb try/catch → Live-Card-Fehler sichtbar geloggt</li>
+  </ul>
+</div>
+
+    <div class="card" style="margin-bottom:14px;">
   <div class="card-title">v1.17.17 — 17. Juni 2026 (Fix)</div>
   <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
     <li>🔥 <strong>Disruptor-Grenzwerte</strong> — 🔥 Disruptor ab 70% (vorher 65%), 💀 Chaos-Spiel ab 90% (vorher 82%)</li>
@@ -2336,12 +2346,15 @@ function getESPNDateParams() {
     blockStart.setDate(blockStart.getDate() + 7);
   }
 
-  // ── 2) Individual daily fetches: from blockStart (current week) to today+2 ──
-  // blockStart is now the first day of the current (incomplete) week
+  // ── 2) Individual daily fetches: 7-day rolling lookback + today+2 ──
+  // Fetches from today-7 so recent finished games appear without manual hardcoding.
   const dayEnd = new Date(now);
   dayEnd.setDate(dayEnd.getDate() + 2); // +2 upcoming
-  if (blockStart < hcCutoff) blockStart = hcCutoff;
-  const d = new Date(blockStart);
+  const lookbackStart = new Date(now);
+  lookbackStart.setDate(lookbackStart.getDate() - 7);
+  lookbackStart.setUTCHours(0, 0, 0, 0);
+  const fetchFrom = new Date(Math.max(WM_START.getTime(), Math.min(blockStart.getTime(), lookbackStart.getTime())));
+  const d = new Date(fetchFrom);
   while (d <= dayEnd) {
     const key = toKey(d);
     if (!added.has(key)) { params.push(key); added.add(key); }
@@ -2414,8 +2427,9 @@ function parseESPNEvents(events, target) {
         const rcMin = det.clock?.displayValue || null;
         if (rcAthlete) scoringEvents.push({ athleteName: rcAthlete, side: rcSide, min: rcMin, evtType: 'rc' });
       }
-      // Goals (exclude own goals / penalties from shootout for scorer tracking)
-      if (txt.includes('goal') && !txt.includes('shootout')) {
+      // Goals: "Goal - Header/Shot", "Penalty - Scored", own goals, etc.
+      // "Penalty - Scored" does NOT contain "goal" → must check txt.includes('scored')
+      if ((txt.includes('goal') || txt.includes('scored')) && !txt.includes('shootout') && !txt.includes('missed') && !txt.includes('saved')) {
         const athleteName = det.athletesInvolved?.[0]?.displayName
                          || det.athletesInvolved?.[0]?.fullName
                          || det.athlete?.displayName
@@ -2521,7 +2535,23 @@ function aggregateGoalScorers_legacy() {
     console.log('[GoalScorers] legacy comp.details:', goals);
   }
 }
-function aggregateGoalScorers(){aggregateGoalScorers_legacy();}
+function aggregateGoalScorers(){
+  aggregateGoalScorers_legacy();
+  const liveGoals = {};
+  for (const [key, game] of Object.entries(liveGames)) {
+    if (key.endsWith('_rev') || game._rev) continue;
+    for (const evt of (game.scoringEvents || [])) {
+      if (evt.evtType !== 'goal' && evt.evtType !== 'pen') continue;
+      if (evt.isOwnGoal) continue;
+      const name = evt.athleteName;
+      if (!name) continue;
+      liveGoals[name] = (liveGoals[name] || 0) + 1;
+    }
+  }
+  for (const [name, liveCount] of Object.entries(liveGoals)) {
+    if (liveCount > (playerGoals[name] || 0)) playerGoals[name] = liveCount;
+  }
+}
 
 // Normalize player name for fuzzy matching (remove accents, lowercase)
 function normName(s) {
@@ -2608,9 +2638,9 @@ async function fetchESPN() {
       anyOk = true;
       liveGames = {...collected};
       updateAPIHealth();
-      renderLastNextMatch();
     }
   } catch(e) {}
+  try { renderLastNextMatch(); } catch(e) { console.error('[ESPN] renderLastNextMatch step1:', e); }
 
   // ── Step 2: Optimized batch fetch ──
   // Weekly date-range batches for older data + individual days for recent+upcoming.
@@ -2640,6 +2670,7 @@ async function fetchESPN() {
   await fetchESPNStatistics();
 
   updateAPIHealth();
+  try { renderLastNextMatch(); } catch(e) { console.error('[ESPN] renderLastNextMatch final:', e); }
 }
 
 
@@ -4902,8 +4933,8 @@ function switchTab(tabId) {
 }
 
 // ═══════ WHAT'S NEW ═══════
-const BUILD_VERSION = 'v1.17.17';
-const BUILD_DATE = '17.06.2026 22:45';
+const BUILD_VERSION = 'v1.18.0';
+const BUILD_DATE    = '17.06.2026 23:00';
 (function(){ var _hb = document.getElementById('headerVersionBadge'); if(_hb) _hb.textContent = BUILD_VERSION; })();
 const WN_VERSION = 'v1.17';
 const WN_STORAGE_KEY = window.location.pathname.includes('staging') ? 'wnSeen_staging' : 'wnSeen_live';
