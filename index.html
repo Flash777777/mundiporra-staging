@@ -971,6 +971,15 @@
   <div class="section-title">📝 Changelog</div>
 
     <div class="card" style="margin-bottom:14px;">
+  <div class="card-title">v1.17.8 — 18. Juni 2026 (Fix)</div>
+  <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
+    <li>⚽ <strong>Scorer-Fix (Root Cause)</strong> — <code>fetchESPNStatistics()</code> suchte in <code>data.leaders</code> statt <code>data.stats[].goalsLeaders</code> → 0 Scorer-Punkte trotz ESPN-Daten</li>
+    <li>🔑 <strong>Curaçao Key-Fix</strong> — HARDCODED_RESULTS hatte CURÇAO statt CURAÇAO → Germany 7-1 fehlte im Dashboard</li>
+    <li>➕ <strong>Austria vs. Jordan</strong> — Ergebnis 3-1 (17.06.) zu HARDCODED_RESULTS hinzugefügt</li>
+    <li>🔍 <strong>Sanity Check #9</strong> — Neuer Check: Vergangene Spiele ohne FT-Ergebnis in liveGames</li>
+  </ul>
+</div>
+<div class="card" style="margin-bottom:14px;">
   <div class="card-title">v1.17.7 — 18. Juni 2026 (Fix)</div>
   <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
     <li>📅 <strong>ESPN Date-Range Fix IV</strong> — <code>blockEndNext >= hcCutoff</code> (statt <code>></code>) → Weekly Batch <code>20260611-20260617</code> wird korrekt ausgeschlossen</li>
@@ -2362,7 +2371,7 @@ const HARDCODED_RESULTS = {
   'BRAZIL-MOROCCO':{s1:1,s2:1,status:'FT'},'MOROCCO-BRAZIL':{s1:1,s2:1,status:'FT'},
   'HAITI-SCOTLAND':{s1:0,s2:1,status:'FT'},'SCOTLAND-HAITI':{s1:1,s2:0,status:'FT'},
   'AUSTRALIA-TURKIYE':{s1:2,s2:0,status:'FT'},'TURKIYE-AUSTRALIA':{s1:0,s2:2,status:'FT'},
-  'GERMANY-CUR\u00c7AO':{s1:7,s2:1,status:'FT'},'CUR\u00c7AO-GERMANY':{s1:1,s2:7,status:'FT'},
+  'GERMANY-CURA\u00c7AO':{s1:7,s2:1,status:'FT'},'CURA\u00c7AO-GERMANY':{s1:1,s2:7,status:'FT'},
   'NETHERLANDS-JAPAN':{s1:2,s2:2,status:'FT'},'JAPAN-NETHERLANDS':{s1:2,s2:2,status:'FT'},
   "C\u00d4TE D'IVOIRE-ECUADOR":{s1:1,s2:0,status:'FT'},"ECUADOR-C\u00d4TE D'IVOIRE":{s1:0,s2:1,status:'FT'},
   'SWEDEN-TUNISIA':{s1:5,s2:1,status:'FT'},'TUNISIA-SWEDEN':{s1:1,s2:5,status:'FT'},
@@ -2373,34 +2382,33 @@ const HARDCODED_RESULTS = {
   'FRANCE-SENEGAL':{s1:3,s2:1,status:'FT'},'SENEGAL-FRANCE':{s1:1,s2:3,status:'FT'},
   'IRAQ-NORWAY':{s1:1,s2:4,status:'FT'},'NORWAY-IRAQ':{s1:4,s2:1,status:'FT'},
   'ARGENTINA-ALGERIA':{s1:3,s2:0,status:'FT'},'ALGERIA-ARGENTINA':{s1:0,s2:3,status:'FT'},
+  'AUSTRIA-JORDAN':{s1:3,s2:1,status:'FT'},'JORDAN-AUSTRIA':{s1:1,s2:3,status:'FT'},
 };
 
 // ── Goal scorer aggregation via /statistics endpoint ─────────────────────
 async function fetchESPNStatistics() {
+  // Primary: /statistics endpoint → data.stats[].goalsLeaders
   try {
-    const urls = [
-      'https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/statistics?limit=50',
-      'https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/leaders?limit=50'
-    ];
-    for (const url of urls) {
-      const r = await fetch(url, {signal: AbortSignal.timeout(8000)});
-      if (!r.ok) continue;
+    const r = await fetch(
+      'https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/statistics?limit=100',
+      {signal: AbortSignal.timeout(8000)}
+    );
+    if (r.ok) {
       const data = await r.json();
       const goals = {};
-      const cats = data.leaders || data.statistics?.leaders || [];
-      for (const cat of cats) {
-        const nm = (cat.name || cat.shortDisplayName || '').toLowerCase();
-        if (!nm.includes('goal')) continue;
-        for (const e of (cat.leaders || [])) {
-          const pn = e.athlete?.displayName || e.athlete?.fullName || null;
-          const v = parseInt(e.value || e.displayValue || 0) || 0;
+      const allStats = Array.isArray(data.stats) ? data.stats : Object.values(data.stats || {});
+      const goalsLeaders = allStats.find(s => s.name === 'goalsLeaders');
+      if (goalsLeaders?.leaders?.length) {
+        for (const l of goalsLeaders.leaders) {
+          const pn = l.athlete?.displayName || l.athlete?.fullName || null;
+          const v = parseInt(l.value) || 0;
           if (pn && v > 0) goals[pn] = (goals[pn]||0) + v;
         }
       }
       if (Object.keys(goals).length > 0) { playerGoals = goals; return; }
     }
-    aggregateGoalScorers_legacy();
-  } catch(e) { aggregateGoalScorers_legacy(); }
+  } catch(e) { /* fallthrough */ }
+  aggregateGoalScorers_legacy();
 }
 
 // ── Goal scorer aggregation from comp.details (via parseESPNEvents) ──
@@ -2628,6 +2636,26 @@ function runSanityChecks() {
     icon: missing.length === 0 ? '✅' : 'ℹ️',
     name: 'ESPN Scorer vs. ts1/ts2',
     note: scorerNote
+  });
+
+  // 9. Vergangene Spiele ohne FT-Ergebnis
+  const now = new Date();
+  const pastGamesNoFT = ALL_GAMES ? Object.values(ALL_GAMES).filter(g => {
+    if (!g.utcDate) return false;
+    const gameDate = new Date(g.utcDate);
+    if (gameDate >= now) return false;
+    const t1 = (g.homeTeam || '').toUpperCase();
+    const t2 = (g.awayTeam || '').toUpperCase();
+    const key = t1 + '-' + t2;
+    const entry = liveGames[key];
+    return !entry || entry.status !== 'FT';
+  }) : [];
+  checks.push({
+    icon: pastGamesNoFT.length === 0 ? '✅' : '🔴',
+    name: 'Vergangene Spiele ohne FT',
+    note: pastGamesNoFT.length === 0
+      ? '0 — alle gespielten Spiele haben FT-Ergebnis'
+      : pastGamesNoFT.length + ' Spiel(e) ohne Ergebnis: ' + pastGamesNoFT.map(g => (g.homeTeam||'?') + ' vs ' + (g.awayTeam||'?')).slice(0,5).join(', ')
   });
 
   // ── Render badge ──
@@ -4774,8 +4802,8 @@ function switchTab(tabId) {
 }
 
 // ═══════ WHAT'S NEW ═══════
-const BUILD_VERSION = 'v1.17.7';
-const BUILD_DATE = '18.06.2026 01:30';
+const BUILD_VERSION = 'v1.17.8';
+const BUILD_DATE = '18.06.2026 03:00';
 (function(){ var _hb = document.getElementById('headerVersionBadge'); if(_hb) _hb.textContent = BUILD_VERSION; })();
 const WN_VERSION = 'v1.17';
 const WN_STORAGE_KEY = window.location.pathname.includes('staging') ? 'wnSeen_staging' : 'wnSeen_live';
