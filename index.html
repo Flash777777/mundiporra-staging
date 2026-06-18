@@ -1044,6 +1044,13 @@
   <div class="section-title">📝 Changelog</div>
 
     <div class="card" style="margin-bottom:14px;">
+  <div class="card-title">v1.19.6 — 19. Juni 2026 (Fix)</div>
+  <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
+    <li>🃏 <strong>Porra-Karte Stats Fix</strong> — <code>e.name</code> statt <code>e.alias</code> im Leaderboard-Lookup; <code>played</code>/<code>hitPct</code>/<code>exactPct</code> korrekt berechnet</li>
+    <li>⬇️ <strong>Download Fix</strong> — <code>USER.player</code> statt <code>USER</code> für Dateiname</li>
+  </ul>
+</div>
+<div class="card" style="margin-bottom:14px;">
   <div class="card-title">v1.19.5 — 19. Juni 2026 (Fix)</div>
   <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
     <li>🐛 <strong>Porra-Karte</strong> — <code>nat is not defined</code> behoben (Template-String noch <code>alt="${nat}"</code> referenziert)</li>
@@ -5162,8 +5169,8 @@ function switchTab(tabId) {
 }
 
 // ═══════ WHAT'S NEW ═══════
-const BUILD_VERSION = 'v1.19.5';
-const BUILD_DATE    = '19.06.2026 00:40';
+const BUILD_VERSION = 'v1.19.6';
+const BUILD_DATE    = '19.06.2026 01:00';
 (function(){ var _hb = document.getElementById('headerVersionBadge'); if(_hb) _hb.textContent = BUILD_VERSION; })();
 const WN_VERSION = 'v1.19';
 const WN_STORAGE_KEY = window.location.pathname.includes('staging') ? 'wnSeen_staging' : 'wnSeen_live';
@@ -5792,8 +5799,9 @@ async function showMyPorraCard(){
   if(!_lastLb||!_lastLb.length)buildLeaderboard();
   const lb=_lastLb||[];
   const alias=USER.player||'';
-  const me=lb.find(e=>e.alias===alias);
-  const stats=me?{total:me.total,exactPct:me.played>0?(me.exact/me.played*100):0,hitPct:me.played>0?(me.hit/me.played*100):0,rank:lb.indexOf(me)+1}:null;
+  const me=lb.find(e=>e.name===alias);
+  const mePlayed=me?(me.exact+me.diff+me.one+me.wrong):0;
+  const stats=me?{total:me.total,exactPct:mePlayed>0?(me.exact/mePlayed*100):0,hitPct:mePlayed>0?((me.exact+me.diff+me.one)/mePlayed*100):0,rank:me.rank??lb.indexOf(me)+1}:null;
   document.getElementById('porra-card-modal-card').innerHTML=_buildPorraCard(alias,stats,mapping,false);
   document.getElementById('porra-card-modal').classList.add('open');
   setTimeout(()=>_porraFitName(document.getElementById('porraCardNameEl')),50);
@@ -5809,7 +5817,7 @@ async function porraCardDownload(){
   if(!card)return;
   const doDownload=()=>html2canvas(card,{scale:2,useCORS:true,allowTaint:true}).then(c=>{
     const a=document.createElement('a');
-    a.download='porra-card-'+USER.replace(/\s+/g,'-')+'.png';
+    a.download='porra-card-'+(USER.player||'card').replace(/\s+/g,'-')+'.png';
     a.href=c.toDataURL('image/png');a.click();
   });
   if(typeof html2canvas!=='undefined'){doDownload();}
