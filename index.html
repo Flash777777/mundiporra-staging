@@ -990,6 +990,13 @@
   <div class="section-title">📝 Changelog</div>
 
     <div class="card" style="margin-bottom:14px;">
+  <div class="card-title">v1.18.5 — 18. Juni 2026 (Fix)</div>
+  <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
+    <li>👤 <strong>Eigener Tipp in FT-Cards</strong> — Letzte Ergebnisse (Overview) und Alle Spiele Tab zeigen jetzt den eigenen Tipp mit Farb-Coding (Exakt / Tordiff. / Tendenz / Falsch)</li>
+  </ul>
+</div>
+
+    <div class="card" style="margin-bottom:14px;">
   <div class="card-title">v1.18.4 — 17. Juni 2026 (Fix)</div>
   <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
     <li>🔔 <strong>Force-Reload Modal Fix</strong> — <code>checkVersionJson()</code> las <code>data.v</code>/<code>data.msg</code> statt <code>data.version</code>/<code>data.message</code> → falscher Text &amp; Endlosschleife nach Reload; beides behoben</li>
@@ -3464,7 +3471,18 @@ function matchCardFinished(g, a, lb) {
     const _sl = a.s1 + ':' + a.s2;
     ptDistHtml = `<hr style="border:none;border-top:1px solid #f0f0f0;margin:10px 0 8px;"><div style="font-size:.6rem;color:#ccc;font-weight:700;text-transform:uppercase;letter-spacing:.07em;text-align:center;margin-bottom:6px;">${T('pts_dist_label')} ${_sl}</div><div style="display:flex;gap:5px;">${[{l:'3 Pkt',n:_dist.p3,p:_dist.pct3,c:'#00c853'},{l:'2 Pkt',n:_dist.p2,p:_dist.pct2,c:'#ff8c00'},{l:'1 Pkt',n:_dist.p1,p:_dist.pct1,c:'#2979ff'},{l:'0 Pkt',n:_dist.p0,p:_dist.pct0,c:'#e74c3c'}].map(({l,n,p,c})=>`<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;border:1.5px solid ${c};border-radius:8px;padding:6px 4px 5px;position:relative;overflow:hidden;"><div style="position:absolute;bottom:0;left:0;right:0;background:${c};opacity:.18;height:${Math.min(p*.8,80)}%;border-radius:0 0 6px 6px;"></div><div style="font-size:.72rem;font-weight:800;color:${c};position:relative;">${n}</div><div style="font-size:.6rem;color:#999;position:relative;">${l}</div></div>`).join('')}</div>`;
   }
-    return `<div class="match-card" style="${cardStyle}">
+    // My tip display
+  let myTipHtml = '';
+  if (USER.player && tip && pts !== null) {
+    const _tipColors = ['#e74c3c','#78c795','#3cb86a','#16a34a'];
+    const _tipBgs    = ['#fde8e8','#edf9f1','#d8f4e2','#c5edcf'];
+    const _tipLabels = ['Falsch ✗','Tendenz ✓','Tordiff. ✓','Exakt ✓'];
+    const _c = _tipColors[pts] || _tipColors[0];
+    const _bg = _tipBgs[pts] || _tipBgs[0];
+    const _lbl = _tipLabels[pts] || _tipLabels[0];
+    myTipHtml = `<div style="display:flex;align-items:center;justify-content:center;gap:6px;margin-top:8px;margin-bottom:2px;font-size:.75rem;"><span style="color:#aaa;">Dein Tipp:</span><span style="color:${_c};font-weight:700;">${tip.goals1}:${tip.goals2}</span><span style="color:${_c};font-size:.68rem;font-weight:600;background:${_bg};padding:1px 6px;border-radius:8px;">${_lbl}</span></div>`;
+  }
+  return `<div class="match-card" style="${cardStyle}">
     ${badgeHtml}
     <div class="match-score">
       <div class="match-team">${g.team1}</div>
@@ -3472,6 +3490,7 @@ function matchCardFinished(g, a, lb) {
       <div class="match-team">${g.team2}</div>
     </div>
     <div class="match-meta">Game ${g.id} · Group ${g.group} · FT${kickoff ? ' · '+kickoff : ''}${venue ? ' · 📍 '+venue : ''}</div>
+      ${myTipHtml}
       ${ptDistHtml}
   </div>`;
 }
@@ -4132,6 +4151,21 @@ function renderGames() {
         : (crowd?.label ? `<span style="color:var(--muted);">👥 ${crowd.label} (${crowd.pct}%)</span>` : '');
       if (myHtml || crowdHtml) {
         tipRowHtml = `<div style="display:flex;gap:12px;align-items:center;margin-top:5px;font-size:.75rem;flex-wrap:wrap;">${myHtml}${myHtml && crowdHtml ? ' · ' : ''}${crowdHtml}</div>`;
+      }
+    } else if (a?.status === 'FT' && USER.player) {
+      const allPreds = ALL_PREDICTIONS;
+      const myTip = allPreds[USER.player]?.[String(g.id)];
+      if (myTip) {
+        const _pts = scoreGame(myTip, a);
+        const _colors = ['#e74c3c','#78c795','#3cb86a','#16a34a'];
+        const _bgs    = ['#fde8e8','#edf9f1','#d8f4e2','#c5edcf'];
+        const _labels = ['Falsch ✗','Tendenz ✓','Tordiff. ✓','Exakt ✓'];
+        const _c = _colors[_pts] || _colors[0];
+        const _bg = _bgs[_pts] || _bgs[0];
+        const _lbl = _labels[_pts] || _labels[0];
+        tipRowHtml = `<div style="display:flex;gap:8px;align-items:center;margin-top:5px;font-size:.75rem;flex-wrap:wrap;"><span style="color:${_c};font-weight:700;">👤 ${myTip.goals1}:${myTip.goals2}</span><span style="color:${_c};font-size:.68rem;font-weight:600;background:${_bg};padding:1px 6px;border-radius:8px;">${_lbl}</span></div>`;
+      } else {
+        tipRowHtml = `<div style="display:flex;gap:12px;align-items:center;margin-top:5px;font-size:.75rem;"><span style="color:var(--muted);">👤 –</span></div>`;
       }
     }
     return `<div class="game-card ${a?.status==='FT'?'finished':''}" onclick="showGameDetail(${g.id})">
@@ -4970,8 +5004,8 @@ function switchTab(tabId) {
 }
 
 // ═══════ WHAT'S NEW ═══════
-const BUILD_VERSION = 'v1.18.4';
-const BUILD_DATE    = '17.06.2026 21:30';
+const BUILD_VERSION = 'v1.18.5';
+const BUILD_DATE    = '18.06.2026 14:00';
 (function(){ var _hb = document.getElementById('headerVersionBadge'); if(_hb) _hb.textContent = BUILD_VERSION; })();
 const WN_VERSION = 'v1.17';
 const WN_STORAGE_KEY = window.location.pathname.includes('staging') ? 'wnSeen_staging' : 'wnSeen_live';
