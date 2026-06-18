@@ -3456,10 +3456,10 @@ function matchCardFinished(g, a, lb) {
   // Points gradient for DU
   let cardStyle = '';
   let badgeHtml = '';
+  const allPreds_ft = ALL_PREDICTIONS;
+  const tip = USER.player ? allPreds_ft[USER.player]?.[String(g.id)] : null;
+  const pts = (USER.player && tip && a) ? scoreGame(tip, a) : null;
   if (USER.player && a) {
-    const allPreds = ALL_PREDICTIONS;
-    const tip = allPreds[USER.player]?.[String(g.id)];
-    const pts = tip ? scoreGame(tip, a) : null;
     const gradients = ['background:#f5f5f8;border-left:4px solid #bbb;','background:#edf9f1;border-left:4px solid #78c795;','background:#d8f4e2;border-left:4px solid #3cb86a;','background:#c5edcf;border-left:4px solid #16a34a;'];
     const badges = ['<span style="background:#999;color:#fff;font-size:0.68rem;font-weight:700;padding:2px 7px;border-radius:10px;float:right;">0 Pts</span>','<span style="background:#78c795;color:#fff;font-size:0.68rem;font-weight:700;padding:2px 7px;border-radius:10px;float:right;">+1 Pt</span>','<span style="background:#3cb86a;color:#fff;font-size:0.68rem;font-weight:700;padding:2px 7px;border-radius:10px;float:right;">+2 Pts</span>','<span style="background:#16a34a;color:#fff;font-size:0.68rem;font-weight:700;padding:2px 7px;border-radius:10px;float:right;">+3 Pts</span>'];
     if (pts !== null) { cardStyle = gradients[pts] || gradients[0]; badgeHtml = badges[pts] || badges[0]; }
