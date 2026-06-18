@@ -2,6 +2,9 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;600;700;800&display=swap" rel="stylesheet">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -613,6 +616,57 @@
   .kpi-pin-btn.pinned{color:var(--accent)!important;opacity:1!important;transform:rotate(-45deg);}
   .kpi-pin-btn{opacity:0.35;transition:opacity .2s,transform .2s,color .2s;}
   .kpi-pin-btn:hover{opacity:0.8;}
+
+  /* ══ MEINE PORRA-KARTE — Panini Style ══ */
+  .porra-card-outer{width:320px;border-radius:22px;padding:12px;cursor:default;position:relative;transition:transform .35s,box-shadow .35s;background:radial-gradient(ellipse 70% 20% at 50% 108%,rgba(255,255,210,.85) 0%,transparent 55%),repeating-conic-gradient(from 0deg at 50% -15%,rgba(255,248,180,.22) 0deg 3.5deg,rgba(160,110,5,.07) 3.5deg 7deg),linear-gradient(155deg,#f7e882 0%,#c8920a 10%,#f2cc45 22%,#b07808 35%,#f5d020 48%,#c08010 60%,#eac840 73%,#a87010 86%,#f7e882 100%);box-shadow:0 0 0 1px rgba(0,0,0,.5),0 16px 60px rgba(0,0,0,.8),0 0 80px rgba(200,146,10,.35),inset 0 2px 1px rgba(255,248,180,.7),inset 0 -3px 2px rgba(80,50,0,.4)}
+  .porra-card-outer:hover{transform:translateY(-6px) rotate(.4deg);box-shadow:0 0 0 1px rgba(0,0,0,.5),0 26px 80px rgba(0,0,0,.9),0 0 120px rgba(200,146,10,.5),inset 0 2px 1px rgba(255,248,180,.7),inset 0 -3px 2px rgba(80,50,0,.4)}
+  .porra-card-border{border-radius:13px;padding:3px;background:#111}
+  .porra-card-inner{border-radius:11px;overflow:hidden;position:relative;background:#e8dfc8}
+  .porra-card-inner::after{content:'';position:absolute;inset:0;pointer-events:none;z-index:20;border-radius:11px;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");background-size:180px 180px;opacity:.09}
+  .porra-card-header{background:#0b1830;padding:10px 14px 9px;display:flex;align-items:center;justify-content:space-between;position:relative;overflow:hidden}
+  .porra-card-header::before{content:'';position:absolute;inset:0;pointer-events:none;background:repeating-conic-gradient(from 0deg at 50% 220%,rgba(255,215,0,.07) 0deg 2.5deg,transparent 2.5deg 6deg)}
+  .porra-card-header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,#d4a012 25%,#f7e070 50%,#d4a012 75%,transparent)}
+  .porra-card-hdr-title{font-family:'Bebas Neue',sans-serif;font-size:1.25rem;color:#f0c830;letter-spacing:3px;text-shadow:0 1px 0 rgba(0,0,0,.8),0 0 16px rgba(240,200,48,.4);position:relative;z-index:1}
+  .porra-card-hdr-trophy{font-size:1.35rem;position:relative;z-index:1;filter:drop-shadow(0 0 8px rgba(240,200,48,.8)) sepia(.3) brightness(1.1)}
+  .porra-card-photo{position:relative;width:100%;height:252px;overflow:hidden;background:#8a7a60}
+  .porra-card-photo img{width:100%;height:100%;object-fit:cover;object-position:center top;display:block;filter:saturate(.75) sepia(.15) contrast(1.08) brightness(.97)}
+  .porra-card-photo::after{content:'';position:absolute;bottom:0;left:0;right:0;height:60px;background:linear-gradient(transparent,#0b1830);pointer-events:none}
+  .porra-card-flag{position:absolute;top:9px;left:10px;width:30px;height:30px;border-radius:50%;border:2px solid rgba(240,200,48,.85);overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.7);z-index:10;filter:saturate(.85)}
+  .porra-card-flag img{width:100%;height:100%;object-fit:cover}
+  .porra-card-footer{background:#0b1830;padding:9px 13px 12px;position:relative}
+  .porra-card-footer::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,#d4a012 25%,#f7e070 50%,#d4a012 75%,transparent)}
+  .porra-card-name{font-family:'Bebas Neue',sans-serif;font-size:1.45rem;color:#e8d080;letter-spacing:2px;text-align:center;margin-bottom:5px;text-shadow:0 1px 2px rgba(0,0,0,.9);line-height:1.05;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .porra-card-divider{height:1px;background:linear-gradient(90deg,transparent,rgba(200,170,80,.25),transparent);margin:5px 0}
+  .porra-card-stats-row{display:flex;align-items:baseline;margin-bottom:2px;line-height:1.7;flex-wrap:nowrap}
+  .porra-card-lbl{font-family:'Barlow Condensed',sans-serif;font-size:.72rem;font-weight:700;color:#9a8e72;text-transform:uppercase;letter-spacing:.8px;margin-right:4px;white-space:nowrap}
+  .porra-card-val{font-family:'Barlow Condensed',sans-serif;font-size:.83rem;font-weight:800;color:#d8cfb4;letter-spacing:.3px;white-space:nowrap}
+  .porra-card-pipe{color:rgba(180,150,70,.28);margin:0 7px;font-weight:400;font-size:.75rem}
+  .porra-card-rank-row{display:flex;align-items:baseline;margin-top:1px;line-height:1.7}
+  .porra-card-fire{font-size:.82rem;margin-left:5px;filter:saturate(.7) brightness(.9)}
+  #porra-card-modal{position:fixed;inset:0;background:rgba(0,0,0,.92);backdrop-filter:blur(14px);display:flex;align-items:center;justify-content:center;z-index:9999;opacity:0;pointer-events:none;transition:opacity .3s}
+  #porra-card-modal.open{opacity:1;pointer-events:all}
+  #porra-card-modal-content{display:flex;flex-direction:column;align-items:center;gap:16px;padding:20px;max-height:100vh;overflow-y:auto}
+  #porra-card-modal.open #porra-card-modal-content{animation:porraCardPopIn .38s cubic-bezier(.34,1.56,.64,1) forwards}
+  @keyframes porraCardPopIn{from{transform:scale(.82) translateY(20px);opacity:0}to{transform:scale(1) translateY(0);opacity:1}}
+  .porra-card-modal-eyebrow{font-family:'Bebas Neue',sans-serif;color:rgba(240,200,48,.55);font-size:.9rem;letter-spacing:6px;text-transform:uppercase}
+  .porra-card-modal-btns{display:flex;gap:10px}
+  .porra-card-modal-btn{padding:9px 24px;border-radius:20px;font-size:.75rem;cursor:pointer;letter-spacing:1.5px;font-family:'Barlow Condensed',sans-serif;font-weight:700;transition:all .2s;text-transform:uppercase;border:1px solid}
+  .porra-card-modal-btn.dl{background:rgba(240,200,48,.15);border-color:rgba(240,200,48,.5);color:#f0c830}
+  .porra-card-modal-btn.dl:hover{background:rgba(240,200,48,.28)}
+  .porra-card-modal-btn.cl{background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.2);color:rgba(255,255,255,.6)}
+  .porra-card-modal-btn.cl:hover{background:rgba(255,255,255,.12);color:#fff}
+  #porra-admin-gallery{display:none;position:fixed;inset:0;background:#111;z-index:9998;overflow-y:auto;padding:24px}
+  #porra-admin-gallery.open{display:block}
+  .porra-gallery-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;padding-bottom:12px;border-bottom:1px solid rgba(240,200,48,.2)}
+  .porra-gallery-title{font-family:'Bebas Neue',sans-serif;color:#f0c830;font-size:1.6rem;letter-spacing:4px}
+  .porra-gallery-close{padding:8px 20px;border-radius:16px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.05);color:rgba(255,255,255,.6);font-family:'Barlow Condensed',sans-serif;font-size:.8rem;font-weight:700;letter-spacing:2px;cursor:pointer;text-transform:uppercase;transition:all .2s}
+  .porra-gallery-close:hover{background:rgba(255,255,255,.12);color:#fff}
+  .porra-gallery-search{width:100%;max-width:400px;padding:10px 16px;border:1px solid rgba(240,200,48,.3);border-radius:20px;background:rgba(255,255,255,.05);color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:.9rem;outline:none;margin-bottom:20px;display:block}
+  .porra-gallery-search::placeholder{color:rgba(255,255,255,.3)}
+  .porra-gallery-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:24px}
+  .porra-gallery-item{display:flex;flex-direction:column;align-items:center;gap:6px}
+  .porra-gallery-item .porra-card-outer{width:220px;cursor:pointer}
+  .porra-gallery-item .porra-card-photo{height:170px}
 </style>
 </head>
 <body>
@@ -958,7 +1012,7 @@
 <div id="tab-search" class="tab-content">
 <div class="page">
   <div class="section-title" id="searchTabTitle">🔍 Player Search</div>
-  <input type="text" class="search-input" id="searchInput" placeholder="Type a player name…" oninput="doSearch(this.value)">
+  <input type="text" class="search-input" id="searchInput" placeholder="Type a player name…" oninput="doSearch(this.value)" onkeydown="porraCardKeydown(event, this.value)">
   <div id="searchResults"></div>
 </div>
 </div>
@@ -990,6 +1044,14 @@
   <div class="section-title">📝 Changelog</div>
 
     <div class="card" style="margin-bottom:14px;">
+  <div class="card-title">v1.19.0 — 18. Juni 2026 (Feature)</div>
+  <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
+    <li>🎯 <strong>Meine Porra-Karte</strong> — Panini-Style: im Such-Tab "panini" + Enter eingeben. Vintage-Look mit Gold-Rahmen, Filmkorn, eigener Flagge und allen Stats.</li>
+    <li>🖼️ <strong>Admin Gallery</strong> — "paniniadminluigi" + Enter zeigt alle 154 Karten im Grid mit Suchfilter.</li>
+    <li>⬇️ <strong>Download</strong> — Karte als PNG speichern via Download-Button im Modal.</li>
+  </ul>
+</div>
+<div class="card" style="margin-bottom:14px;">
   <div class="card-title">v1.18.8 — 18. Juni 2026 (Fix)</div>
   <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
     <li>🏅 <strong>Live-Tipp Badge</strong> — Provisorische Wertung (~Exakt ✓ / ~Tordiff. ✓ / ~Tendenz ✓ / Falsch ✗) jetzt auch in der oberen Live-Matchcard sichtbar</li>
@@ -5049,10 +5111,10 @@ function switchTab(tabId) {
 }
 
 // ═══════ WHAT'S NEW ═══════
-const BUILD_VERSION = 'v1.18.8';
-const BUILD_DATE    = '18.06.2026 21:30';
+const BUILD_VERSION = 'v1.19.0';
+const BUILD_DATE    = '18.06.2026 23:30';
 (function(){ var _hb = document.getElementById('headerVersionBadge'); if(_hb) _hb.textContent = BUILD_VERSION; })();
-const WN_VERSION = 'v1.17';
+const WN_VERSION = 'v1.19';
 const WN_STORAGE_KEY = window.location.pathname.includes('staging') ? 'wnSeen_staging' : 'wnSeen_live';
 (function(){ const old = localStorage.getItem('wnSeen'); if(old && !localStorage.getItem(WN_STORAGE_KEY)) localStorage.setItem(WN_STORAGE_KEY, old); })();
 const WN_I18N={
@@ -5064,6 +5126,9 @@ const WN_I18N={
     wn_ptdist:'📊 <strong>Point Distribution</strong>: live &amp; simulator cards now show how many players score 3, 2, 1 or 0 pts — with color-coded mini-bars.',
     wn_fixes16:'🔧 <strong>Fixes &amp; Translations</strong>: header version badge restored, live card group filter fixed (only your group members shown), scoring guard corrected, translations added throughout.',
     // v1.13
+    wn_porracard: '🃏 <strong>My Porra Card</strong>: Type <code>panini</code> + Enter in the Search tab!',
+    wn_porracard: '🃏 <strong>Meine Porra-Karte</strong>: Im Such-Tab <code>panini</code> + Enter eingeben!',
+    wn_porracard: '🃏 <strong>Mi Carta Porra</strong>: Escribe <code>panini</code> + Enter en la pestaña de búsqueda!',
     wn_form:'💹 <strong>My Form</strong>: new KPI — consistency (equal-weighted hit rate, since all tips were pre-submitted), strength calibration (tougher matches weighted higher) and future outlook.',
     wn_momentum:'📈 <strong>Momentum</strong>: rank positions gained/lost over your last 5 completed matches. <strong>▲+8</strong> climbing · <strong>▼-3</strong> slipping.',
     wn_xpts:'🎯 <strong>Still Possible (xPts)</strong>: realistic points projection — your personal hit rate × remaining match difficulty.',
@@ -5122,6 +5187,8 @@ const WN_I18N={
 };
 // Icon map für WN-Keys — Reihenfolge & Icons für v1.12
 const WN_ITEMS = [
+  { key: 'wn_porracard', icon: '🃏', highlight: true },
+  { divider: true },
   // v1.17 items
   { key: 'wn_banner',      icon: '🔄', highlight: true },
   { key: 'wn_pointdist',   icon: '📊' },
@@ -5603,6 +5670,136 @@ window.addEventListener('resize',_chkLandscape);
   document.body.prepend(badge);
   document.body.style.paddingTop = '22px';
 })();
+
+/* ══ PORRA-KARTE System ══ */
+const PORRA_CARD_BASE_URL='https://raw.githubusercontent.com/Flash777777/mundiporra-dashboard/main/assets/cards/';
+let _porraCardMapping=null,_porraCardMappingLoading=false;
+async function _loadCardMapping(){
+  if(_porraCardMapping)return _porraCardMapping;
+  if(_porraCardMappingLoading){await new Promise(r=>setTimeout(r,800));return _porraCardMapping;}
+  _porraCardMappingLoading=true;
+  try{const r=await fetch(PORRA_CARD_BASE_URL+'card_mapping.json?v='+Date.now());_porraCardMapping=await r.json();}
+  catch(e){console.error('card_mapping load failed',e);_porraCardMapping={};}
+  _porraCardMappingLoading=false;return _porraCardMapping;
+}
+function _getCC(nat){
+  const m={'Germany':'de','Spain':'es','France':'fr','Argentina':'ar','Brazil':'br','Italy':'it','Portugal':'pt','England':'gb-eng','Netherlands':'nl','Belgium':'be','Croatia':'hr','Uruguay':'uy','Mexico':'mx','Colombia':'co','Chile':'cl','Switzerland':'ch','Denmark':'dk','Sweden':'se','Norway':'no','Poland':'pl','Austria':'at','Czech Republic':'cz','Hungary':'hu','Romania':'ro','Greece':'gr','Turkey':'tr','Russia':'ru','Ukraine':'ua','Serbia':'rs','Slovakia':'sk','Scotland':'gb-sct','Wales':'gb-wls','Ireland':'ie','Japan':'jp','South Korea':'kr','USA':'us','Canada':'ca','Australia':'au','Morocco':'ma','Senegal':'sn','Nigeria':'ng','Ghana':'gh','Cameroon':'cm','Egypt':'eg','Saudi Arabia':'sa','Iran':'ir','Ecuador':'ec','Peru':'pe','Venezuela':'ve','Paraguay':'py','Bolivia':'bo','Costa Rica':'cr','Panama':'pa','Honduras':'hn','Finland':'fi','Bulgaria':'bg','Slovenia':'si','Iceland':'is','South Africa':'za','China':'cn','India':'in'};
+  return m[nat]||'un';
+}
+function _buildPorraCard(alias,stats,mapping,isSmall){
+  const info=ALL_PARTICIPANTS?ALL_PARTICIPANTS.find(p=>p.alias===alias):null;
+  const nat=info?.nationality||'Germany';
+  const cc=_getCC(nat);
+  const flagUrl='https://flagcdn.com/w80/'+cc+'.png';
+  const imgFile=mapping[alias]||'germany_1.jpg';
+  const imgUrl=PORRA_CARD_BASE_URL+imgFile;
+  const pts=stats?.total??'—';
+  const exact=stats?.exactPct!=null?Math.round(stats.exactPct)+'%':'—';
+  const hit=stats?.hitPct!=null?Math.round(stats.hitPct)+'%':'—';
+  const rank=stats?.rank??'—';
+  const total=_lastLb?_lastLb.length:154;
+  const isTop10=typeof rank==='number'&&rank<=10;
+  const fire=isTop10?'<span class="porra-card-fire">🔥</span>':'';
+  const pred=ALL_PREDICTIONS?ALL_PREDICTIONS[alias]:null;
+  const champ=pred?.champion||'—';
+  const ts1=pred?.ts1||'—';
+  const ts2=pred?.ts2||'—';
+  const photoStyle=isSmall?'height:170px':'';
+  const cardStyle=isSmall?'width:220px':'';
+  const nameId=isSmall?'':'id="porraCardNameEl"';
+  return `<div class="porra-card-outer" style="${cardStyle}"><div class="porra-card-border"><div class="porra-card-inner">
+    <div class="porra-card-header"><span class="porra-card-hdr-title">Mundiporra 2026</span><span class="porra-card-hdr-trophy">🏆</span></div>
+    <div class="porra-card-photo" style="${photoStyle}">
+      <img src="${imgUrl}" alt="${alias}" loading="lazy" onerror="this.src='${PORRA_CARD_BASE_URL}germany_1.jpg'">
+      <div class="porra-card-flag"><img src="${flagUrl}" alt="${nat}" loading="lazy"></div>
+    </div>
+    <div class="porra-card-footer">
+      <div class="porra-card-name" ${nameId}>${alias}</div>
+      <div class="porra-card-divider"></div>
+      <div class="porra-card-stats-row">
+        <span class="porra-card-lbl">${T('porra_card_points')}</span><span class="porra-card-val">${pts}</span>
+        <span class="porra-card-pipe">|</span>
+        <span class="porra-card-lbl">${T('porra_card_exact')}</span><span class="porra-card-val">${exact}</span>
+        <span class="porra-card-pipe">|</span>
+        <span class="porra-card-lbl">${T('porra_card_hit')}</span><span class="porra-card-val">${hit}</span>
+      </div>
+      <div class="porra-card-stats-row">
+        <span class="porra-card-lbl">${T('porra_card_champion')}</span><span class="porra-card-val">${champ}</span>
+        <span class="porra-card-pipe">|</span>
+        <span class="porra-card-lbl">${T('porra_card_ts1')}</span><span class="porra-card-val">${ts1}</span>
+        <span class="porra-card-pipe">|</span>
+        <span class="porra-card-lbl">${T('porra_card_ts2')}</span><span class="porra-card-val">${ts2}</span>
+      </div>
+      <div class="porra-card-divider"></div>
+      <div class="porra-card-rank-row"><span class="porra-card-lbl">${T('porra_card_rank')}</span><span class="porra-card-val">&nbsp;#${rank} / ${total}</span>${fire}</div>
+    </div>
+  </div></div></div>`;
+}
+function _porraFitName(el){
+  if(!el)return;
+  const max=el.parentElement.offsetWidth-20;
+  let sz=23;el.style.fontSize=sz+'px';
+  while(el.scrollWidth>max&&sz>10){sz-=.5;el.style.fontSize=sz+'px';}
+}
+async function showMyPorraCard(){
+  const mapping=await _loadCardMapping();
+  const lb=_lastLb||[];
+  const me=lb.find(e=>e.alias===USER);
+  const stats=me?{total:me.total,exactPct:me.played>0?(me.exact/me.played*100):0,hitPct:me.played>0?(me.hit/me.played*100):0,rank:lb.indexOf(me)+1}:null;
+  document.getElementById('porra-card-modal-card').innerHTML=_buildPorraCard(USER,stats,mapping,false);
+  document.getElementById('porra-card-modal').classList.add('open');
+  setTimeout(()=>_porraFitName(document.getElementById('porraCardNameEl')),50);
+  document.getElementById('searchInput').value='';
+  document.getElementById('searchResults').innerHTML='';
+}
+function porraCardModalClose(e){
+  if(!e||e.target===document.getElementById('porra-card-modal'))
+    document.getElementById('porra-card-modal').classList.remove('open');
+}
+async function porraCardDownload(){
+  const card=document.querySelector('#porra-card-modal .porra-card-outer');
+  if(!card)return;
+  const doDownload=()=>html2canvas(card,{scale:2,useCORS:true,allowTaint:true}).then(c=>{
+    const a=document.createElement('a');
+    a.download='porra-card-'+USER.replace(/\s+/g,'-')+'.png';
+    a.href=c.toDataURL('image/png');a.click();
+  });
+  if(typeof html2canvas!=='undefined'){doDownload();}
+  else{
+    const s=document.createElement('script');
+    s.src='https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+    s.onload=doDownload;document.head.appendChild(s);
+  }
+}
+async function showPorraAdminGallery(){
+  const mapping=await _loadCardMapping();
+  document.getElementById('porra-admin-gallery').classList.add('open');
+  _porraRenderGallery(mapping,_lastLb||[],'');
+  document.getElementById('searchInput').value='';
+  document.getElementById('searchResults').innerHTML='';
+}
+function _porraRenderGallery(mapping,lb,filter){
+  const players=ALL_PLAYERS||[];
+  const filtered=filter?players.filter(p=>p.toLowerCase().includes(filter.toLowerCase())):players;
+  document.getElementById('porraGalleryGrid').innerHTML=filtered.map(alias=>{
+    const e=lb.find(x=>x.alias===alias);
+    const stats=e?{total:e.total,exactPct:e.played>0?(e.exact/e.played*100):0,hitPct:e.played>0?(e.hit/e.played*100):0,rank:lb.indexOf(e)+1}:null;
+    return '<div class="porra-gallery-item">'+_buildPorraCard(alias,stats,mapping,true)+'</div>';
+  }).join('');
+  setTimeout(()=>document.querySelectorAll('#porraGalleryGrid .porra-card-name').forEach(_porraFitName),100);
+}
+function porraGalleryFilter(val){_porraRenderGallery(_porraCardMapping||{},_lastLb||[],val);}
+function porraAdminGalleryClose(){document.getElementById('porra-admin-gallery').classList.remove('open');}
+function porraCardKeydown(e,val){
+  if(e.key!=='Enter')return;
+  const q=val.trim().toLowerCase();
+  if(q==='paniniadminluigi')showPorraAdminGallery();
+  else if(q==='panini')showMyPorraCard();
+}
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){porraCardModalClose();porraAdminGalleryClose();}
+});
+
 </script>
 
 <!-- ══════════════ SANITY MODAL (Don Patricio only) ══════════════ -->
@@ -5623,6 +5820,27 @@ window.addEventListener('resize',_chkLandscape);
     </table>
     <div style="margin-top:12px;font-size:0.75rem;color:#aaa;">Nur sichtbar für Don Patricio de la Porra</div>
   </div>
+</div>
+
+<!-- PORRA CARD MODAL -->
+<div id="porra-card-modal" onclick="porraCardModalClose(event)">
+  <div id="porra-card-modal-content" onclick="event.stopPropagation()">
+    <div class="porra-card-modal-eyebrow">🎯 My Porra Card</div>
+    <div id="porra-card-modal-card"></div>
+    <div class="porra-card-modal-btns">
+      <button class="porra-card-modal-btn dl" onclick="porraCardDownload()">⬇ Download Card</button>
+      <button class="porra-card-modal-btn cl" onclick="porraCardModalClose()">✕ Close</button>
+    </div>
+  </div>
+</div>
+<!-- PORRA ADMIN GALLERY -->
+<div id="porra-admin-gallery">
+  <div class="porra-gallery-header">
+    <div class="porra-gallery-title">🎯 Porra Card Gallery — All 154</div>
+    <button class="porra-gallery-close" onclick="porraAdminGalleryClose()">✕ Close</button>
+  </div>
+  <input type="text" class="porra-gallery-search" id="porraGallerySearch" placeholder="Search player…" oninput="porraGalleryFilter(this.value)">
+  <div class="porra-gallery-grid" id="porraGalleryGrid"></div>
 </div>
 </body>
 </html>
