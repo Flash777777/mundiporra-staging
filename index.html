@@ -990,6 +990,13 @@
   <div class="section-title">📝 Changelog</div>
 
     <div class="card" style="margin-bottom:14px;">
+  <div class="card-title">v1.18.7 — 18. Juni 2026 (Fix)</div>
+  <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
+    <li>💙 <strong>Tipp-Zeile in Live-Card</strong> — Dein Tipp (👤) + Community-Tipp (👥) jetzt auch in der oberen Live-Matchcard sichtbar (wie in der unteren LIVE — JETZT Karte)</li>
+  </ul>
+</div>
+
+<div class="card" style="margin-bottom:14px;">
   <div class="card-title">v1.18.6 — 18. Juni 2026 (Fix)</div>
   <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
     <li>⭐ <strong>Champions-Tab Torjäger</strong> — TS1 &amp; TS2 vollständig angezeigt (kein Limit mehr)</li>
@@ -3591,6 +3598,22 @@ function matchCardLive(g, a) {
     </div>`;
   }
 
+  // My tip + community tip row (wie in renderGameTipBlock)
+  const _mcMyTip = USER.player ? ALL_PREDICTIONS[USER.player]?.[String(g.id)] : null;
+  const _mcCrowd = _crowdPick(g.id);
+  const _mcMyHtml = USER.player
+    ? (_mcMyTip
+        ? `<span style="color:var(--blue);font-weight:700;">👤 ${_mcMyTip.goals1}:${_mcMyTip.goals2}</span>`
+        : `<span style="color:var(--muted);">👤 –</span>`)
+    : '';
+  const _mcCrowdHtml = _mcCrowd?.score
+    ? `<span style="color:var(--muted);">👥 ${_mcCrowd.score} <span style="font-size:.68rem;">(${_mcCrowd.pct}%)</span></span>`
+    : (_mcCrowd?.label ? `<span style="color:var(--muted);">👥 ${_mcCrowd.label} (${_mcCrowd.pct}%)</span>` : '');
+  const _mcSep = _mcMyHtml && _mcCrowdHtml ? ' · ' : '';
+  const _mcTipRowHtml = (_mcMyHtml || _mcCrowdHtml)
+    ? `<div style="display:flex;gap:8px;align-items:center;margin-top:8px;font-size:.75rem;flex-wrap:wrap;padding:4px 8px;background:rgba(0,82,204,.06);border-radius:6px;">${_mcMyHtml}${_mcSep}${_mcCrowdHtml}</div>`
+    : '';
+
   return `<div class="match-card${dClass}" style="border-left:3px solid var(--red);position:relative;">${dBadge}
     <div class="match-score" style="align-items:center;">
       <div style="display:flex;align-items:center;gap:6px;justify-content:flex-end;flex:1;">
@@ -3610,6 +3633,7 @@ function matchCardLive(g, a) {
     </div>
     ${scorersHtml}
     ${possHtml}
+    ${_mcTipRowHtml}
     ${ptDistHtml}
     ${venue ? `<div class="match-meta" style="margin-top:4px;">📍 ${venue}${kickoff ? ' · '+kickoff : ''}</div>` : ''}
   </div>`;
@@ -5012,8 +5036,8 @@ function switchTab(tabId) {
 }
 
 // ═══════ WHAT'S NEW ═══════
-const BUILD_VERSION = 'v1.18.6';
-const BUILD_DATE    = '18.06.2026 16:00';
+const BUILD_VERSION = 'v1.18.7';
+const BUILD_DATE    = '18.06.2026 21:00';
 (function(){ var _hb = document.getElementById('headerVersionBadge'); if(_hb) _hb.textContent = BUILD_VERSION; })();
 const WN_VERSION = 'v1.17';
 const WN_STORAGE_KEY = window.location.pathname.includes('staging') ? 'wnSeen_staging' : 'wnSeen_live';
