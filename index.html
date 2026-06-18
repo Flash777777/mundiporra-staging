@@ -990,6 +990,14 @@
   <div class="section-title">📝 Changelog</div>
 
     <div class="card" style="margin-bottom:14px;">
+  <div class="card-title">v1.18.6 — 18. Juni 2026 (Fix)</div>
+  <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
+    <li>⭐ <strong>Champions-Tab Torjäger</strong> — TS1 &amp; TS2 vollständig angezeigt (kein Limit mehr)</li>
+    <li>🏆 <strong>Champion-Tipper</strong> — Namen aufklappbar: erste 5 sichtbar, Rest via „+N weitere ▼"</li>
+  </ul>
+</div>
+
+    <div class="card" style="margin-bottom:14px;">
   <div class="card-title">v1.18.5 — 18. Juni 2026 (Fix)</div>
   <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
     <li>👤 <strong>Eigener Tipp in FT-Cards</strong> — Letzte Ergebnisse (Overview) und Alle Spiele Tab zeigen jetzt den eigenen Tipp mit Farb-Coding (Exakt / Tordiff. / Tendenz / Falsch)</li>
@@ -1554,7 +1562,7 @@ const TRANSLATIONS = {
     live_extra_time: 'Extra Time', live_shootout: 'Penalties', live_delayed: 'Delayed',
     sim_title: '⚡ Score Simulator', sim_btn: '⚡ Simulator', sim_crowd_pick: 'Crowd Pick',
     sim_reset: 'Reset', sim_winners: '😊 Winners', sim_losers: '😬 Losers',
-    sim_no_live: 'No live or upcoming games', pts_dist_label: 'Point distribution at', tip_my_label: 'Your Tip:', tip_exact: 'Exact ✓', tip_diff: 'Goal Diff. ✓', tip_trend: 'Trend ✓', tip_wrong: 'Wrong ✗', sim_pts_gain: 'pts gain',
+    sim_no_live: 'No live or upcoming games', pts_dist_label: 'Point distribution at', tip_my_label: 'Your Tip:', champ_more: 'more', tip_exact: 'Exact ✓', tip_diff: 'Goal Diff. ✓', tip_trend: 'Trend ✓', tip_wrong: 'Wrong ✗', sim_pts_gain: 'pts gain',
     sim_rank_lbl: 'Rank', sim_pts_lbl: 'Points', sim_active_lbl: 'Simulated', sim_active_unit: 'games', sim_active_unit1: 'game',
     sim_close: '✕ Close', rank_abbr: '#',
     whatsnew_title: "✨ What's New", whatsnew_got_it: 'Got it ✓', whatsnew_full_log: '📝 Full Changelog',
@@ -1862,7 +1870,7 @@ const TRANSLATIONS = {
     live_extra_time: 'Verlängerung', live_shootout: 'Elfmeter', live_delayed: 'Verzögert',
     sim_title: '⚡ Score-Simulator', sim_btn: '⚡ Simulator', sim_crowd_pick: 'Mehrheitstipp',
     sim_reset: 'Reset', sim_winners: '😊 Gewinner', sim_losers: '😬 Verlierer',
-    sim_no_live: 'Keine Live- oder kommenden Spiele', pts_dist_label: 'Punkteverteilung bei', tip_my_label: 'Dein Tipp:', tip_exact: 'Exakt ✓', tip_diff: 'Tordiff. ✓', tip_trend: 'Tendenz ✓', tip_wrong: 'Falsch ✗', sim_pts_gain: 'Pkt Gewinn',
+    sim_no_live: 'Keine Live- oder kommenden Spiele', pts_dist_label: 'Punkteverteilung bei', tip_my_label: 'Dein Tipp:', champ_more: 'weitere', tip_exact: 'Exakt ✓', tip_diff: 'Tordiff. ✓', tip_trend: 'Tendenz ✓', tip_wrong: 'Falsch ✗', sim_pts_gain: 'Pkt Gewinn',
     sim_rank_lbl: 'Rang', sim_pts_lbl: 'Punkte', sim_active_lbl: 'Simuliert', sim_active_unit: 'Spiele', sim_active_unit1: 'Spiel',
     sim_close: '✕ Schließen', rank_abbr: '#',
     whatsnew_title: '✨ Neuigkeiten', whatsnew_got_it: 'Verstanden ✓', whatsnew_full_log: '📝 Changelog',
@@ -2022,7 +2030,7 @@ const TRANSLATIONS = {
     live_extra_time: 'Prórroga', live_shootout: 'Penaltis', live_delayed: 'Retrasado',
     sim_title: '⚡ Simulador', sim_btn: '⚡ Simulador', sim_crowd_pick: 'Pronóstico Mayoría',
     sim_reset: 'Reset', sim_winners: '😊 Ganadores', sim_losers: '😬 Perdedores',
-    sim_no_live: 'Sin partidos en vivo ni próximos', pts_dist_label: 'Distribución de puntos en', tip_my_label: 'Tu pronóstico:', tip_exact: 'Exacto ✓', tip_diff: 'Dif. Goles ✓', tip_trend: 'Tendencia ✓', tip_wrong: 'Fallo ✗', sim_pts_gain: 'pts ganados',
+    sim_no_live: 'Sin partidos en vivo ni próximos', pts_dist_label: 'Distribución de puntos en', tip_my_label: 'Tu pronóstico:', champ_more: 'más', tip_exact: 'Exacto ✓', tip_diff: 'Dif. Goles ✓', tip_trend: 'Tendencia ✓', tip_wrong: 'Fallo ✗', sim_pts_gain: 'pts ganados',
     sim_rank_lbl: 'Puesto', sim_pts_lbl: 'Puntos', sim_active_lbl: 'Simulado', sim_active_unit: 'partidos', sim_active_unit1: 'partido',
     sim_close: '✕ Cerrar', rank_abbr: '#',
     whatsnew_title: '✨ Novedades', whatsnew_got_it: 'Entendido ✓', whatsnew_full_log: '📝 Registro',
@@ -4231,7 +4239,7 @@ function renderChampions() {
       <div class="champ-flag">🏆</div>
       <div class="champ-team">${team}</div>
       <div class="champ-pickers">${count} ${count>1 ? T('picker_plural') : T('picker_single')}</div>
-      <div class="champ-names">${(champNames[team]||[]).slice(0,5).join(', ')}</div>
+      <div class="champ-names">${(()=>{const _n=champNames[team]||[];if(_n.length<=5)return _n.join(', ');return `<details style="display:inline;"><summary style="list-style:none;cursor:pointer;display:inline;">${_n.slice(0,5).join(', ')} <span style="color:var(--accent);font-size:.72rem;font-weight:600;">+${_n.length-5} ${T('champ_more')} ▼</span></summary><span> ${_n.slice(5).join(', ')}</span></details>`;})()}</div>
     </div>`).join('');
   document.getElementById('champGrid').innerHTML = `<div class="champ-grid">${champHtml}</div>`;
 
@@ -4243,8 +4251,8 @@ function renderChampions() {
     if (m.ts2) { if (!ts2Pickers[m.ts2]) ts2Pickers[m.ts2]=[]; ts2Pickers[m.ts2].push(name); }
   }
 
-  const ts1Sorted = Object.entries(ts1Count).sort((a,b)=>b[1]-a[1]).slice(0,10);
-  const ts2Sorted = Object.entries(ts2Count).sort((a,b)=>b[1]-a[1]).slice(0,10);
+  const ts1Sorted = Object.entries(ts1Count).sort((a,b)=>b[1]-a[1]);
+  const ts2Sorted = Object.entries(ts2Count).sort((a,b)=>b[1]-a[1]);
   const hasLiveGoals = Object.keys(playerGoals).length > 0;
 
   const goalBadge = (player) => {
@@ -5004,8 +5012,8 @@ function switchTab(tabId) {
 }
 
 // ═══════ WHAT'S NEW ═══════
-const BUILD_VERSION = 'v1.18.5';
-const BUILD_DATE    = '18.06.2026 14:00';
+const BUILD_VERSION = 'v1.18.6';
+const BUILD_DATE    = '18.06.2026 16:00';
 (function(){ var _hb = document.getElementById('headerVersionBadge'); if(_hb) _hb.textContent = BUILD_VERSION; })();
 const WN_VERSION = 'v1.17';
 const WN_STORAGE_KEY = window.location.pathname.includes('staging') ? 'wnSeen_staging' : 'wnSeen_live';
