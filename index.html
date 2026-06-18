@@ -1044,6 +1044,14 @@
   <div class="section-title">📝 Changelog</div>
 
     <div class="card" style="margin-bottom:14px;">
+  <div class="card-title">v1.19.7 — 19. Juni 2026 (Fix)</div>
+  <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
+    <li>🏷️ <strong>Karten-Labels Englisch</strong> — DE/ES i18n-Keys für Porra-Karte auf englische Abkürzungen vereinheitlicht (Hit%, Exact, Rank, PKT…)</li>
+    <li>🏆 <strong>Champion/TS1/TS2 Fix</strong> — liest jetzt aus <code>ALL_PARTICIPANTS</code> statt <code>ALL_PREDICTIONS</code></li>
+    <li>⬇️ <strong>Download Fix</strong> — html2canvas <code>onclone</code> deaktiviert <code>conic-gradient</code>-Styles vor dem Rendering</li>
+  </ul>
+</div>
+<div class="card" style="margin-bottom:14px;">
   <div class="card-title">v1.19.6 — 19. Juni 2026 (Fix)</div>
   <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
     <li>🃏 <strong>Porra-Karte Stats Fix</strong> — <code>e.name</code> statt <code>e.alias</code> im Leaderboard-Lookup; <code>played</code>/<code>hitPct</code>/<code>exactPct</code> korrekt berechnet</li>
@@ -1779,13 +1787,13 @@ const TRANSLATIONS = {
     tab_my_groups: '👥 My Groups',
   },
   de: {
-    porra_card_points: 'Pkt',
-    porra_card_exact: 'Exakt',
-    porra_card_hit: 'Treffer%',
+    porra_card_points: 'PKT',
+    porra_card_exact: 'Exact',
+    porra_card_hit: 'Hit%',
     porra_card_champion: 'Champion',
     porra_card_ts1: 'TS1',
     porra_card_ts2: 'TS2',
-    porra_card_rank: 'Rang',
+    porra_card_rank: 'Rank',
     // Database tab
     db_title: '🗃️ Datenbasis — Alle Tipps',
     db_search_ph: '🔍 Name / Gruppe suchen…',
@@ -2003,13 +2011,13 @@ const TRANSLATIONS = {
     whatsnew_title: '✨ Neuigkeiten', whatsnew_got_it: 'Verstanden ✓', whatsnew_full_log: '📝 Changelog',
   },
   es: {
-    porra_card_points: 'Pts',
-    porra_card_exact: 'Exacto',
-    porra_card_hit: 'Acierto%',
-    porra_card_champion: 'Campeón',
-    porra_card_ts1: 'GT1',
-    porra_card_ts2: 'GT2',
-    porra_card_rank: 'Posición',
+    porra_card_points: 'PKT',
+    porra_card_exact: 'Exact',
+    porra_card_hit: 'Hit%',
+    porra_card_champion: 'Champion',
+    porra_card_ts1: 'TS1',
+    porra_card_ts2: 'TS2',
+    porra_card_rank: 'Rank',
     // Database tab
     db_title: '🗃️ Base de Datos — Todos los Pronósticos',
     db_search_ph: '🔍 Buscar nombre / grupo…',
@@ -5169,8 +5177,8 @@ function switchTab(tabId) {
 }
 
 // ═══════ WHAT'S NEW ═══════
-const BUILD_VERSION = 'v1.19.6';
-const BUILD_DATE    = '19.06.2026 01:00';
+const BUILD_VERSION = 'v1.19.7';
+const BUILD_DATE    = '19.06.2026 01:20';
 (function(){ var _hb = document.getElementById('headerVersionBadge'); if(_hb) _hb.textContent = BUILD_VERSION; })();
 const WN_VERSION = 'v1.19';
 const WN_STORAGE_KEY = window.location.pathname.includes('staging') ? 'wnSeen_staging' : 'wnSeen_live';
@@ -5753,10 +5761,9 @@ function _buildPorraCard(alias,stats,mapping,isSmall){
   const total=_lastLb?_lastLb.length:154;
   const isTop10=typeof rank==='number'&&rank<=10;
   const fire=isTop10?'<span class="porra-card-fire">🔥</span>':'';
-  const pred=ALL_PREDICTIONS?ALL_PREDICTIONS[alias]:null;
-  const champ=pred?.champion||'—';
-  const ts1=pred?.ts1||'—';
-  const ts2=pred?.ts2||'—';
+  const champ=info?.champion||'—';
+  const ts1=info?.ts1||'—';
+  const ts2=info?.ts2||'—';
   const photoStyle=isSmall?'height:170px':'';
   const cardStyle=isSmall?'width:220px':'';
   const nameId=isSmall?'':'id="porraCardNameEl"';
@@ -5815,7 +5822,7 @@ function porraCardModalClose(e){
 async function porraCardDownload(){
   const card=document.querySelector('#porra-card-modal .porra-card-outer');
   if(!card)return;
-  const doDownload=()=>html2canvas(card,{scale:2,useCORS:true,allowTaint:true}).then(c=>{
+  const doDownload=()=>html2canvas(card,{scale:2,useCORS:true,allowTaint:false,onclone:(clonedDoc)=>{const s=clonedDoc.createElement('style');s.textContent='.porra-card-outer{background:radial-gradient(ellipse at top,#2a2a6e,#1a1a40) !important;}.porra-card-outer::before,.porra-card-outer::after{display:none !important;}.porra-card-inner::after{display:none !important;}';clonedDoc.head.appendChild(s);}}).then(c=>{
     const a=document.createElement('a');
     a.download='porra-card-'+(USER.player||'card').replace(/\s+/g,'-')+'.png';
     a.href=c.toDataURL('image/png');a.click();
