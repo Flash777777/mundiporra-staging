@@ -3476,11 +3476,11 @@ function matchCardFinished(g, a, lb) {
   if (USER.player && tip && pts !== null) {
     const _tipColors = ['#e74c3c','#78c795','#3cb86a','#16a34a'];
     const _tipBgs    = ['#fde8e8','#edf9f1','#d8f4e2','#c5edcf'];
-    const _tipLabels = ['Falsch ✗','Tendenz ✓','Tordiff. ✓','Exakt ✓'];
+    const _tipLabels = [T('tip_wrong'),T('tip_trend'),T('tip_diff'),T('tip_exact')];
     const _c = _tipColors[pts] || _tipColors[0];
     const _bg = _tipBgs[pts] || _tipBgs[0];
     const _lbl = _tipLabels[pts] || _tipLabels[0];
-    myTipHtml = `<div style="display:flex;align-items:center;justify-content:center;gap:6px;margin-top:8px;margin-bottom:2px;font-size:.75rem;"><span style="color:#aaa;">Dein Tipp:</span><span style="color:${_c};font-weight:700;">${tip.goals1}:${tip.goals2}</span><span style="color:${_c};font-size:.68rem;font-weight:600;background:${_bg};padding:1px 6px;border-radius:8px;">${_lbl}</span></div>`;
+    myTipHtml = `<div style="display:flex;align-items:center;justify-content:center;gap:6px;margin-top:8px;margin-bottom:2px;font-size:.75rem;"><span style="color:#aaa;">${T('tip_my_label')}</span><span style="color:${_c};font-weight:700;">${tip.goals1}:${tip.goals2}</span><span style="color:${_c};font-size:.68rem;font-weight:600;background:${_bg};padding:1px 6px;border-radius:8px;">${_lbl}</span></div>`;
   }
   return `<div class="match-card" style="${cardStyle}">
     ${badgeHtml}
@@ -4159,7 +4159,7 @@ function renderGames() {
         const _pts = scoreGame(myTip, a);
         const _colors = ['#e74c3c','#78c795','#3cb86a','#16a34a'];
         const _bgs    = ['#fde8e8','#edf9f1','#d8f4e2','#c5edcf'];
-        const _labels = ['Falsch ✗','Tendenz ✓','Tordiff. ✓','Exakt ✓'];
+        const _labels = [T('tip_wrong'),T('tip_trend'),T('tip_diff'),T('tip_exact')];
         const _c = _colors[_pts] || _colors[0];
         const _bg = _bgs[_pts] || _bgs[0];
         const _lbl = _labels[_pts] || _labels[0];
