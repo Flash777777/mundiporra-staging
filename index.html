@@ -1044,7 +1044,13 @@
   <div class="section-title">📝 Changelog</div>
 
     <div class="card" style="margin-bottom:14px;">
-  <div class="card-title">v1.19.2 — 19. Juni 2026 (Fix)</div>
+  <div class="card-title">v1.19.3 — 19. Juni 2026 (Fix)</div>
+  <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
+    <li>🃏 <strong>Porra-Karte Daten-Fixes</strong> — <code>USER.player</code> als Alias, i18n-Keys für Stats, Flagge aus Champion-Tipp, Leaderboard-Trigger vor Kartenanzeige</li>
+  </ul>
+</div>
+<div class="card" style="margin-bottom:14px;">
+<div class="card-title">v1.19.2 — 19. Juni 2026 (Fix)</div>
   <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
     <li>🐛 <strong>Porra-Karte SyntaxError Fix</strong> — <code>async async function</code> → <code>async function</code> (doppeltes async durch zweifachen Patch)</li>
   </ul>
@@ -1521,6 +1527,13 @@ for (const [gname, members] of Object.entries(GROUP_DATA)) {
 // ══════════════ i18n TRANSLATIONS ══════════════
 const TRANSLATIONS = {
   en: {
+    porra_card_points: 'PTS',
+    porra_card_exact: 'Exact',
+    porra_card_hit: 'Hit%',
+    porra_card_champion: 'Champion',
+    porra_card_ts1: 'TS1',
+    porra_card_ts2: 'TS2',
+    porra_card_rank: 'Rank',
     // Database tab
     db_title: '🗃️ Database — All Tips',
     db_search_ph: '🔍 Search name / group…',
@@ -1747,6 +1760,13 @@ const TRANSLATIONS = {
     tab_my_groups: '👥 My Groups',
   },
   de: {
+    porra_card_points: 'Pkt',
+    porra_card_exact: 'Exakt',
+    porra_card_hit: 'Treffer%',
+    porra_card_champion: 'Champion',
+    porra_card_ts1: 'TS1',
+    porra_card_ts2: 'TS2',
+    porra_card_rank: 'Rang',
     // Database tab
     db_title: '🗃️ Datenbasis — Alle Tipps',
     db_search_ph: '🔍 Name / Gruppe suchen…',
@@ -1964,6 +1984,13 @@ const TRANSLATIONS = {
     whatsnew_title: '✨ Neuigkeiten', whatsnew_got_it: 'Verstanden ✓', whatsnew_full_log: '📝 Changelog',
   },
   es: {
+    porra_card_points: 'Pts',
+    porra_card_exact: 'Exacto',
+    porra_card_hit: 'Acierto%',
+    porra_card_champion: 'Campeón',
+    porra_card_ts1: 'GT1',
+    porra_card_ts2: 'GT2',
+    porra_card_rank: 'Posición',
     // Database tab
     db_title: '🗃️ Base de Datos — Todos los Pronósticos',
     db_search_ph: '🔍 Buscar nombre / grupo…',
@@ -5123,8 +5150,8 @@ function switchTab(tabId) {
 }
 
 // ═══════ WHAT'S NEW ═══════
-const BUILD_VERSION = 'v1.19.2';
-const BUILD_DATE    = '19.06.2026 00:05';
+const BUILD_VERSION = 'v1.19.3';
+const BUILD_DATE    = '19.06.2026 00:20';
 (function(){ var _hb = document.getElementById('headerVersionBadge'); if(_hb) _hb.textContent = BUILD_VERSION; })();
 const WN_VERSION = 'v1.19';
 const WN_STORAGE_KEY = window.location.pathname.includes('staging') ? 'wnSeen_staging' : 'wnSeen_live';
@@ -5695,7 +5722,9 @@ function _getCC(nat){
 }
 function _buildPorraCard(alias,stats,mapping,isSmall){
   const info=ALL_PARTICIPANTS&&ALL_PARTICIPANTS[alias]?ALL_PARTICIPANTS[alias]:null;
-  const nat=info?.nationality||'Germany';
+  // nationality nicht in Daten → Flagge aus Champion-Tipp ableiten
+  const champNat=info?.champion?info.champion.charAt(0)+info.champion.slice(1).toLowerCase():'Germany';
+  const nat=champNat||'Germany';
   const cc=_getCC(nat);
   const flagUrl='https://flagcdn.com/w80/'+cc+'.png';
   const imgFile=mapping[alias]||'germany_1.jpg';
@@ -5750,10 +5779,12 @@ function _porraFitName(el){
 }
 async function showMyPorraCard(){
   const mapping=await _loadCardMapping();
+  if(!_lastLb||!_lastLb.length)buildLeaderboard();
   const lb=_lastLb||[];
-  const me=lb.find(e=>e.alias===USER);
+  const alias=USER.player||'';
+  const me=lb.find(e=>e.alias===alias);
   const stats=me?{total:me.total,exactPct:me.played>0?(me.exact/me.played*100):0,hitPct:me.played>0?(me.hit/me.played*100):0,rank:lb.indexOf(me)+1}:null;
-  document.getElementById('porra-card-modal-card').innerHTML=_buildPorraCard(USER,stats,mapping,false);
+  document.getElementById('porra-card-modal-card').innerHTML=_buildPorraCard(alias,stats,mapping,false);
   document.getElementById('porra-card-modal').classList.add('open');
   setTimeout(()=>_porraFitName(document.getElementById('porraCardNameEl')),50);
   document.getElementById('searchInput').value='';
@@ -5780,6 +5811,7 @@ async function porraCardDownload(){
 }
 async function showPorraAdminGallery(){
   const mapping=await _loadCardMapping();
+  if(!_lastLb||!_lastLb.length)buildLeaderboard();
   document.getElementById('porra-admin-gallery').classList.add('open');
   _porraRenderGallery(mapping,_lastLb||[],'');
   document.getElementById('searchInput').value='';
