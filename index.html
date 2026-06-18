@@ -1044,7 +1044,13 @@
   <div class="section-title">📝 Changelog</div>
 
     <div class="card" style="margin-bottom:14px;">
-  <div class="card-title">v1.19.0 — 18. Juni 2026 (Feature)</div>
+  <div class="card-title">v1.19.1 — 18. Juni 2026 (Fix)</div>
+  <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
+    <li>🃏 <strong>Porra-Karte Fix</strong> — <code>ALL_PARTICIPANTS</code>-Lookup korrigiert (Objekt statt Array), <code>showMyPorraCard</code> als <code>async</code> deklariert, WN-Modal für Easter Egg entfernt</li>
+  </ul>
+</div>
+<div class="card" style="margin-bottom:14px;">
+<div class="card-title">v1.19.0 — 18. Juni 2026 (Feature)</div>
   <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
     <li>🎯 <strong>Meine Porra-Karte</strong> — Panini-Style: im Such-Tab "panini" + Enter eingeben. Vintage-Look mit Gold-Rahmen, Filmkorn, eigener Flagge und allen Stats.</li>
     <li>🖼️ <strong>Admin Gallery</strong> — "paniniadminluigi" + Enter zeigt alle 154 Karten im Grid mit Suchfilter.</li>
@@ -5111,10 +5117,10 @@ function switchTab(tabId) {
 }
 
 // ═══════ WHAT'S NEW ═══════
-const BUILD_VERSION = 'v1.19.0';
-const BUILD_DATE    = '18.06.2026 23:30';
+const BUILD_VERSION = 'v1.19.1';
+const BUILD_DATE    = '18.06.2026 23:55';
 (function(){ var _hb = document.getElementById('headerVersionBadge'); if(_hb) _hb.textContent = BUILD_VERSION; })();
-const WN_VERSION = 'v1.19';
+const WN_VERSION = 'v1.17';
 const WN_STORAGE_KEY = window.location.pathname.includes('staging') ? 'wnSeen_staging' : 'wnSeen_live';
 (function(){ const old = localStorage.getItem('wnSeen'); if(old && !localStorage.getItem(WN_STORAGE_KEY)) localStorage.setItem(WN_STORAGE_KEY, old); })();
 const WN_I18N={
@@ -5128,7 +5134,6 @@ const WN_I18N={
     // v1.13
     wn_porracard: '🃏 <strong>My Porra Card</strong>: Type <code>panini</code> + Enter in the Search tab!',
     wn_porracard: '🃏 <strong>Meine Porra-Karte</strong>: Im Such-Tab <code>panini</code> + Enter eingeben!',
-    wn_porracard: '🃏 <strong>Mi Carta Porra</strong>: Escribe <code>panini</code> + Enter en la pestaña de búsqueda!',
     wn_form:'💹 <strong>My Form</strong>: new KPI — consistency (equal-weighted hit rate, since all tips were pre-submitted), strength calibration (tougher matches weighted higher) and future outlook.',
     wn_momentum:'📈 <strong>Momentum</strong>: rank positions gained/lost over your last 5 completed matches. <strong>▲+8</strong> climbing · <strong>▼-3</strong> slipping.',
     wn_xpts:'🎯 <strong>Still Possible (xPts)</strong>: realistic points projection — your personal hit rate × remaining match difficulty.',
@@ -5187,8 +5192,6 @@ const WN_I18N={
 };
 // Icon map für WN-Keys — Reihenfolge & Icons für v1.12
 const WN_ITEMS = [
-  { key: 'wn_porracard', icon: '🃏', highlight: true },
-  { divider: true },
   // v1.17 items
   { key: 'wn_banner',      icon: '🔄', highlight: true },
   { key: 'wn_pointdist',   icon: '📊' },
@@ -5687,7 +5690,7 @@ function _getCC(nat){
   return m[nat]||'un';
 }
 function _buildPorraCard(alias,stats,mapping,isSmall){
-  const info=ALL_PARTICIPANTS?ALL_PARTICIPANTS.find(p=>p.alias===alias):null;
+  const info=ALL_PARTICIPANTS&&ALL_PARTICIPANTS[alias]?ALL_PARTICIPANTS[alias]:null;
   const nat=info?.nationality||'Germany';
   const cc=_getCC(nat);
   const flagUrl='https://flagcdn.com/w80/'+cc+'.png';
@@ -5741,7 +5744,7 @@ function _porraFitName(el){
   let sz=23;el.style.fontSize=sz+'px';
   while(el.scrollWidth>max&&sz>10){sz-=.5;el.style.fontSize=sz+'px';}
 }
-async function showMyPorraCard(){
+async async function showMyPorraCard(){
   const mapping=await _loadCardMapping();
   const lb=_lastLb||[];
   const me=lb.find(e=>e.alias===USER);
@@ -5771,7 +5774,7 @@ async function porraCardDownload(){
     s.onload=doDownload;document.head.appendChild(s);
   }
 }
-async function showPorraAdminGallery(){
+async async function showPorraAdminGallery(){
   const mapping=await _loadCardMapping();
   document.getElementById('porra-admin-gallery').classList.add('open');
   _porraRenderGallery(mapping,_lastLb||[],'');
