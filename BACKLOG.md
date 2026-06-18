@@ -1,7 +1,7 @@
 # 📋 Mundiporra 2026 — Backlog
 
-> Letzte Aktualisierung: 17. Juni 2026  
-> Dashboard: https://flash777777.github.io/mundiporra-dashboard/  
+> Letzte Aktualisierung: 18. Juni 2026
+> Dashboard: https://flash777777.github.io/mundiporra-dashboard/
 > Staging: https://flash777777.github.io/mundiporra-staging/
 
 ---
@@ -10,93 +10,65 @@
 
 | # | Bug | Diagnose | Fix-Ansatz | Prio |
 |---|---|---|---|---|
-| 1 | **Live-Button zeigt ×2** | `liveGames` speichert `key` + `keyRev`, `liveCount` zählt beide | `Set` mit kanonischem Key (alphabetisch sortiert) oder `_rev: true` Flag | 🟠 High |
-| 2 | **KPI Pin-Icon** nicht unterscheidbar | Kein CSS für `.kpi-pin-btn.pinned` | `.pinned { color: var(--accent); opacity: 1; }` + Icon-Wechsel | 🟢 Low |
-| 3 | **KPI „Gespielt"** zeigt `11 ✓ / 60 →` statt `11 / 72` | Zählt `ALL_GAMES.length` statt Gesamtzahl | Hardcode `TOTAL_GAMES = 72` | 🟢 Low |
-| 4 | **KPI Momentum** Diskrepanz: Claude −2 vs. Dashboard −19 | Fenster-Definition unterschiedlich | Fenster-Größe im Code prüfen + Tooltip | 🟡 Mittel |
-| 5 | **KO-Multiplikatoren** fehlen | Excel-Regeln dokumentiert, nicht implementiert | `calcPoints()` mit Multiplikator je Runde erweitern | 🔴 Korrektheit |
-| 6 | **Champion Change Penalty** fehlt | 5 statt 10 Punkte bei Champion-Wechsel | `champion_changed`-Feld + Bonus-Logik anpassen | 🔴 Korrektheit |
+| 1 | **KPI Momentum** Diskrepanz | Fenster-Definition im Code unklar | Fenster-Größe prüfen + Tooltip ergänzen | 🟡 Mittel |
 
 ---
 
 ## 🟡 Features (geplant)
 
-### 🔥 Disruptor-Potential Badge *(Medium Prio)*
+### ⚡ Upsetometer *(nur sichtbar für Don Patricio)*
 
-**Idee:** Live-Match-Karten bekommen ein Badge, das auf starke Rangverschiebungen, wenige Punktegewinner oder Top-10-Disruption hinweist.
+Ein grafisches Widget (Live- und Simulator-Karte), das die „Überraschungsstärke" eines Spielergebnisses visualisiert.
 
-**Badge-Level:**
+**Konzept:**
+- Horizontal-Balken 0–100 %
+- Wert = gewichtetes Maß: % Spieler mit 0 Punkten + Abweichung vom meistgetippten Ergebnis
+- Farb-Coding: Grün (< 30 %) → Gelb (30–60 %) → Orange (60–80 %) → Rot (> 80 %)
+- Label: „Upset-Level: Niedrig / Mittel / Hoch / Extrem"
+- **Sichtbarkeit:** Guard `USER.name === 'Don Patricio de la Porra'` — für alle anderen Spieler unsichtbar
 
-| Badge | Trigger | Bedingung |
-|---|---|---|
-| 🔥 **Disruptor** | Viele Spieler gehen leer aus | ≥ 65% der Spieler erhalten 0 Punkte |
-| 💀 **Chaos-Spiel** | Extremes Durcheinander | ≥ 82% der Spieler erhalten 0 Punkte |
-| ⬆️ **Upgrade** | Top-10 Disruption | ≥ 4 aktuelle Top-10-Spieler fallen aus den Top-10 → hebt "Disruptor" auf "Chaos-Spiel" |
-
-**Sonderregel — 0:0-Gate:**
-- Das Badge wird bei einem 0:0-Spielstand **nur ausgelöst wenn Spielminute ≥ 70**
-- Verhindert False Positives zu Spielbeginn
-
-**Implementierung (Schätzung: ~1 Push):**
-```javascript
-// Neue Hilfsfunktionen:
-function calcTop10Disruption(game, s1, s2) { ... }
-// Zählt wie viele der aktuellen Top-10 bei diesem Ergebnis aus den Top-10 fallen würden
-
-function calcDisruptorLevel(game, actual) {
-  const dist = calcPointDist(game.id, actual.s1, actual.s2);
-  const pct0 = dist.pct0;
-  const disruption = calcTop10Disruption(game, actual.s1, actual.s2);
-  
-  if (actual.s1 === 0 && actual.s2 === 0 && (actual.minute || 0) < 70) return null; // 0:0-Gate
-  
-  let level = null;
-  if (pct0 >= 65) level = 'disruptor';
-  if (pct0 >= 82) level = 'chaos';
-  if (level === 'disruptor' && disruption >= 4) level = 'chaos'; // Top-10 Upgrade
-  
-  return level;
-}
-```
-
-**Badge-HTML** (im `matchCardLive` Header):
-- 🔥 Disruptor: oranges Badge mit Flammen-Icon
-- 💀 Chaos-Spiel: rotes Badge mit Skull-Icon + leichter Pulsanimation
+**Beziehung zu Disruptor-Badge:**
+- Upsetometer = kontinuierlich (Balken), Disruptor = diskret (Badge ab Schwellwert)
+- Können parallel koexistieren
 
 ---
 
-### ⚡ Upsetometer *(Low-Medium Prio)*
+### ⚔️ H2H ohne Limit
 
-**Idee:** Ein grafisches Widget (Live- und Simulator-Karte), das die "Überraschungsstärke" eines Spielergebnisses visualisiert — wie sehr weicht das aktuelle/simulierte Ergebnis vom Community-Konsens ab?
+Player-Cap entfernen. Dynamisch: Mobile 2–3, Desktop 2–10 Spieler gleichzeitig vergleichbar.
 
-**Konzept:**
-- Horizontal-Balken von 0% bis 100%
-- Wert = gewichtetes Maß aus: % Spieler mit 0 Punkten + Abweichung vom meistgetippten Ergebnis
-- Farb-Coding: Grün (< 30%) → Gelb (30–60%) → Orange (60–80%) → Rot (> 80%)
-- Label: "Upset-Level: Niedrig / Mittel / Hoch / Extrem"
+---
 
-**Beziehung zu Disruptor-Badge:**
-- Upsetometer ist **kontinuierlich** (Balken), Disruptor ist **diskret** (Badge ab Schwellwert)
-- Können parallel existieren oder das Upsetometer ersetzt den Badge
-- Entscheidung steht noch aus
+### 🌍 Ländernamen-Lokalisierung *(zurückgestellt — Risikoanalyse ausstehend)*
 
-**Implementierung (Schätzung: ~1–2 Pushes):**
-- Neue Funktion `calcUpsetLevel(gameId, s1, s2)` → Score 0–100
-- HTML-Widget mit `<div class="upset-bar">` + CSS-Gradient
-- Integration in `renderGameTipBlock` neben Punkteverteilung
+> ⚠️ Zurückgestellt. Ländernamen kommen aus mehreren Quellen (`ALL_GAMES`, ESPN API, `ALL_PREDICTIONS`) und werden an vielen Stellen gerendert (Spielkarten, Leaderboard, Simulator, Suche, Champions-Tab, H2H, Stats). Eine zentrale Country-Map wäre nötig — hohes Fehlerrisiko. Erst umsetzen wenn alle Rendering-Stellen vollständig kartiert sind.
+
+---
+
+### ⏱️ Countdown-Timer — immer sichtbar *(Analyse ausstehend)*
+
+> ⚠️ Countdown existiert bereits. Aktuelles Verhalten: wird ausgeblendet sobald ein Live-Spiel läuft. Gewünschtes Verhalten: **Countdown bleibt sichtbar parallel zum Live-Banner**. Vor der Umsetzung Code-Analyse der Sichtbarkeitslogik nötig.
+
+---
+
+### 🃏 Player Card + „Meine Porra-Karte" *(zusammengeführt)*
+
+Ein kombiniertes Feature — **kein Doppelaufwand:**
+
+| Aspekt | Details |
+|---|---|
+| **Für jeden Spieler** | Panini/FUT-Style Modal mit Stats (Rang, Punkte, Exakt-Rate, TS1/TS2, Champion) |
+| **Für den eigenen Account** | Zusätzlich „Teilen"-Button → Export als Bild via Canvas API / `navigator.share()` |
+| **Output** | In-App Modal + optionaler Download/WhatsApp-Share |
 
 ---
 
 ### Weitere Features
 
 - **Phase 2 KO-Runden Scoring:** Gruppenklassifikations-Punkte nur wenn Position bestätigt
-- **H2H ohne Limit:** Player-Cap entfernen; Dynamisch Mobile 2–3, Desktop 2–10
-- **Simulator:** Ländernamen lokalisieren
 - **My Form:** `commCalibration` vereinfachen (Näherung `commCalibration ≈ commHit`)
 - **Stats-Tab (10 Widgets):** Community-Tipp Badge, Populärster Tipp, POINTS ACHIEVED Chart, DAY WINNER, GROUPS EXPERTS, TOP SCORERS by GOALS, GOLDEN BOOT, CHAMPION CHANGE, UPS & DOWNS, GROUPS avg
 - **Konfigurierbares Rang-Umfeld:** Slider/Dropdown im Setup-Modal für ±N Ränge
-- **Countdown-Timer:** Nächstes Spiel auf Übersicht-Tab
-- **Player Card Visualization:** Panini/FUT-Style Modal
 
 ---
 
@@ -116,21 +88,47 @@ function calcDisruptorLevel(game, actual) {
 - 🌙 Dark Mode Toggle (CSS Custom Properties bereits mit `var(--bg)`, `var(--text)` vorbereitet)
 - 📤 WhatsApp Schnellteilen (`navigator.share()` + Fallback)
 - 🏅 Achievement/Badge System (Erste exakte Vorhersage, 3er-Serie, etc.)
-- 🃏 „Meine Porra-Karte" (PDF/Image Export via Canvas API)
 - 📰 ESPN API Erweiterungen: News-Ticker, Assists/Cards/Shots/Saves Leaders, Game Report Snippet, Team Logos
 
 ---
 
-## ✅ Abgeschlossen (Auszug)
+## 🏗️ v2.0 — KO-Phase (nach Gruppenphase)
+
+> **Trigger:** Nacho liefert neues Excel mit allen Gruppenphase-Ergebnissen + KO-Tipps aller 154 Spieler.
+> Das Dashboard wird zu diesem Zeitpunkt als **v2.0** neu aufgesetzt.
+
+| # | Feature / Fix | Details |
+|---|---|---|
+| 1 | **KO-Multiplikatoren** | `calcPoints()` um Runden-Multiplikator erweitern (AF ×2, VF ×3, HF ×4, P3 ×5, F ×6) — gilt für Spiel- UND Scorer-Punkte |
+| 2 | **Champion Change Penalty** | Wer Champion geändert hat: nur +5 statt +10 bei Treffer — `champion_changed`-Feld + Bonus-Logik |
+| 3 | **KO-Tipps aus neuem Excel** | Datenimport + Anpassung `ALL_PREDICTIONS`, `ALL_GAMES` für KO-Runden |
+| 4 | **Gruppenklassifikations-Punkte** | Nur auszahlen wenn Gruppenposition offiziell bestätigt |
+
+---
+
+## ✅ Abgeschlossen
 
 | Version | Feature / Fix |
 |---|---|
-| v1.16.0 | Punkteverteilung Styling, What's New Modal (DE/EN/ES) |
-| v1.15.2 | Scoring-Guard: `calcPointDist` nutzt `_calcScore()` statt `scoreGame()` |
-| v1.15.1 | Live-Karte zeigt nur eigene Gruppe; Simulator Punkteverteilung |
-| v1.15.0 | Punkteverteilung Feature (Live + Simulator Karten) |
-| v1.14.5 | Header-Versions-Badge Fix (doppelte ID entfernt) |
-| v1.13.9 | ESPN API Range-Key Fix (fehlender Bindestrich) |
-| v1.13.8 | Scorer-Doppelzählung Fix (Set für kanonische Game-Keys) |
-| v1.13.7 | `Illegal return statement` Fix, `saveSetup` Fix |
-| v1.13.6 | ESPN Date Params Fix, Simulator baseRankMap, What's New Modal |
+| v1.18.8 | 🏅 Live-Tipp Badge (~Exakt/Tordiff/Tendenz) in `matchCardLive` |
+| v1.18.7 | 💙 Tipp-Zeile (👤 Dein Tipp + 👥 Community) in `matchCardLive` |
+| v1.18.6 | ⭐ Champions-Tab: alle TS1/TS2-Tipper + `<details>` für Champion-Tipper |
+| v1.18.5 | 💙 Dein Tipp in FT-Spielkarten (Spiele-Tab + Overview) |
+| v1.18.4 | 🔄 Force-Reload Modal (Loop-Fix, multilingual `version.json`) |
+| v1.18.1–3 | 🔧 Simulator Rang-Fixes (scorerPts, simTotals), Champions-Tab Fix |
+| v1.18.0 | ⚽ Kane-Elfmeter Fix (Penalty Scored), 7-Tage Lookback, scoringEvents-Merge |
+| v1.17.17 | 🔥 Disruptor-Schwellen: Disruptor ≥ 70%, Chaos-Spiel ≥ 90% |
+| v1.17.16 | 📊 Simulator Rang-Header (Rang aktuell → simuliert, Punkte-Delta) |
+| v1.17.15 | 🔀 Live-Card Reihenfolge: Scorer → Ballbesitz → Punkteverteilung → Venue |
+| v1.17.14 | 🔧 `ptDistHtml` ReferenceError Fix in `matchCardLive` |
+| v1.17.0–13 | 🔧 ESPN API Fixes, Scorer-Logik, `getESPNDateParams`, Live-Count Bugs |
+| v1.16.x | 🔥 Disruptor-Badge (Implementierung), Punkteverteilung Styling, What's New Modal |
+| v1.15.x | 📊 Punkteverteilung Feature (Live + Simulator), Live-Karte nur eigene Gruppe |
+| v1.14.5 | 🔧 Header-Versions-Badge Fix |
+| v1.13.9 | 🔧 ESPN API Range-Key Fix (fehlender Bindestrich) |
+| v1.13.8 | 🔧 Scorer-Doppelzählung Fix (kanonische Game-Keys) |
+| v1.13.7 | 🔧 `Illegal return statement` Fix, `saveSetup` Fix |
+| v1.13.6 | 🔧 ESPN Date Params Fix, Simulator `baseRankMap`, What's New Modal |
+| — | ✅ Bug: Live-Button ×2 → `_canonKeys` Set-Zählung (v1.17.x) |
+| — | ✅ Bug: KPI Pin-Icon → CSS `.kpi-pin-btn.pinned` (v1.17.x) |
+| — | ✅ Bug: KPI „Gespielt" → `TOTAL_GAMES = 72` (v1.17.x) |
