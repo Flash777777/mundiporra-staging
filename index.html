@@ -5887,7 +5887,7 @@ async function porraCardDownload(){
         const msg=lang==='es'?'MANTÉN PULSADO PARA GUARDAR':lang==='en'?'HOLD TO SAVE IMAGE':'HALTE GEDRÜCKT ZUM SPEICHERN';
         ov.innerHTML='<p style="color:#f0c830;font-family:Bebas Neue,sans-serif;font-size:1.1rem;letter-spacing:2px;text-align:center;margin:0;">'+msg+'</p>'
           +'<img src="'+dataUrl+'" style="max-width:min(340px,90vw);border-radius:18px;box-shadow:0 8px 48px rgba(0,0,0,.9);">'
-          +'<button onclick="document.getElementById('porra-dl-overlay').remove()" style="padding:10px 30px;border-radius:20px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.25);color:rgba(255,255,255,.7);font-size:.8rem;cursor:pointer;letter-spacing:1.5px;font-family:Barlow Condensed,sans-serif;">✕ CLOSE</button>';
+          +'<button onclick="document.getElementById(\'porra-dl-overlay\').remove()" style="padding:10px 30px;border-radius:20px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.25);color:rgba(255,255,255,.7);font-size:.8rem;cursor:pointer;letter-spacing:1.5px;font-family:Barlow Condensed,sans-serif;">✕ CLOSE</button>';
         document.body.appendChild(ov);
       } else {
         const a=document.createElement('a');
