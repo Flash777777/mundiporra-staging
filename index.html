@@ -5221,8 +5221,8 @@ function switchTab(tabId) {
 }
 
 // ═══════ WHAT'S NEW ═══════
-const BUILD_VERSION = 'v1.19.10';
-const BUILD_DATE    = '19.06.2026 22:35';
+const BUILD_VERSION = 'v1.19.11';
+const BUILD_DATE    = '19.06.2026 23:30';
 (function(){ var _hb = document.getElementById('headerVersionBadge'); if(_hb) _hb.textContent = BUILD_VERSION; })();
 const WN_VERSION = 'v1.19';
 const WN_STORAGE_KEY = window.location.pathname.includes('staging') ? 'wnSeen_staging' : 'wnSeen_live';
@@ -5867,16 +5867,39 @@ function porraCardModalClose(e){
 async function porraCardDownload(){
   const card=document.querySelector('#porra-card-modal .porra-card-outer');
   if(!card)return;
-  const doDownload=()=>html2canvas(card,{scale:2,useCORS:true,allowTaint:false,onclone:(clonedDoc)=>{const s=clonedDoc.createElement('style');s.textContent='.porra-card-outer{background:radial-gradient(ellipse at top,#2a2a6e,#1a1a40) !important;}.porra-card-outer::before,.porra-card-outer::after{display:none !important;}.porra-card-inner::after{display:none !important;}';clonedDoc.head.appendChild(s);}}).then(c=>{
-    const a=document.createElement('a');
-    a.download='porra-card-'+(USER.player||'card').replace(/\s+/g,'-')+'.png';
-    a.href=c.toDataURL('image/png');a.click();
-  });
-  if(typeof html2canvas!=='undefined'){doDownload();}
+  function doDownload(){
+    const fileName='porra-card-'+(USER.player||'card').replace(/\s+/g,'-')+'.png';
+    const isIOS=/iPhone|iPad|iPod/i.test(navigator.userAgent);
+    htmlToImage.toPng(card,{pixelRatio:2,cacheBust:true}).then(dataUrl=>{
+      if(isIOS){
+        let ov=document.getElementById('porra-dl-overlay');
+        if(ov)ov.remove();
+        ov=document.createElement('div');
+        ov.id='porra-dl-overlay';
+        ov.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.93);z-index:10000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:24px;';
+        const lang=document.documentElement.lang||'de';
+        const msg=lang==='es'?'MANTÉN PULSADO PARA GUARDAR':lang==='en'?'HOLD TO SAVE IMAGE':'HALTE GEDRÜCKT ZUM SPEICHERN';
+        ov.innerHTML='<p style="color:#f0c830;font-family:Bebas Neue,sans-serif;font-size:1.1rem;letter-spacing:2px;text-align:center;margin:0;">'+msg+'</p>'
+          +'<img src="'+dataUrl+'" style="max-width:min(340px,90vw);border-radius:18px;box-shadow:0 8px 48px rgba(0,0,0,.9);">'
+          +'<button onclick="document.getElementById('porra-dl-overlay').remove()" style="padding:10px 30px;border-radius:20px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.25);color:rgba(255,255,255,.7);font-size:.8rem;cursor:pointer;letter-spacing:1.5px;font-family:Barlow Condensed,sans-serif;">✕ CLOSE</button>';
+        document.body.appendChild(ov);
+      } else {
+        const a=document.createElement('a');
+        a.download=fileName;
+        a.href=dataUrl;
+        a.click();
+      }
+    }).catch(err=>{
+      console.error('html-to-image error:',err);
+    });
+  }
+  if(typeof htmlToImage!=='undefined'){doDownload();}
   else{
     const s=document.createElement('script');
-    s.src='https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
-    s.onload=doDownload;document.head.appendChild(s);
+    s.src='https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.min.js';
+    s.onload=doDownload;
+    s.onerror=()=>console.error('html-to-image CDN load failed');
+    document.head.appendChild(s);
   }
 }
 async function showPorraAdminGallery(){
