@@ -637,7 +637,7 @@
   .porra-card-footer::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,#d4a012 25%,#f7e070 50%,#d4a012 75%,transparent)}
   .porra-card-name{font-family:'Bebas Neue',sans-serif;font-size:1.45rem;color:#e8d080;letter-spacing:2px;text-align:center;margin-bottom:5px;text-shadow:0 1px 2px rgba(0,0,0,.9);line-height:1.05;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .porra-card-divider{height:1px;background:linear-gradient(90deg,transparent,rgba(200,170,80,.25),transparent);margin:5px 0}
-  .porra-card-stats-row{display:flex;align-items:baseline;margin-bottom:2px;line-height:1.7;flex-wrap:nowrap}
+  .porra-card-stats-row{display:flex;align-items:baseline;margin-bottom:2px;line-height:1.7;flex-wrap:wrap}
   .porra-card-lbl{font-family:'Barlow Condensed',sans-serif;font-size:.72rem;font-weight:700;color:#9a8e72;text-transform:uppercase;letter-spacing:.8px;margin-right:4px;white-space:nowrap}
   .porra-card-val{font-family:'Barlow Condensed',sans-serif;font-size:.83rem;font-weight:800;color:#d8cfb4;letter-spacing:.3px;white-space:nowrap}
   .porra-card-pipe{color:rgba(180,150,70,.28);margin:0 7px;font-weight:400;font-size:.75rem}
@@ -5221,8 +5221,8 @@ function switchTab(tabId) {
 }
 
 // ═══════ WHAT'S NEW ═══════
-const BUILD_VERSION = 'v1.19.9';
-const BUILD_DATE = '19.06.2026 17:00';
+const BUILD_VERSION = 'v1.19.10';
+const BUILD_DATE    = '19.06.2026 22:35';
 (function(){ var _hb = document.getElementById('headerVersionBadge'); if(_hb) _hb.textContent = BUILD_VERSION; })();
 const WN_VERSION = 'v1.19';
 const WN_STORAGE_KEY = window.location.pathname.includes('staging') ? 'wnSeen_staging' : 'wnSeen_live';
@@ -5829,7 +5829,8 @@ function _buildPorraCard(alias,stats,mapping,isSmall){
       </div>
       <div class="porra-card-stats-row">
         <span class="porra-card-lbl">${T('porra_card_champion')}</span><span class="porra-card-val">${champ}</span>
-        <span class="porra-card-pipe">|</span>
+      </div>
+      <div class="porra-card-stats-row">
         <span class="porra-card-lbl">${T('porra_card_ts1')}</span><span class="porra-card-val">${ts1}</span>
         <span class="porra-card-pipe">|</span>
         <span class="porra-card-lbl">${T('porra_card_ts2')}</span><span class="porra-card-val">${ts2}</span>
