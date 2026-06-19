@@ -3794,6 +3794,21 @@ function matchCardUpcoming(g) {
   const cdHtml = cdVal
     ? `<span class="cd-pill" data-kickoff="${koISO}" style="display:inline-flex;align-items:center;gap:4px;background:linear-gradient(135deg,#1e3a5f,#2563eb);color:#fff;font-size:0.72rem;font-weight:700;padding:3px 9px;border-radius:20px;letter-spacing:.03em;">⏱ <span class="cd-val">${cdVal}</span></span>`
     : '';
+  // My tip + Community tip row (reuse matchCardLive pattern, no badge)
+  const _upMyTip = USER.player ? ALL_PREDICTIONS[USER.player]?.[String(g.id)] : null;
+  const _upCrowd = _crowdPick(g.id);
+  const _upMyHtml = USER.player
+    ? (_upMyTip
+        ? `<span style="color:var(--blue);font-weight:700;">👤 ${_upMyTip.goals1}:${_upMyTip.goals2}</span>`
+        : `<span style="color:var(--muted);">👤 –</span>`)
+    : '';
+  const _upCrowdHtml = _upCrowd?.score
+    ? `<span style="color:var(--muted);">👥 ${_upCrowd.score} <span style="font-size:.68rem;">(${_upCrowd.pct}%)</span></span>`
+    : (_upCrowd?.label ? `<span style="color:var(--muted);">👥 ${_upCrowd.label} (${_upCrowd.pct}%)</span>` : '');
+  const _upSep = _upMyHtml && _upCrowdHtml ? ' · ' : '';
+  const _upTipRowHtml = (_upMyHtml || _upCrowdHtml)
+    ? `<div style="display:flex;gap:8px;align-items:center;margin-top:8px;font-size:.75rem;flex-wrap:wrap;padding:4px 8px;background:rgba(0,82,204,.06);border-radius:6px;">${_upMyHtml}${_upSep}${_upCrowdHtml}</div>`
+    : '';
   return `<div class="match-card">
     <div style="display:flex; align-items:center; justify-content:space-between; padding: 6px 0; gap:8px;">
       <span style="font-weight:700; font-size:0.88rem; flex:1; text-align:right;">${g.team1}</span>
@@ -3804,6 +3819,7 @@ function matchCardUpcoming(g) {
       <span style="font-weight:700; font-size:0.88rem; flex:1;">${g.team2}</span>
     </div>
     <div class="match-meta">Game ${g.id} · Group ${g.group}${kickoff ? ' · ⏰ '+kickoff : ''}${venue ? ' · 📍 '+venue : ''}</div>
+    ${_upTipRowHtml}
   </div>`;
 }
 
@@ -5199,8 +5215,8 @@ function switchTab(tabId) {
 }
 
 // ═══════ WHAT'S NEW ═══════
-const BUILD_VERSION = 'v1.19.8';
-const BUILD_DATE    = '19.06.2026 21:00';
+const BUILD_VERSION = 'v1.19.9';
+const BUILD_DATE = '19.06.2026 17:00';
 (function(){ var _hb = document.getElementById('headerVersionBadge'); if(_hb) _hb.textContent = BUILD_VERSION; })();
 const WN_VERSION = 'v1.19';
 const WN_STORAGE_KEY = window.location.pathname.includes('staging') ? 'wnSeen_staging' : 'wnSeen_live';
