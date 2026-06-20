@@ -2843,6 +2843,101 @@ function getPlayerGoals(playerName) {
   return 0;
 }
 
+
+/* ══ CONFETTI RAIN ══ */
+let _confettiShownGames = new Set();
+
+function _ccToFlag(cc) {
+  if (!cc || cc.length !== 2) return '🏳️';
+  return cc.toUpperCase().replace(/./g, c => String.fromCodePoint(0x1F1E6 + c.charCodeAt(0) - 65));
+}
+
+function _natTeamMatch(nat, team) {
+  const aliases = {
+    'SPAIN':['SPAIN','ESP'],'GERMANY':['GERMANY','GER'],'FRANCE':['FRANCE','FRA'],
+    'ARGENTINA':['ARGENTINA','ARG'],'BRAZIL':['BRAZIL','BRA'],'PORTUGAL':['PORTUGAL','POR'],
+    'ENGLAND':['ENGLAND','ENG'],'USA':['USA','UNITED STATES'],'MEXICO':['MEXICO','MEX'],
+    'NETHERLANDS':['NETHERLANDS','NED','HOLLAND'],'ITALY':['ITALY','ITA'],
+    'COLOMBIA':['COLOMBIA','COL'],'CHILE':['CHILE','CHI'],'SWITZERLAND':['SWITZERLAND','SUI'],
+    'MOROCCO':['MOROCCO','MAR'],'URUGUAY':['URUGUAY','URU'],'BELGIUM':['BELGIUM','BEL'],
+    'JAPAN':['JAPAN','JPN'],'SOUTH KOREA':['SOUTH KOREA','KOREA REP.','KOR'],
+    'CROATIA':['CROATIA','CRO'],'SENEGAL':['SENEGAL','SEN'],'ECUADOR':['ECUADOR','ECU'],
+    'PERU':['PERU'],'VENEZUELA':['VENEZUELA','VEN'],'DENMARK':['DENMARK','DEN'],
+    'NIGERIA':['NIGERIA','NGA'],'CAMEROON':['CAMEROON','CMR'],'IRAN':['IRAN'],
+    'AUSTRALIA':['AUSTRALIA','AUS'],'CANADA':['CANADA','CAN'],'QATAR':['QATAR','QAT'],
+    'SAUDI ARABIA':['SAUDI ARABIA','KSA'],'SOUTH AFRICA':['SOUTH AFRICA','RSA'],
+    'COSTA RICA':['COSTA RICA','CRC'],'PARAGUAY':['PARAGUAY','PAR'],
+    'BOLIVIA':['BOLIVIA','BOL'],'HONDURAS':['HONDURAS','HON'],
+    'CZECHIA':['CZECHIA','CZECH REPUBLIC','CZE'],'AUSTRIA':['AUSTRIA','AUT'],
+    'SERBIA':['SERBIA','SRB'],'UKRAINE':['UKRAINE','UKR'],'TURKEY':['TURKEY','TUR'],
+    'IRAN':['IRAN','IRN'],'JAMAICA':['JAMAICA','JAM'],'HAITI':['HAITI','HAI'],
+    'TRINIDAD AND TOBAGO':['TRINIDAD AND TOBAGO','TRI'],
+    'UNITED ARAB EMIRATES':['UNITED ARAB EMIRATES','UAE'],
+    'BOSNIA-HERZ.':['BOSNIA-HERZ.','BOSNIA','BIH'],
+    'IVORY COAST':['IVORY COAST','CÔTE D\'IVOIRE','CIV'],
+    'DR CONGO':['DR CONGO','COD'],'EGYPT':['EGYPT','EGY'],
+    'ALGERIA':['ALGERIA','ALG'],'GHANA':['GHANA','GHA'],
+    'TUNISIA':['TUNISIA','TUN'],'ZAMBIA':['ZAMBIA','ZAM'],
+    'NEW ZEALAND':['NEW ZEALAND','NZL'],
+    'KOREA REP.':['KOREA REP.','SOUTH KOREA','KOR'],
+    'NEW CALEDONIA':['NEW CALEDONIA','NCL'],
+  };
+  for (const [key, vals] of Object.entries(aliases)) {
+    if ((vals.includes(nat) || nat === key) && (vals.includes(team) || team === key)) return true;
+  }
+  return false;
+}
+
+function _launchConfetti(ccs1, count1, ccs2, count2) {
+  document.getElementById('confetti-overlay')?.remove();
+  const overlay = document.createElement('div');
+  overlay.id = 'confetti-overlay';
+  const half1 = document.createElement('div'); half1.className = 'confetti-half';
+  const half2 = document.createElement('div'); half2.className = 'confetti-half';
+  function spawnPieces(container, ccs, count) {
+    if (!count || !ccs.length) return;
+    for (let i = 0; i < count; i++) {
+      const piece = document.createElement('div');
+      piece.className = 'confetti-piece';
+      piece.textContent = _ccToFlag(ccs[i % ccs.length]);
+      piece.style.left = (Math.random() * 88 + 6) + '%';
+      const delay = Math.random() * 3;
+      const dur   = 3 + Math.random() * 2.5;
+      piece.style.animationDuration = dur + 's';
+      piece.style.animationDelay    = delay + 's';
+      piece.style.fontSize = (1.2 + Math.random() * 0.9) + 'rem';
+      container.appendChild(piece);
+    }
+  }
+  spawnPieces(half1, ccs1, count1);
+  spawnPieces(half2, ccs2, count2);
+  overlay.appendChild(half1);
+  overlay.appendChild(half2);
+  document.body.appendChild(overlay);
+  setTimeout(() => overlay.remove(), 7000);
+}
+
+async function _triggerConfettiForGame(team1Name, team2Name) {
+  if (!_porraCardMapping) await _loadCardMapping();
+  const mapping = _porraCardMapping || {};
+  const normT1 = team1Name.toUpperCase();
+  const normT2 = team2Name.toUpperCase();
+  const team1CCs = [], team2CCs = [];
+  let cnt1 = 0, cnt2 = 0;
+  for (const [, pdata] of Object.entries(mapping)) {
+    if (!pdata.cc || !pdata.nationality) continue;
+    const nat = pdata.nationality.toUpperCase();
+    const matchT1 = normT1 === nat || normT1.includes(nat) || nat.includes(normT1) || _natTeamMatch(nat, normT1);
+    const matchT2 = normT2 === nat || normT2.includes(nat) || nat.includes(normT2) || _natTeamMatch(nat, normT2);
+    if (matchT1) { cnt1++; if (!team1CCs.includes(pdata.cc)) team1CCs.push(pdata.cc); }
+    if (matchT2) { cnt2++; if (!team2CCs.includes(pdata.cc)) team2CCs.push(pdata.cc); }
+  }
+  const pieces1 = team1CCs.length ? Math.max(cnt1 * 3, 12) : 0;
+  const pieces2 = team2CCs.length ? Math.max(cnt2 * 3, 12) : 0;
+  if (!pieces1 && !pieces2) return;
+  _launchConfetti(team1CCs, pieces1, team2CCs, pieces2);
+}
+
 async function fetchESPN() {
   const BASE = 'https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard';
   const collected = {};
@@ -2858,6 +2953,16 @@ async function fetchESPN() {
       anyOk = true;
       liveGames = {...collected};
       updateAPIHealth();
+      // 🎉 Konfetti: prüfe neu gestartete LIVE-Spiele
+      try {
+        for (const [key, val] of Object.entries(liveGames)) {
+          if (val.status === 'LIVE' && !val._rev && !_confettiShownGames.has(key)) {
+            _confettiShownGames.add(key);
+            const parts = key.split('-');
+            if (parts.length >= 2) _triggerConfettiForGame(parts[0], parts.slice(1).join('-'));
+          }
+        }
+      } catch(e) { console.error('[Confetti]', e); }
     }
   } catch(e) {}
   try { renderLastNextMatch(); } catch(e) { console.error('[ESPN] renderLastNextMatch step1:', e); }
@@ -5239,14 +5344,16 @@ function switchTab(tabId) {
 }
 
 // ═══════ WHAT'S NEW ═══════
-const BUILD_VERSION = 'v1.19.13';
-const BUILD_DATE    = '20.06.2026 00:10';
+const BUILD_VERSION = 'v1.19.14';
+const BUILD_DATE    = '20.06.2026 23:00';
 (function(){ var _hb = document.getElementById('headerVersionBadge'); if(_hb) _hb.textContent = BUILD_VERSION; })();
-const WN_VERSION = 'v1.19';
+const WN_VERSION = 'v1.20';
 const WN_STORAGE_KEY = window.location.pathname.includes('staging') ? 'wnSeen_staging' : 'wnSeen_live';
 (function(){ const old = localStorage.getItem('wnSeen'); if(old && !localStorage.getItem(WN_STORAGE_KEY)) localStorage.setItem(WN_STORAGE_KEY, old); })();
 const WN_I18N={
   en:{
+    // v1.20
+    wn_confetti:'🎉 <strong>Confetti Rain</strong>: when a match kicks off (ESPN LIVE), a flag confetti shower bursts across the screen — showing the flags of all participants who support each team.',
     // v1.17
     wn_banner:'🔄 <strong>Force Reload System</strong>: critical updates now trigger a blocking modal that ensures all players reload to the latest version — no more stale dashboards.',
     wn_pointdist:'📊 <strong>Point Distribution</strong>: all live &amp; simulator cards now show how many of the 154 players score 3, 2, 1 or 0 pts — with color-coded mini-bars.',
@@ -5268,6 +5375,8 @@ const WN_I18N={
     wn_fetch:'⚡ <strong>8× faster reload</strong>: weekly batch fetching replaces 38 daily requests. Scorer data straight from match events.',
   },
   de:{
+    // v1.20
+    wn_confetti:'🎉 <strong>Konfetti-Regen</strong>: wenn ein Spiel anpfeift (ESPN LIVE), regnet es Flaggen-Konfetti über den gesamten Bildschirm — mit den Flaggen aller Teilnehmer, die das jeweilige Team unterstützen.',
     // v1.17
     wn_banner:'🔄 <strong>Force-Reload-System</strong>: kritische Updates lösen jetzt ein blockierendes Modal aus — alle Spieler laden automatisch die neuste Version.',
     wn_pointdist:'📊 <strong>Punkteverteilung</strong>: alle Live- &amp; Simulator-Karten zeigen jetzt, wie viele der 154 Spieler 3, 2, 1 oder 0 Punkte erzielen — mit farbigen Mini-Balken.',
@@ -5289,6 +5398,8 @@ const WN_I18N={
     wn_fetch:'⚡ <strong>8× schnellerer Reload</strong>: Wöchentliche Batches statt 38 täglicher Requests. Torschützen direkt aus Match-Events.',
   },
   es:{
+    // v1.20
+    wn_confetti:'🎉 <strong>Lluvia de Confeti</strong>: cuando un partido empieza (ESPN LIVE), explota una lluvia de confeti con banderas por toda la pantalla — mostrando las banderas de todos los participantes que apoyan a cada equipo.',
     // v1.17
     wn_banner:'🔄 <strong>Sistema de Recarga Forzada</strong>: las actualizaciones críticas ahora muestran un modal bloqueante que garantiza que todos los jugadores carguen la versión más reciente.',
     wn_pointdist:'📊 <strong>Distribución de Puntos</strong>: todas las tarjetas en vivo y del simulador muestran ahora cuántos de los 154 jugadores consiguen 3, 2, 1 o 0 pts — con mini-barras en color.',
@@ -5312,6 +5423,10 @@ const WN_I18N={
 };
 // Icon map für WN-Keys — Reihenfolge & Icons für v1.12
 const WN_ITEMS = [
+  // v1.20 items
+  { key: 'wn_confetti',    icon: '🎉', highlight: true },
+  // divider
+  { divider: true },
   // v1.17 items
   { key: 'wn_banner',      icon: '🔄', highlight: true },
   { key: 'wn_pointdist',   icon: '📊' },
@@ -5793,6 +5908,26 @@ window.addEventListener('resize',_chkLandscape);
   document.body.prepend(badge);
   document.body.style.paddingTop = '22px';
 })();
+
+/* ══ CONFETTI RAIN ══ */
+#confetti-overlay {
+  position: fixed; inset: 0; z-index: 9999;
+  pointer-events: none; overflow: hidden;
+  display: flex; align-items: flex-start; justify-content: space-between;
+}
+.confetti-half {
+  position: relative; width: 50%; height: 100%; overflow: hidden;
+}
+.confetti-piece {
+  position: absolute; top: -60px; font-size: 1.6rem;
+  animation: confetti-fall linear forwards;
+  will-change: transform, opacity;
+}
+@keyframes confetti-fall {
+  0%   { transform: translateY(0) rotate(0deg) scale(1);   opacity: 1; }
+  80%  { opacity: 1; }
+  100% { transform: translateY(110vh) rotate(720deg) scale(0.6); opacity: 0; }
+}
 
 /* ══ PORRA-KARTE System ══ */
 const PORRA_CARD_BASE_URL='https://raw.githubusercontent.com/Flash777777/mundiporra-dashboard/main/assets/cards/';
