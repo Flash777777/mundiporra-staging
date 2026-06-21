@@ -65,12 +65,21 @@ Slider/Dropdown im Setup-Modal für ±N Ränge
 
 ### 🔮 Potential Points *(Nacho-Wunsch)*
 
-Berechnung der maximal noch erreichbaren Punkte je Spieler für den verbleibenden Turnierverlauf.
+Für jeden Spieler: Maximale noch erzielbare Punkte berechnen → daraus den **bestmöglich noch erreichbaren Rang** ableiten.
+
+**Logik:**
+1. Für jeden Spieler: Maximalpunkte bei optimalen verbleibenden Ergebnissen berechnen
+2. Für jeden anderen Spieler: Minimalpunkte (Worst-Case) annehmen
+3. Best-Case-Rang = Rang des eigenen Maximums im Feld der Gegner-Worst-Cases
 
 **Methoden:**
-- **Method 1 — Greedy Pairwise (ab R32):** Für jede noch nicht gespielte Partie das beste erreichbare Ergebnis (Exact = 3 Pkt + Scorer-Bonus) annehmen
-- **Method 2 — Exact Brute Force (ab QF):** Alle Ergebniskombinationen der verbleibenden Spiele durchrechnen, Maximum ermitteln
+- **Method 1 — Greedy Pairwise (ab R32):** Für jede noch nicht gespielte Partie Exact = 3 Pkt + Scorer-Bonus annehmen
+- **Method 2 — Exact Brute Force (ab QF):** Alle Ergebniskombinationen durchrechnen, globales Optimum ermitteln
 - Browser ist schneller als Excel; Nacho wurde informiert
+
+**Anzeige:**
+- Pro Spieler: *„Bester möglicher Rang: #X (max. Y Punkte)"*
+- Optional: Deltabadge zum aktuellen Rang (z.B. ↑12)
 
 ---
 
