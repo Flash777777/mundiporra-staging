@@ -763,6 +763,7 @@
     <button class="tab-btn" data-tab="h2h" onclick="switchTab('h2h')">⚔️ Vergleich</button>
     <button class="tab-btn" data-tab="games" onclick="switchTab('games')">⚽ Spiele</button>
     <button class="tab-btn" data-tab="champions" onclick="switchTab('champions')">⭐ Campeones</button>
+    <button class="tab-btn" data-tab="gruppen" onclick="switchTab('gruppen')" data-i18n="tab_gruppen">🏟️ Gruppen</button>
     <button class="tab-btn" data-tab="stats" onclick="switchTab('stats')">📊 Statistiken</button>
     <button class="tab-btn" data-tab="search" onclick="switchTab('search')">🔍 Suche</button>
     <button class="tab-btn" data-tab="database" onclick="switchTab('database')" data-i18n="tab_database">🗄️ Datenbasis</button>
@@ -776,6 +777,7 @@
     <button class="mobile-nav-btn" onclick="switchTab('h2h')" data-tab="h2h"><span class="nav-icon">⚔️</span><span class="nav-label">Vergleich</span></button>
     <button class="mobile-nav-btn" onclick="switchTab('games')" data-tab="games"><span class="nav-icon">⚽</span><span class="nav-label">Spiele</span></button>
     <button class="mobile-nav-btn" onclick="switchTab('champions')" data-tab="champions"><span class="nav-icon">⭐</span><span class="nav-label">Campeones</span></button>
+    <button class="mobile-nav-btn" onclick="switchTab('gruppen')" data-tab="gruppen"><span class="nav-icon">🏟️</span><span class="nav-label" data-i18n="tab_gruppen">Gruppen</span></button>
     <button class="mobile-nav-btn" onclick="switchTab('stats')" data-tab="stats"><span class="nav-icon">📊</span><span class="nav-label">Statistiken</span></button>
     <button class="mobile-nav-btn" onclick="switchTab('search')" data-tab="search"><span class="nav-icon">🔍</span><span class="nav-label">Suche</span></button>
     <button class="mobile-nav-btn" onclick="switchTab('database')" data-tab="database"><span class="nav-icon">🗄️</span><span class="nav-label" data-i18n="tab_database">Datenbasis</span></button>
@@ -907,6 +909,12 @@
 </div>
 
 <!-- ══════════════ CHAMPIONS TAB ══════════════ -->
+<div id="tab-gruppen" class="tab-content">
+<div class="page">
+  <div id="gruppen-container" style="padding:10px"><p style="text-align:center;color:#888;padding:30px">⏳ Lade Gruppenstandings…</p></div>
+</div>
+</div>
+
 <div id="tab-champions" class="tab-content">
 <div class="page">
   <div class="grid-2">
@@ -1044,7 +1052,17 @@
   <div class="section-title">📝 Changelog</div>
 
     <div class="card" style="margin-bottom:14px;">
-          <div class="card-title">v1.19.15 — 20. Juni 2026 (Fix)</div>
+          <div class="card" style="margin-bottom:14px;">
+  <div class="card-title">v1.21.0 — 22. Juni 2026 (Feature)</div>
+  <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
+    <li>🏟️ <strong>Group Standings Tab</strong> — ESPN API Standings aller 12 WM-Gruppen. Quali-Ampel, Jump-Buttons. 60s Cache.</li>
+    <li>🌐 <strong>i18n</strong> — EN/DE/ES (tab_gruppen, grp_* Keys).</li>
+    <li>🆕 <strong>What's New Modal v1.21</strong></li>
+  </ul>
+</div>
+
+<div class="card" style="margin-bottom:14px;">
+  <div class="card-title">v1.19.15 — 20. Juni 2026 (Fix)</div>
           <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
             <li>👥 <strong>Team Luis Díaz</strong> — 4 Mitglieder aus „Entes locales" hinzugefügt: Luis Díaz Gómez, Ainhoa Díaz Gómez, Conchi Gómez Jimenez, José María Díaz Toloba.</li>
           </ul>
@@ -1652,6 +1670,9 @@ const TRANSLATIONS = {
     tab_group: '👥 My Group',
     tab_games: '⚽ Games',
     tab_champions: '🌟 Champions',
+    tab_gruppen: '🏟️ Groups',
+    grp_pts:'Pts',grp_played:'P',grp_won:'W',grp_draw:'D',grp_lost:'L',grp_gf:'GF',grp_ga:'GA',grp_gd:'GD',
+    grp_quali_q:'Qualified',grp_quali_m:'Needs max pts',grp_quali_e:'Eliminated',
     tab_stats: '📈 Stats',
     tab_database: '🗄️ Data',
     tab_search: '🔍 Search',
@@ -1883,6 +1904,9 @@ const TRANSLATIONS = {
     tab_group: '👥 Meine Gruppe',
     tab_games: '⚽ Spiele',
     tab_champions: '🌟 Champions',
+    tab_gruppen: '🏟️ Gruppen',
+    grp_pts:'Pkt',grp_played:'Sp',grp_won:'S',grp_draw:'U',grp_lost:'N',grp_gf:'T+',grp_ga:'T-',grp_gd:'Diff',
+    grp_quali_q:'Qualifiziert',grp_quali_m:'Braucht max. Pkt.',grp_quali_e:'Ausgeschieden',
     tab_stats: '📈 Statistiken',
     tab_database: '🗄️ Datenbasis',
     tab_search: '🔍 Suche',
@@ -2107,6 +2131,9 @@ const TRANSLATIONS = {
     tab_group: '👥 Mi Grupo',
     tab_games: '⚽ Partidos',
     tab_champions: '🌟 Campeones',
+    tab_gruppen: '🏟️ Grupos',
+    grp_pts:'Pts',grp_played:'J',grp_won:'G',grp_draw:'E',grp_lost:'P',grp_gf:'GF',grp_ga:'GC',grp_gd:'DG',
+    grp_quali_q:'Clasificado',grp_quali_m:'Necesita máx. pts',grp_quali_e:'Eliminado',
     tab_stats: '📈 Estadísticas',
     tab_database: '🗄️ Datos',
     tab_search: '🔍 Buscar',
@@ -4563,6 +4590,8 @@ function showGameDetail(gameId) {
   document.getElementById('gameDetailPanel').scrollIntoView({behavior:'smooth', block:'nearest'});
 }
 
+function renderGruppen(){const container=document.getElementById('gruppen-container');if(!container)return;const cached=window._gruppenCache;if(cached&&(Date.now()-cached.ts<60000)){_renderGruppenUI(container,cached.data);return;}container.innerHTML='<p style="text-align:center;color:#888;padding:30px">⏳ Lade Gruppenstandings…</p>';const GROUPS=['a','b','c','d','e','f','g','h','i','j','k','l'];Promise.all(GROUPS.map(g=>fetch('https://site.api.espn.com/apis/v2/sports/soccer/fifa.world/standings?season=2026&group='+g).then(r=>r.ok?r.json():null).catch(()=>null))).then(results=>{const groups=[];results.forEach((data,gi)=>{if(!data)return;try{const entries=(data.children?data.children[0]?.standings?.entries:data.standings?.entries)||[];const teams=entries.map(e=>{const stats={};(e.stats||[]).forEach(s=>{stats[s.abbreviation||s.name]=s.value;});return{name:e.team?.displayName||e.team?.name||'?',logo:e.team?.logos?.[0]?.href||'',pts:stats['PTS']??stats['pts']??0,played:stats['GP']??stats['gp']??0,won:stats['W']??0,draw:stats['T']??stats['D']??0,lost:stats['L']??0,gf:stats['PF']??stats['GF']??0,ga:stats['PA']??stats['GA']??0,gd:stats['DIFF']??stats['GD']??0};}).sort((a,b)=>b.pts-a.pts||b.gd-a.gd||b.gf-a.gf);groups.push({letter:GROUPS[gi].toUpperCase(),teams});}catch(ex){}});window._gruppenCache={ts:Date.now(),data:groups};_renderGruppenUI(container,groups);}).catch(err=>{container.innerHTML='<p style="color:red;padding:20px">❌ '+err.message+'</p>';});}
+function _renderGruppenUI(container,groups){if(!groups||!groups.length){container.innerHTML='<p style="text-align:center;padding:30px;color:#888">Keine Daten verfügbar</p>';return;}let html='<div style="display:flex;flex-wrap:wrap;gap:6px;padding:12px 12px 8px;justify-content:center">';groups.forEach(g=>{html+='<button onclick="document.getElementById(\'grp-'+g.letter+'\').scrollIntoView({behavior:\'smooth\'})" style="background:var(--accent,#1e90ff);color:#fff;border:none;border-radius:6px;padding:4px 10px;cursor:pointer;font-size:0.8rem">Gr. '+g.letter+'</button>';});html+='</div>';groups.forEach(g=>{html+='<div id="grp-'+g.letter+'" class="card" style="margin:8px 10px;overflow:hidden"><div class="card-title">🏟️ Gruppe '+g.letter+'</div><div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:0.82rem"><thead><tr style="background:var(--card-header,#f0f4f8)"><th style="text-align:left;padding:5px 4px">#</th><th style="text-align:left;padding:5px 4px">Team</th><th style="padding:5px 4px">'+T('grp_pts')+'</th><th style="padding:5px 4px">'+T('grp_played')+'</th><th style="padding:5px 4px">'+T('grp_won')+'</th><th style="padding:5px 4px">'+T('grp_draw')+'</th><th style="padding:5px 4px">'+T('grp_lost')+'</th><th style="padding:5px 4px">'+T('grp_gf')+'</th><th style="padding:5px 4px">'+T('grp_ga')+'</th><th style="padding:5px 4px">'+T('grp_gd')+'</th></tr></thead><tbody>';g.teams.forEach((t,ti)=>{const rank=ti+1,bg=rank<=2?'#e8f5e9':(rank===3&&t.played<3?'#fff8e1':'transparent'),ic=rank<=2?'✅':(rank===3&&t.played<3?'⚠️':'❌');html+='<tr style="background:'+bg+';border-bottom:1px solid #eee"><td style="padding:4px;font-weight:600">'+ic+' '+rank+'</td><td style="padding:4px">'+(t.logo?'<img src="'+t.logo+'" style="height:16px;vertical-align:middle;margin-right:4px">':'')+'<strong>'+t.name+'</strong></td><td style="text-align:center;padding:4px;font-weight:700">'+t.pts+'</td><td style="text-align:center;padding:4px">'+t.played+'</td><td style="text-align:center;padding:4px">'+t.won+'</td><td style="text-align:center;padding:4px">'+t.draw+'</td><td style="text-align:center;padding:4px">'+t.lost+'</td><td style="text-align:center;padding:4px">'+t.gf+'</td><td style="text-align:center;padding:4px">'+t.ga+'</td><td style="text-align:center;padding:4px">'+t.gd+'</td></tr>';});html+='</tbody></table></div></div>';});container.innerHTML=html;}
 function renderChampions() {
   const allPreds = ALL_PREDICTIONS;
   const champCount = {};
@@ -5351,20 +5380,23 @@ function switchTab(tabId) {
   if (tabId === 'h2h') initH2HTab();
   if (tabId === 'group' && _lastLb) renderGroupTab(_lastLb);
   if (tabId === 'stats' && _lastLb) renderStats(_lastLb);
+  if (tabId === 'gruppen') renderGruppen();
   if (tabId === 'database') renderDatabase();
   // Scroll to top on mobile
   if (window.innerWidth <= 600) window.scrollTo({top: 0, behavior: 'smooth'});
 }
 
 // ═══════ WHAT'S NEW ═══════
-const BUILD_VERSION = 'v1.19.15';
-const BUILD_DATE    = '20.06.2026 23:30';
+const BUILD_VERSION = 'v1.21.0';
+const BUILD_DATE    = '22.06.2026 10:00';
 (function(){ var _hb = document.getElementById('headerVersionBadge'); if(_hb) _hb.textContent = BUILD_VERSION; })();
-const WN_VERSION = 'v1.20';
+const WN_VERSION = 'v1.21';
 const WN_STORAGE_KEY = window.location.pathname.includes('staging') ? 'wnSeen_staging' : 'wnSeen_live';
 (function(){ const old = localStorage.getItem('wnSeen'); if(old && !localStorage.getItem(WN_STORAGE_KEY)) localStorage.setItem(WN_STORAGE_KEY, old); })();
 const WN_I18N={
   en:{
+    // v1.21
+    wn_gruppen:'🏟️ <strong>Group Standings</strong>: Live ESPN standings for all 12 groups — qualification traffic light, jump buttons.',
     // v1.20
     wn_confetti:'🎉 <strong>Confetti Rain</strong>: when a match kicks off (ESPN LIVE), a flag confetti shower bursts across the screen — showing the flags of all participants who support each team.',
     // v1.17
@@ -5388,6 +5420,8 @@ const WN_I18N={
     wn_fetch:'⚡ <strong>8× faster reload</strong>: weekly batch fetching replaces 38 daily requests. Scorer data straight from match events.',
   },
   de:{
+    // v1.21
+    wn_gruppen:'🏟️ <strong>Gruppenstandings</strong>: Live ESPN-Standings aller 12 Gruppen — Quali-Ampel, Jump-Buttons.',
     // v1.20
     wn_confetti:'🎉 <strong>Konfetti-Regen</strong>: wenn ein Spiel anpfeift (ESPN LIVE), regnet es Flaggen-Konfetti über den gesamten Bildschirm — mit den Flaggen aller Teilnehmer, die das jeweilige Team unterstützen.',
     // v1.17
@@ -5411,6 +5445,8 @@ const WN_I18N={
     wn_fetch:'⚡ <strong>8× schnellerer Reload</strong>: Wöchentliche Batches statt 38 täglicher Requests. Torschützen direkt aus Match-Events.',
   },
   es:{
+    // v1.21
+    wn_gruppen:'🏟️ <strong>Clasificación de Grupos</strong>: Standings ESPN en vivo — semáforo de clasificación.',
     // v1.20
     wn_confetti:'🎉 <strong>Lluvia de Confeti</strong>: cuando un partido empieza (ESPN LIVE), explota una lluvia de confeti con banderas por toda la pantalla — mostrando las banderas de todos los participantes que apoyan a cada equipo.',
     // v1.17
@@ -5436,6 +5472,8 @@ const WN_I18N={
 };
 // Icon map für WN-Keys — Reihenfolge & Icons für v1.12
 const WN_ITEMS = [
+  { key: 'wn_gruppen', icon: '🏟️', highlight: true },
+  { divider: true },
   // v1.20 items
   { key: 'wn_confetti',    icon: '🎉', highlight: true },
   // divider
