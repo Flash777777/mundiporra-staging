@@ -4662,7 +4662,18 @@ function renderGruppen(){
 }
 function _renderGruppenUI(container,groups){
   if(!groups||!groups.length){container.innerHTML='<p style="text-align:center;padding:30px;color:#888">Keine Daten verfügbar</p>';return;}
-  let html='<div style="display:flex;flex-wrap:wrap;gap:6px;padding:12px 12px 8px;justify-content:center">';
+  // Legend für Qualifikationsstatus
+  let html='<div style="background:#f5f5f5;border-radius:8px;padding:12px;margin-bottom:12px;font-size:0.8rem;line-height:1.8;border-left:4px solid var(--accent,#1e90ff)">';
+  html+='<strong style="display:block;margin-bottom:6px">🏆 Qualifikationsstatus:</strong>';
+  html+='<div style="display:flex;flex-wrap:wrap;gap:12px">';
+  html+='<span><span style="font-size:1.1rem">✅</span> = Qualifiziert (Platz 1–2)</span>';
+  html+='<span><span style="font-size:1.1rem">⏳</span> = Noch offen (Platz 3, Spiele laufen)</span>';
+  html+='<span><span style="font-size:1.1rem">🤞</span> = Möglich als bester Dritter (Platz 3, Gruppe fertig)</span>';
+  html+='<span><span style="font-size:1.1rem">❌</span> = Ausgeschieden</span>';
+  html+='</div>';
+  html+='</div>';
+  // Jump buttons
+  html+='<div style="display:flex;flex-wrap:wrap;gap:6px;padding:12px 12px 8px;justify-content:center">';
     groups.forEach(g=>{html+='<button onclick="document.getElementById(\'grp-'+g.letter+'\').scrollIntoView({behavior:\'smooth\'})" style="background:var(--accent,#1e90ff);color:#fff;border:none;border-radius:6px;padding:4px 10px;cursor:pointer;font-size:0.8rem">Gr. '+g.letter+'</button>';});
   html+='</div>';
   groups.forEach(g=>{
@@ -4671,7 +4682,13 @@ function _renderGruppenUI(container,groups){
     html+='<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:0.82rem">';
     html+='<thead><tr style="background:var(--card-header,#f0f4f8)"><th style="text-align:left;padding:5px 4px">#</th><th style="text-align:left;padding:5px 4px">Team</th><th style="padding:5px 4px">'+T('grp_pts')+'</th><th style="padding:5px 4px">'+T('grp_played')+'</th><th style="padding:5px 4px">'+T('grp_won')+'</th><th style="padding:5px 4px">'+T('grp_draw')+'</th><th style="padding:5px 4px">'+T('grp_lost')+'</th><th style="padding:5px 4px">'+T('grp_gf')+'</th><th style="padding:5px 4px">'+T('grp_ga')+'</th><th style="padding:5px 4px">'+T('grp_gd')+'</th></tr></thead><tbody>';
     g.teams.forEach((t,ti)=>{
-      const rank=ti+1,bg=rank<=2?'#e8f5e9':(rank===3&&t.played<3?'#fff8e1':'transparent'),ic=rank<=2?'✅':(rank===3&&t.played<3?'⚠️':'❌');
+      const rank=ti+1;
+      let bg,ic;
+      if(rank<=2){bg='#e8f5e9';ic='✅';} 
+      else if(rank===3){
+        bg=t.played<3?'#fff8e1':'#fffbe6';
+        ic=t.played<3?'⏳':'🤞';
+      } else {bg='transparent';ic='❌';}
       html+='<tr style="background:'+bg+';border-bottom:1px solid #eee"><td style="padding:4px;font-weight:600">'+ic+' '+rank+'</td>';
       html+='<td style="padding:4px">'+(t.logo?'<img src="'+t.logo+'" style="height:16px;vertical-align:middle;margin-right:4px">':'')+'<strong>'+t.name+'</strong></td>';
       html+='<td style="text-align:center;padding:4px;font-weight:700">'+t.pts+'</td>';
@@ -5483,8 +5500,8 @@ function switchTab(tabId) {
 }
 
 // ═══════ WHAT'S NEW ═══════
-const BUILD_VERSION = 'v1.21.3';
-const BUILD_DATE    = '22.06.2026 13:00';
+const BUILD_VERSION = 'v1.21.4';
+const BUILD_DATE    = '22.06.2026 13:30';
 (function(){ var _hb = document.getElementById('headerVersionBadge'); if(_hb) _hb.textContent = BUILD_VERSION; })();
 const WN_VERSION = 'v1.21';
 const WN_STORAGE_KEY = window.location.pathname.includes('staging') ? 'wnSeen_staging' : 'wnSeen_live';
