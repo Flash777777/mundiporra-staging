@@ -1,6 +1,6 @@
 # 🗺️ Mundiporra Dashboard — UI Map
 > Kanonische Komponentennamen für Patrick ↔ Claude Kommunikation
-> Stand: v1.21.0 · Repo: `Flash777777/mundiporra-staging` + `mundiporra-dashboard`
+> Stand: v1.21.1 · Repo: `Flash777777/mundiporra-staging` + `mundiporra-dashboard`
 
 **Konvention:** `Kanonischer Name` → `fn()` / `#id` / `.class`
 Wenn Patrick "X" sagt → Claude adressiert exakt den Code hinter "X". Keine Interpretation.

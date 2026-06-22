@@ -1053,6 +1053,15 @@
 
     <div class="card" style="margin-bottom:14px;">
           <div class="card" style="margin-bottom:14px;">
+  <div class="card" style="margin-bottom:14px;">
+  <div class="card-title">v1.21.1 — 22. Juni 2026 (Fix)</div>
+  <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
+    <li>🔧 <strong>renderGruppen ESPN Fix</strong> — 1 Call statt 12, korrekte Stat-Keys (P/GP/W/D/L/F/A/GD).</li>
+    <li>🔧 <strong>#confetti CSS Fix</strong> — CSS außerhalb &lt;style&gt; in &lt;style&gt; eingewickelt (SyntaxError behoben).</li>
+  </ul>
+</div>
+
+<div class="card" style="margin-bottom:14px;">
   <div class="card-title">v1.21.0 — 22. Juni 2026 (Feature)</div>
   <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
     <li>🏟️ <strong>Group Standings Tab</strong> — ESPN API Standings aller 12 WM-Gruppen. Quali-Ampel, Jump-Buttons. 60s Cache.</li>
@@ -4590,8 +4599,68 @@ function showGameDetail(gameId) {
   document.getElementById('gameDetailPanel').scrollIntoView({behavior:'smooth', block:'nearest'});
 }
 
-function renderGruppen(){const container=document.getElementById('gruppen-container');if(!container)return;const cached=window._gruppenCache;if(cached&&(Date.now()-cached.ts<60000)){_renderGruppenUI(container,cached.data);return;}container.innerHTML='<p style="text-align:center;color:#888;padding:30px">⏳ Lade Gruppenstandings…</p>';const GROUPS=['a','b','c','d','e','f','g','h','i','j','k','l'];Promise.all(GROUPS.map(g=>fetch('https://site.api.espn.com/apis/v2/sports/soccer/fifa.world/standings?season=2026&group='+g).then(r=>r.ok?r.json():null).catch(()=>null))).then(results=>{const groups=[];results.forEach((data,gi)=>{if(!data)return;try{const entries=(data.children?data.children[0]?.standings?.entries:data.standings?.entries)||[];const teams=entries.map(e=>{const stats={};(e.stats||[]).forEach(s=>{stats[s.abbreviation||s.name]=s.value;});return{name:e.team?.displayName||e.team?.name||'?',logo:e.team?.logos?.[0]?.href||'',pts:stats['PTS']??stats['pts']??0,played:stats['GP']??stats['gp']??0,won:stats['W']??0,draw:stats['T']??stats['D']??0,lost:stats['L']??0,gf:stats['PF']??stats['GF']??0,ga:stats['PA']??stats['GA']??0,gd:stats['DIFF']??stats['GD']??0};}).sort((a,b)=>b.pts-a.pts||b.gd-a.gd||b.gf-a.gf);groups.push({letter:GROUPS[gi].toUpperCase(),teams});}catch(ex){}});window._gruppenCache={ts:Date.now(),data:groups};_renderGruppenUI(container,groups);}).catch(err=>{container.innerHTML='<p style="color:red;padding:20px">❌ '+err.message+'</p>';});}
-function _renderGruppenUI(container,groups){if(!groups||!groups.length){container.innerHTML='<p style="text-align:center;padding:30px;color:#888">Keine Daten verfügbar</p>';return;}let html='<div style="display:flex;flex-wrap:wrap;gap:6px;padding:12px 12px 8px;justify-content:center">';groups.forEach(g=>{html+='<button onclick="document.getElementById(\'grp-'+g.letter+'\').scrollIntoView({behavior:\'smooth\'})" style="background:var(--accent,#1e90ff);color:#fff;border:none;border-radius:6px;padding:4px 10px;cursor:pointer;font-size:0.8rem">Gr. '+g.letter+'</button>';});html+='</div>';groups.forEach(g=>{html+='<div id="grp-'+g.letter+'" class="card" style="margin:8px 10px;overflow:hidden"><div class="card-title">🏟️ Gruppe '+g.letter+'</div><div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:0.82rem"><thead><tr style="background:var(--card-header,#f0f4f8)"><th style="text-align:left;padding:5px 4px">#</th><th style="text-align:left;padding:5px 4px">Team</th><th style="padding:5px 4px">'+T('grp_pts')+'</th><th style="padding:5px 4px">'+T('grp_played')+'</th><th style="padding:5px 4px">'+T('grp_won')+'</th><th style="padding:5px 4px">'+T('grp_draw')+'</th><th style="padding:5px 4px">'+T('grp_lost')+'</th><th style="padding:5px 4px">'+T('grp_gf')+'</th><th style="padding:5px 4px">'+T('grp_ga')+'</th><th style="padding:5px 4px">'+T('grp_gd')+'</th></tr></thead><tbody>';g.teams.forEach((t,ti)=>{const rank=ti+1,bg=rank<=2?'#e8f5e9':(rank===3&&t.played<3?'#fff8e1':'transparent'),ic=rank<=2?'✅':(rank===3&&t.played<3?'⚠️':'❌');html+='<tr style="background:'+bg+';border-bottom:1px solid #eee"><td style="padding:4px;font-weight:600">'+ic+' '+rank+'</td><td style="padding:4px">'+(t.logo?'<img src="'+t.logo+'" style="height:16px;vertical-align:middle;margin-right:4px">':'')+'<strong>'+t.name+'</strong></td><td style="text-align:center;padding:4px;font-weight:700">'+t.pts+'</td><td style="text-align:center;padding:4px">'+t.played+'</td><td style="text-align:center;padding:4px">'+t.won+'</td><td style="text-align:center;padding:4px">'+t.draw+'</td><td style="text-align:center;padding:4px">'+t.lost+'</td><td style="text-align:center;padding:4px">'+t.gf+'</td><td style="text-align:center;padding:4px">'+t.ga+'</td><td style="text-align:center;padding:4px">'+t.gd+'</td></tr>';});html+='</tbody></table></div></div>';});container.innerHTML=html;}
+function renderGruppen(){
+  const container=document.getElementById('gruppen-container');
+  if(!container)return;
+  const cached=window._gruppenCache;
+  if(cached&&(Date.now()-cached.ts<60000)){_renderGruppenUI(container,cached.data);return;}
+  container.innerHTML='<p style="text-align:center;color:#888;padding:30px">⏳ Lade Gruppenstandings…</p>';
+  fetch('https://site.api.espn.com/apis/v2/sports/soccer/fifa.world/standings?season=2026')
+    .then(r=>r.ok?r.json():Promise.reject('ESPN '+r.status))
+    .then(data=>{
+      const groups=(data.children||[]).map(g=>{
+        const entries=g.standings?.entries||[];
+        const teams=entries.map(e=>{
+          const stats={};
+          (e.stats||[]).forEach(s=>{stats[s.abbreviation]=s.value;});
+          return{
+            name:e.team?.displayName||e.team?.name||'?',
+            logo:e.team?.logos?.[0]?.href||'',
+            pts:stats['P']??0,
+            played:stats['GP']??0,
+            won:stats['W']??0,
+            draw:stats['D']??0,
+            lost:stats['L']??0,
+            gf:stats['F']??0,
+            ga:stats['A']??0,
+            gd:stats['GD']??0
+          };
+        }).sort((a,b)=>b.pts-a.pts||b.gd-a.gd||b.gf-a.gf);
+        return{letter:g.name.replace('Group ',''),teams};
+      });
+      window._gruppenCache={ts:Date.now(),data:groups};
+      _renderGruppenUI(container,groups);
+    })
+    .catch(err=>{container.innerHTML='<p style="color:red;padding:20px">❌ ESPN: '+err+'</p>';});
+}
+function _renderGruppenUI(container,groups){
+  if(!groups||!groups.length){container.innerHTML='<p style="text-align:center;padding:30px;color:#888">Keine Daten verfügbar</p>';return;}
+  let html='<div style="display:flex;flex-wrap:wrap;gap:6px;padding:12px 12px 8px;justify-content:center">';
+  groups.forEach(g=>{html+='<button onclick="document.getElementById('grp-'+g.letter+'').scrollIntoView({behavior:'smooth'})" style="background:var(--accent,#1e90ff);color:#fff;border:none;border-radius:6px;padding:4px 10px;cursor:pointer;font-size:0.8rem">Gr. '+g.letter+'</button>';});
+  html+='</div>';
+  groups.forEach(g=>{
+    html+='<div id="grp-'+g.letter+'" class="card" style="margin:8px 10px;overflow:hidden">';
+    html+='<div class="card-title">🏟️ Gruppe '+g.letter+'</div>';
+    html+='<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:0.82rem">';
+    html+='<thead><tr style="background:var(--card-header,#f0f4f8)"><th style="text-align:left;padding:5px 4px">#</th><th style="text-align:left;padding:5px 4px">Team</th><th style="padding:5px 4px">'+T('grp_pts')+'</th><th style="padding:5px 4px">'+T('grp_played')+'</th><th style="padding:5px 4px">'+T('grp_won')+'</th><th style="padding:5px 4px">'+T('grp_draw')+'</th><th style="padding:5px 4px">'+T('grp_lost')+'</th><th style="padding:5px 4px">'+T('grp_gf')+'</th><th style="padding:5px 4px">'+T('grp_ga')+'</th><th style="padding:5px 4px">'+T('grp_gd')+'</th></tr></thead><tbody>';
+    g.teams.forEach((t,ti)=>{
+      const rank=ti+1,bg=rank<=2?'#e8f5e9':(rank===3&&t.played<3?'#fff8e1':'transparent'),ic=rank<=2?'✅':(rank===3&&t.played<3?'⚠️':'❌');
+      html+='<tr style="background:'+bg+';border-bottom:1px solid #eee"><td style="padding:4px;font-weight:600">'+ic+' '+rank+'</td>';
+      html+='<td style="padding:4px">'+(t.logo?'<img src="'+t.logo+'" style="height:16px;vertical-align:middle;margin-right:4px">':'')+'<strong>'+t.name+'</strong></td>';
+      html+='<td style="text-align:center;padding:4px;font-weight:700">'+t.pts+'</td>';
+      html+='<td style="text-align:center;padding:4px">'+t.played+'</td>';
+      html+='<td style="text-align:center;padding:4px">'+t.won+'</td>';
+      html+='<td style="text-align:center;padding:4px">'+t.draw+'</td>';
+      html+='<td style="text-align:center;padding:4px">'+t.lost+'</td>';
+      html+='<td style="text-align:center;padding:4px">'+t.gf+'</td>';
+      html+='<td style="text-align:center;padding:4px">'+t.ga+'</td>';
+      html+='<td style="text-align:center;padding:4px">'+t.gd+'</td></tr>';
+    });
+    html+='</tbody></table></div></div>';
+  });
+  container.innerHTML=html;
+}
+
 function renderChampions() {
   const allPreds = ALL_PREDICTIONS;
   const champCount = {};
@@ -5387,8 +5456,8 @@ function switchTab(tabId) {
 }
 
 // ═══════ WHAT'S NEW ═══════
-const BUILD_VERSION = 'v1.21.0';
-const BUILD_DATE    = '22.06.2026 10:00';
+const BUILD_VERSION = 'v1.21.1';
+const BUILD_DATE    = '22.06.2026 12:00';
 (function(){ var _hb = document.getElementById('headerVersionBadge'); if(_hb) _hb.textContent = BUILD_VERSION; })();
 const WN_VERSION = 'v1.21';
 const WN_STORAGE_KEY = window.location.pathname.includes('staging') ? 'wnSeen_staging' : 'wnSeen_live';
