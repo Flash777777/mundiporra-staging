@@ -1885,6 +1885,11 @@ const TRANSLATIONS = {
     h2h_total_pts: 'TOTAL POINTS',
     h2h_rank: 'RANK',
     tab_my_groups: '👥 My Groups',
+    grp_legend_title: 'Qualification Status',
+    grp_status_qualified: 'Qualified (Places 1–2)',
+    grp_status_open: 'Still open (3rd place, matches ongoing)',
+    grp_status_maybe: 'Possible as best 3rd (3rd place, group finished)',
+    grp_status_eliminated: 'Eliminated',
   },
   de: {
     porra_card_points: 'PKT',
@@ -2104,6 +2109,11 @@ const TRANSLATIONS = {
     h2h_total_pts: 'GESAMTPUNKTE',
     h2h_rank: 'RANG',
     tab_my_groups: '👥 Meine Gruppen',
+    grp_legend_title: 'Qualifikationsstatus',
+    grp_status_qualified: 'Qualifiziert (Platz 1–2)',
+    grp_status_open: 'Noch offen (Platz 3, Spiele laufen)',
+    grp_status_maybe: 'Möglich als bester Dritter (Platz 3, Gruppe fertig)',
+    grp_status_eliminated: 'Ausgeschieden',
     live_halftime: 'Halbzeit', live_first_half: '1. HZ', live_second_half: '2. HZ', live_possession: 'Ballbesitz',
     live_extra_time: 'Verlängerung', live_shootout: 'Elfmeter', live_delayed: 'Verzögert',
     sim_title: '⚡ Score-Simulator', sim_btn: '⚡ Simulator', sim_crowd_pick: 'Mehrheitstipp',
@@ -2339,6 +2349,11 @@ const TRANSLATIONS = {
     h2h_total_pts: 'PUNTOS TOTALES',
     h2h_rank: 'POSICIÓN',
     tab_my_groups: '👥 Mis Grupos',
+    grp_legend_title: 'Estado de Calificación',
+    grp_status_qualified: 'Clasificados (Posiciones 1–2)',
+    grp_status_open: 'Aún abierto (3. puesto, partidos en juego)',
+    grp_status_maybe: 'Posible como mejor 3. (3. puesto, grupo terminado)',
+    grp_status_eliminated: 'Eliminados',
   }
 };
 
@@ -4664,12 +4679,12 @@ function _renderGruppenUI(container,groups){
   if(!groups||!groups.length){container.innerHTML='<p style="text-align:center;padding:30px;color:#888">Keine Daten verfügbar</p>';return;}
   // Legend für Qualifikationsstatus
   let html='<div style="background:#f5f5f5;border-radius:8px;padding:12px;margin-bottom:12px;font-size:0.8rem;line-height:1.8;border-left:4px solid var(--accent,#1e90ff)">';
-  html+='<strong style="display:block;margin-bottom:6px">🏆 Qualifikationsstatus:</strong>';
+  html+='<strong style="display:block;margin-bottom:6px">🏆 '+T('grp_legend_title')+'</strong>';
   html+='<div style="display:flex;flex-wrap:wrap;gap:12px">';
-  html+='<span><span style="font-size:1.1rem">✅</span> = Qualifiziert (Platz 1–2)</span>';
-  html+='<span><span style="font-size:1.1rem">⏳</span> = Noch offen (Platz 3, Spiele laufen)</span>';
-  html+='<span><span style="font-size:1.1rem">🤞</span> = Möglich als bester Dritter (Platz 3, Gruppe fertig)</span>';
-  html+='<span><span style="font-size:1.1rem">❌</span> = Ausgeschieden</span>';
+  html+='<span><span style="font-size:1.1rem">✅</span> = '+T('grp_status_qualified')+'</span>';
+  html+='<span><span style="font-size:1.1rem">⏳</span> = '+T('grp_status_open')+'</span>';
+  html+='<span><span style="font-size:1.1rem">🤞</span> = '+T('grp_status_maybe')+'</span>';
+  html+='<span><span style="font-size:1.1rem">❌</span> = '+T('grp_status_eliminated')+'</span>';
   html+='</div>';
   html+='</div>';
   // Jump buttons
@@ -5500,8 +5515,8 @@ function switchTab(tabId) {
 }
 
 // ═══════ WHAT'S NEW ═══════
-const BUILD_VERSION = 'v1.21.4';
-const BUILD_DATE    = '22.06.2026 13:30';
+const BUILD_VERSION = 'v1.21.5';
+const BUILD_DATE    = '22.06.2026 14:25';
 (function(){ var _hb = document.getElementById('headerVersionBadge'); if(_hb) _hb.textContent = BUILD_VERSION; })();
 const WN_VERSION = 'v1.21';
 const WN_STORAGE_KEY = window.location.pathname.includes('staging') ? 'wnSeen_staging' : 'wnSeen_live';
