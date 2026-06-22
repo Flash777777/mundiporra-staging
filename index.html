@@ -1072,6 +1072,13 @@
   <div class="section-title">📝 Changelog</div>
 
     <div class="card" style="margin-bottom:14px;">
+  <div class="card-title">v1.21.6 — 22. Juni 2026 (Fix)</div>
+  <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
+    <li>🔧 <strong>Header-Buttons Fix</strong> — Sanity-Check (<code>openSanity</code>-Alias), Simulator und What's New Modal öffnen jetzt korrekt</li>
+    <li>🛡️ <strong>Error Guards</strong> — try/catch in <code>openSimulator()</code> und <code>openWhatsNew()</code> für saubere Console-Diagnose</li>
+  </ul>
+</div>
+<div class="card" style="margin-bottom:14px;">
           <div class="card" style="margin-bottom:14px;">
   <div class="card" style="margin-bottom:14px;">
   <div class="card-title">v1.21.2 — 22. Juni 2026 (Fix)</div>
@@ -3220,6 +3227,7 @@ function runSanityChecks() {
   badge._checks = checks;
 }
 
+function openSanity(){ openSanityModal(); }
 function openSanityModal() {
   const badge = document.getElementById('sanity-badge');
   if (!badge || !badge._checks) return;
@@ -5515,8 +5523,8 @@ function switchTab(tabId) {
 }
 
 // ═══════ WHAT'S NEW ═══════
-const BUILD_VERSION = 'v1.21.5';
-const BUILD_DATE    = '22.06.2026 14:25';
+const BUILD_VERSION = 'v1.21.6';
+const BUILD_DATE    = '22.06.2026 15:30';
 (function(){ var _hb = document.getElementById('headerVersionBadge'); if(_hb) _hb.textContent = BUILD_VERSION; })();
 const WN_VERSION = 'v1.21';
 const WN_STORAGE_KEY = window.location.pathname.includes('staging') ? 'wnSeen_staging' : 'wnSeen_live';
@@ -5634,10 +5642,15 @@ const WN_ITEMS = [
 ];
 
 function openWhatsNew(){
-  document.getElementById('whatsNewOverlay').classList.add('active');
-  document.getElementById('wnDot').classList.remove('visible');
-  localStorage.setItem(WN_STORAGE_KEY, WN_VERSION);
-  _applyWnLang();
+  try {
+    const overlay = document.getElementById('whatsNewOverlay');
+    if(!overlay){ console.error('whatsNewOverlay not found'); return; }
+    overlay.classList.add('active');
+    const dot = document.getElementById('wnDot');
+    if(dot) dot.classList.remove('visible');
+    localStorage.setItem(WN_STORAGE_KEY, WN_VERSION);
+    try { _applyWnLang(); } catch(e){ console.error('_applyWnLang error:',e); }
+  } catch(e){ console.error('openWhatsNew error:',e); }
 }
 function closeWhatsNew(){document.getElementById('whatsNewOverlay').classList.remove('active');localStorage.setItem(WN_STORAGE_KEY,WN_VERSION);document.getElementById('wnDot').classList.remove('visible');}
 function _applyWnLang(){
@@ -5805,7 +5818,16 @@ function _crowdPick(gid){
   }
   return{score:topScore,pct,count:topCount};
 }
-function openSimulator(){_simInit();_simLb=_lastLb||[];document.getElementById('simOverlay').classList.add('active');_renderSimulator();}
+function openSimulator(){
+  try {
+    _simInit();
+    _simLb = _lastLb || [];
+    const overlay = document.getElementById('simOverlay');
+    if(!overlay){ console.error('simOverlay not found'); return; }
+    overlay.classList.add('active');
+    try { _renderSimulator(); } catch(e){ console.error('_renderSimulator error:',e); }
+  } catch(e){ console.error('openSimulator error:',e); }
+}
 function closeSimulator(){document.getElementById('simOverlay').classList.remove('active');}
 function _simAdj(gid,team,d){
   // Ensure gid is treated as string key consistently
