@@ -1071,7 +1071,14 @@
 <div class="page">
   <div class="section-title">📝 Changelog</div>
 
-    <div class="card" style="margin-bottom:14px;">
+    
+<div class="card" style="margin-bottom:14px;">
+  <div class="card-title">v1.21.7 — 22.06.2026 (Fix)</div>
+  <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
+    <li>🔧 <strong>Simulator & What's New Overlay Fix</strong> — Fehlende <code>&lt;/div&gt;</code>-Tags am Ende des Changelog-Tabs korrigiert; alle Overlays lagen dadurch im falschen DOM-Parent und waren unsichtbar (0×0 px).</li>
+  </ul>
+</div>
+<div class="card" style="margin-bottom:14px;">
   <div class="card-title">v1.21.6 — 22. Juni 2026 (Fix)</div>
   <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
     <li>🔧 <strong>Header-Buttons Fix</strong> — Sanity-Check (<code>openSanity</code>-Alias), Simulator und What's New Modal öffnen jetzt korrekt</li>
@@ -5523,8 +5530,8 @@ function switchTab(tabId) {
 }
 
 // ═══════ WHAT'S NEW ═══════
-const BUILD_VERSION = 'v1.21.6';
-const BUILD_DATE    = '22.06.2026 15:30';
+const BUILD_VERSION = 'v1.21.7';
+const BUILD_DATE    = '22.06.2026 16:35';
 (function(){ var _hb = document.getElementById('headerVersionBadge'); if(_hb) _hb.textContent = BUILD_VERSION; })();
 const WN_VERSION = 'v1.21';
 const WN_STORAGE_KEY = window.location.pathname.includes('staging') ? 'wnSeen_staging' : 'wnSeen_live';
@@ -6049,6 +6056,7 @@ window.addEventListener('resize',_chkLandscape);
 
 </script>
 
+</div></div>
 <!-- WHAT'S NEW -->
 <div id="whatsNewOverlay">
   <div class="wn-box">
