@@ -5042,7 +5042,11 @@ function calcTeamClassificationPoints(playerName, teamName) {
     const team = teams.find(t => t.name === teamName);
     if (!team) continue;
     
-    const groupDone = teams.length === 4 && teams.every(t => t.played >= 3) && !_hasLiveGameInGroup(letter);
+    const len4 = teams.length === 4;
+    const all3played = teams.every(t => t.played >= 3);
+    const noLive = !_hasLiveGameInGroup(letter);
+    const groupDone = len4 && all3played && noLive;
+    console.log('  [CHECK_' + letter + ']', {len4, all3played, noLive, groupDone});
     if (!groupDone) continue;
     
     console.log('[GROUP_' + letter + '_DONE] For', teamName, '→ checking positions');
