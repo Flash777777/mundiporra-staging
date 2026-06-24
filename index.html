@@ -5030,7 +5030,11 @@ function renderGruppen(){
 }
 function calcTeamClassificationPoints(playerName, teamName) {
   const tips = ALL_GROUP_PREDICTIONS[playerName];
-  if (!tips || !_grupClassCache) return 0;
+  console.log('[calcTeamClassificationPoints]', {playerName, teamName, hasTips: !!tips, hasCache: !!_grupClassCache});
+  if (!tips || !_grupClassCache) {
+    console.log('  → Early return: tips=' + !!tips + ', cache=' + !!_grupClassCache);
+    return 0;
+  }
   const standings = _grupClassCache;
   let pts = 0;
   
@@ -5089,6 +5093,7 @@ function _renderGruppenUI(container,groups){
     g.teams.forEach((t,ti)=>{
       const rank=ti+1;
       const teamPts = calcTeamClassificationPoints(USER.player, t.name) || 0;
+      console.log('[DEBUG] teamPts for', t.name, ':', teamPts, '| USER:', USER.player, '| cache:', !!_grupClassCache);
       const teamPtsDisplay = teamPts > 0 ? '<span style="color:#7c3aed;font-weight:700;margin-left:4px;">🏅 ' + teamPts + '</span>' : '';
       let bg,ic;
       if(rank<=2){bg='#e8f5e9';ic='✅';} 
