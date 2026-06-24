@@ -5030,42 +5030,46 @@ function renderGruppen(){
 }
 function calcTeamClassificationPoints(playerName, teamName) {
   const tips = ALL_GROUP_PREDICTIONS[playerName];
-  console.log('[calcTeamClassificationPoints]', {playerName, teamName, hasTips: !!tips, hasCache: !!_grupClassCache});
-  if (!tips || !_grupClassCache) {
-    console.log('  → Early return: tips=' + !!tips + ', cache=' + !!_grupClassCache);
-    return 0;
-  }
+  if (!tips || !_grupClassCache) return 0;
+  
+  console.log('[CALC_TEAM]', {playerName, teamName, tipsKeys: Object.keys(tips).slice(0, 10)});
+  
   const standings = _grupClassCache;
   let pts = 0;
   
-  // Find which group this team belongs to and check tips
   for (const letter of Object.keys(standings)) {
     const teams = standings[letter] || [];
     const team = teams.find(t => t.name === teamName);
     if (!team) continue;
     
     const groupDone = teams.length === 4 && teams.every(t => t.played >= 3) && !_hasLiveGameInGroup(letter);
-    if (!groupDone) continue; // Skip unfinished groups
+    if (!groupDone) continue;
     
-    // Check all position tips for this group
+    console.log('[GROUP_' + letter + '_DONE] For', teamName, '→ checking positions');
+    
     for (let pos = 1; pos <= 3; pos++) {
       const tipKey = pos + letter;
       const tip = tips[tipKey];
+      console.log('  tipKey:', tipKey, '→ tip:', tip);
+      
       if (!tip || tip === '-') continue;
       
       const actualAtPos = teams.find(t => t.rank === pos);
       if (!actualAtPos) continue;
       
-      // If this team was tipped at this position
       if (tip === teamName) {
         if (actualAtPos.name === teamName) {
-          pts += 3; // Exact match
+          pts += 3;
+          console.log('    ✓ MATCH! +3');
         } else if (actualAtPos.noteDesc === 'Advance to Round of 32') {
-          pts += 1; // Team qualifies but wrong position
+          pts += 1;
+          console.log('    ✓ QUALIFIED +1');
         }
       }
     }
+    break;
   }
+  console.log('[RESULT]', teamName, '→', pts, 'pts');
   return pts;
 }
 
