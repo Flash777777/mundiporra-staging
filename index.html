@@ -5041,7 +5041,7 @@ function calcTeamClassificationPoints(playerName, teamName) {
     if (!team) continue;
     
     const groupDone = teams.length === 4 && teams.every(t => t.played >= 3) && !_hasLiveGameInGroup(letter);
-    if (!groupDone) return 0; // Only count if group is done
+    if (!groupDone) continue; // Skip unfinished groups
     
     // Check all position tips for this group
     for (let pos = 1; pos <= 3; pos++) {
@@ -6068,7 +6068,7 @@ function switchTab(tabId) {
 }
 
 // ═══════ WHAT'S NEW ═══════
-const BUILD_VERSION = 'v1.23.7';
+const BUILD_VERSION = 'v1.23.8';
 const BUILD_DATE = '24.06.2026 23:59';
 (function(){ var _hb = document.getElementById('headerVersionBadge'); if(_hb) _hb.textContent = BUILD_VERSION; })();
 const WN_VERSION = 'v1.22';
