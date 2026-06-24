@@ -687,6 +687,39 @@
   80%  { opacity: 1; }
   100% { transform: translateY(110vh) rotate(720deg) scale(0.6); opacity: 0; }
 }
+/* ═══════ KO BRACKET ═══════ */
+.ko-bracket-wrap{overflow-x:auto;padding:8px 0;}
+.ko-bracket-desktop{display:flex;gap:0;min-height:1050px;padding:16px 4px;align-items:stretch;}
+.ko-round-col{display:flex;flex-direction:column;flex-shrink:0;}
+.ko-round-col-inner{display:flex;flex-direction:column;justify-content:space-around;flex:1;}
+.ko-round-hdr{font-size:0.63rem;font-weight:700;text-align:center;text-transform:uppercase;letter-spacing:.06em;padding:4px 8px;border-radius:4px;margin-bottom:8px;white-space:nowrap;}
+.ko-match-wrap{padding:2px 0;}
+.ko-match{background:var(--card);border:1px solid var(--border);border-radius:6px;padding:5px 8px;min-width:148px;max-width:168px;font-size:0.74rem;position:relative;cursor:default;transition:border-color .15s;}
+.ko-match:hover{border-color:var(--accent);}
+.ko-match.live{border-color:var(--red);}
+.ko-match.live::before{content:'🔴';font-size:.5rem;position:absolute;top:3px;right:4px;}
+.ko-team{display:flex;align-items:center;gap:5px;padding:2px 0;}
+.ko-team.winner{font-weight:700;color:var(--accent);}
+.ko-flag{font-size:.95rem;flex-shrink:0;}
+.ko-name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text);}
+.ko-name.placeholder{color:#999;font-style:italic;font-size:.68rem;}
+.ko-score{font-weight:600;color:var(--text);margin-left:auto;min-width:14px;text-align:right;}
+.ko-match-meta{font-size:.6rem;color:#999;margin-top:2px;padding-top:2px;border-top:1px solid var(--border);}
+.ko-connector-col{display:flex;flex-direction:column;justify-content:space-around;width:18px;flex-shrink:0;}
+.ko-conn{flex:1;position:relative;}
+.ko-conn-upper::before{content:'';position:absolute;top:50%;left:0;right:0;height:0;border-top:1px solid var(--border);}
+.ko-conn-upper::after{content:'';position:absolute;top:50%;right:0;bottom:0;width:0;border-right:1px solid var(--border);}
+.ko-conn-lower::before{content:'';position:absolute;bottom:50%;left:0;right:0;height:0;border-top:1px solid var(--border);}
+.ko-conn-lower::after{content:'';position:absolute;top:0;right:0;bottom:50%;width:0;border-right:1px solid var(--border);}
+.ko-round-tabs-wrap{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;}
+.ko-round-tab{padding:5px 12px;border:1px solid var(--border);border-radius:16px;background:none;color:var(--text);font-size:.73rem;cursor:pointer;transition:background .15s;}
+.ko-round-tab.active{background:var(--accent);color:#fff;border-color:var(--accent);}
+.ko-mobile-matches{display:flex;flex-direction:column;gap:10px;}
+.ko-match-mobile{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:10px 14px;}
+.ko-match-mobile .ko-team{padding:4px 0;}
+.ko-match-mobile .ko-name{font-size:.85rem;}
+.ko-match-mobile .ko-score{font-size:.95rem;}
+.ko-match-mobile .ko-match-meta{font-size:.7rem;}
 </style>
 </head>
 <body>
@@ -779,6 +812,7 @@
   <div class="tab-bar">
     <button class="tab-btn active" data-tab="overview" onclick="switchTab('overview')">📋 Zusammenfassung</button>
     <button class="tab-btn" data-tab="leaderboard" onclick="switchTab('leaderboard')">🏆 Rangliste</button>
+    <button class="tab-btn" data-tab="kobracket" onclick="switchTab('kobracket')" data-i18n="tab_bracket">⚔️ Bracket</button>
     <button class="tab-btn" data-tab="group" id="groupTabBtn" onclick="switchTab('group')">👥 Meine Gruppe</button>
     <button class="tab-btn" data-tab="h2h" onclick="switchTab('h2h')">⚔️ Vergleich</button>
     <button class="tab-btn" data-tab="games" onclick="switchTab('games')">⚽ Spiele</button>
@@ -793,6 +827,7 @@
   <nav class="mobile-bottom-nav" id="mobileNav">
     <button class="mobile-nav-btn active" onclick="switchTab('overview')" data-tab="overview"><span class="nav-icon">📋</span><span class="nav-label">Zusammenfassung</span></button>
     <button class="mobile-nav-btn" onclick="switchTab('leaderboard')" data-tab="leaderboard"><span class="nav-icon">🏆</span><span class="nav-label">Rangliste</span></button>
+    <button class="mobile-nav-btn" onclick="switchTab('kobracket')" data-tab="kobracket"><span class="nav-icon">⚔️</span><span class="nav-label" data-i18n="tab_bracket">Bracket</span></button>
     <button class="mobile-nav-btn" onclick="switchTab('group')" data-tab="group" id="mobileGroupBtn"><span class="nav-icon">👥</span><span class="nav-label">Meine Gruppe</span></button>
     <button class="mobile-nav-btn" onclick="switchTab('h2h')" data-tab="h2h"><span class="nav-icon">⚔️</span><span class="nav-label">Vergleich</span></button>
     <button class="mobile-nav-btn" onclick="switchTab('games')" data-tab="games"><span class="nav-icon">⚽</span><span class="nav-label">Spiele</span></button>
@@ -899,6 +934,13 @@
     </table>
     </div>
   </div>
+</div>
+</div>
+
+<!-- ══════════════ KO BRACKET TAB ══════════════ -->
+<div id="tab-kobracket" class="tab-content">
+<div class="page">
+  <div id="ko-bracket-root"><p style="text-align:center;color:#888;padding:30px">⚔️ Loading KO Bracket…</p></div>
 </div>
 </div>
 
@@ -1073,6 +1115,13 @@
   <div class="section-title">📝 Changelog</div>
 
     
+<div class="card" style="margin-bottom:14px;">
+  <div class="card-title">v1.23.0 — 24. Juni 2026 (Feature)</div>
+  <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
+    <li>⚔️ <strong>KO-Bracket Tab</strong> — Neuer Tab mit vollständigem WM-2026-Turnierbaum: Desktop L→R Bracket (5 Runden, mit Connector-Lines), Mobile Round-Tabs (R32 / R16 / QF / SF / Finale). Bekannte Teams mit Flagge angezeigt (🇩🇪 GER, 🇺🇸 USA, 🇦🇷 ARG, 🇲🇽 MEX), Platzhalter grau. ESPN Live-Overlay für Ergebnisse wenn Spiele beginnen. <code>KO_PREDICTIONS = {}</code> als Platzhalter für Nachos Excel-Tipps.</li>
+  </ul>
+</div>
+
 <div class="card" style="margin-bottom:14px;">
   <div class="card-title">v1.22.1 — 24. Juni 2026 (Fix)</div>
   <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
@@ -1897,6 +1946,13 @@ const TRANSLATIONS = {
     // Group scorer col
     grp_scorer_pts: '⚽ Pts',
     grp_classpts_col: '🏅 Class. Pts',
+    tab_bracket: '⚔️ Bracket',
+    ko_r32: 'Round of 32',
+    ko_r16: 'Round of 16',
+    ko_qf: 'Quarterfinal',
+    ko_sf: 'Semifinal',
+    ko_final: 'Final 🏆',
+    ko_tbd: 'TBD',
     members_dropdown: 'members',
     h2h_group_pts: 'Group points',
     h2h_classif_pts: 'Classification points',
@@ -2123,6 +2179,13 @@ const TRANSLATIONS = {
     // Group scorer col
     grp_scorer_pts: '⚽ Pkt',
     grp_classpts_col: '🏅 Klass. Pkt.',
+    tab_bracket: '⚔️ Bracket',
+    ko_r32: 'Runde 32',
+    ko_r16: 'Achtelfinale',
+    ko_qf: 'Viertelfinale',
+    ko_sf: 'Halbfinale',
+    ko_final: 'Finale 🏆',
+    ko_tbd: 'n.n.',
     h2h_group_pts: 'Gruppenpunkte',
     h2h_classif_pts: 'Klassifizierungspunkte',
     h2h_ko_pts: 'KO-Punkte',
@@ -2364,6 +2427,13 @@ const TRANSLATIONS = {
     // Group scorer col
     grp_scorer_pts: '⚽ Pts',
     grp_classpts_col: '🏅 Pts. Clasif.',
+    tab_bracket: '⚔️ Bracket',
+    ko_r32: 'Ronda 32',
+    ko_r16: 'Octavos',
+    ko_qf: 'Cuartos',
+    ko_sf: 'Semis',
+    ko_final: 'Final 🏆',
+    ko_tbd: 'p.d.',
     h2h_group_pts: 'Puntos de grupo',
     h2h_classif_pts: 'Puntos de clasificación',
     h2h_ko_pts: 'Puntos KO',
@@ -3363,6 +3433,65 @@ function getActual(game) {
 // Trigger 1./2.: Alle 4 Teams der Gruppe GP≥3 UND kein Live-Spiel in der Gruppe
 // Trigger 3.:    Alle 12 Gruppen komplett UND kein Live-Spiel gesamt
 // ══════════════════════════════════════════════════════════════════════════════
+// ═══════ KO BRACKET DATA ═══════
+const KO_PREDICTIONS = {}; // Placeholder — will be filled from Nacho's Excel
+const KO_BRACKET_DATA = {
+  rounds: {
+    r32: ['760486','760489','760487','760490','760497','760496','760493','760494',
+          '760488','760492','760491','760495','760498','760500','760499','760501'],
+    r16: ['760502','760503','760506','760507','760504','760505','760508','760509'],
+    qf:  ['760510','760511','760512','760513'],
+    sf:  ['760514','760515'],
+    final:['760517']
+  },
+  feeds: {
+    '760502':['760486','760489'],'760503':['760487','760490'],
+    '760506':['760497','760496'],'760507':['760493','760494'],
+    '760504':['760488','760492'],'760505':['760491','760495'],
+    '760508':['760498','760500'],'760509':['760499','760501'],
+    '760510':['760502','760503'],'760511':['760506','760507'],
+    '760512':['760504','760505'],'760513':['760508','760509'],
+    '760514':['760510','760511'],'760515':['760512','760513'],
+    '760517':['760514','760515']
+  },
+  games: {
+    '760486':{round:'r32',date:'28.06',t1:{a:'2A'},t2:{a:'2B'},city:'Inglewood'},
+    '760489':{round:'r32',date:'29.06',t1:{a:'GER',cc:'de',n:'Germany'},t2:{a:'3RD'},city:'Foxborough'},
+    '760487':{round:'r32',date:'29.06',t1:{a:'1C'},t2:{a:'2F'},city:'Houston'},
+    '760490':{round:'r32',date:'30.06',t1:{a:'2E'},t2:{a:'2I'},city:'Arlington'},
+    '760497':{round:'r32',date:'02.07',t1:{a:'1H'},t2:{a:'2J'},city:'Inglewood'},
+    '760496':{round:'r32',date:'02.07',t1:{a:'2K'},t2:{a:'2L'},city:'Toronto'},
+    '760493':{round:'r32',date:'01.07',t1:{a:'1G'},t2:{a:'3RD'},city:'Seattle'},
+    '760494':{round:'r32',date:'02.07',t1:{a:'USA',cc:'us',n:'USA'},t2:{a:'3RD'},city:'Santa Clara'},
+    '760488':{round:'r32',date:'30.06',t1:{a:'1F'},t2:{a:'2C'},city:'Guadalupe'},
+    '760492':{round:'r32',date:'30.06',t1:{a:'1I'},t2:{a:'3RD'},city:'E.Rutherford'},
+    '760491':{round:'r32',date:'01.07',t1:{a:'MEX',cc:'mx',n:'Mexico'},t2:{a:'3RD'},city:'Mexico City'},
+    '760495':{round:'r32',date:'01.07',t1:{a:'1L'},t2:{a:'3RD'},city:'Atlanta'},
+    '760498':{round:'r32',date:'03.07',t1:{a:'1B'},t2:{a:'3RD'},city:'Vancouver'},
+    '760500':{round:'r32',date:'03.07',t1:{a:'ARG',cc:'ar',n:'Argentina'},t2:{a:'2H'},city:'Miami'},
+    '760499':{round:'r32',date:'03.07',t1:{a:'2D'},t2:{a:'2G'},city:'Arlington'},
+    '760501':{round:'r32',date:'04.07',t1:{a:'1K'},t2:{a:'3RD'},city:'Kansas City'},
+    '760502':{round:'r16',date:'04.07',t1:{a:'?'},t2:{a:'?'},city:'Houston'},
+    '760503':{round:'r16',date:'04.07',t1:{a:'?'},t2:{a:'?'},city:'Philadelphia'},
+    '760506':{round:'r16',date:'06.07',t1:{a:'?'},t2:{a:'?'},city:'Arlington'},
+    '760507':{round:'r16',date:'07.07',t1:{a:'?'},t2:{a:'?'},city:'Seattle'},
+    '760504':{round:'r16',date:'05.07',t1:{a:'?'},t2:{a:'?'},city:'E.Rutherford'},
+    '760505':{round:'r16',date:'06.07',t1:{a:'?'},t2:{a:'?'},city:'Mexico City'},
+    '760508':{round:'r16',date:'07.07',t1:{a:'?'},t2:{a:'?'},city:'Vancouver'},
+    '760509':{round:'r16',date:'07.07',t1:{a:'?'},t2:{a:'?'},city:'Atlanta'},
+    '760510':{round:'qf',date:'09.07',t1:{a:'?'},t2:{a:'?'},city:'Foxborough'},
+    '760511':{round:'qf',date:'10.07',t1:{a:'?'},t2:{a:'?'},city:'Inglewood'},
+    '760512':{round:'qf',date:'11.07',t1:{a:'?'},t2:{a:'?'},city:'Miami'},
+    '760513':{round:'qf',date:'12.07',t1:{a:'?'},t2:{a:'?'},city:'Kansas City'},
+    '760514':{round:'sf',date:'14.07',t1:{a:'?'},t2:{a:'?'},city:'Arlington'},
+    '760515':{round:'sf',date:'15.07',t1:{a:'?'},t2:{a:'?'},city:'Atlanta'},
+    '760517':{round:'final',date:'19.07',t1:{a:'?'},t2:{a:'?'},city:'MetLife Stadium 🏆'}
+  }
+};
+let _koLive = {};
+let _koLiveFetchTime = 0;
+const KO_LIVE_CACHE_TTL = 30000;
+
 let _grupClassCache = null;
 let _grupClassFetchTime = 0;
 const GRUP_CLASS_CACHE_TTL = 60000;
@@ -5647,6 +5776,152 @@ function initDashboard() {
 }
 
 // ══════════════ TAB SWITCHING ══════════════
+
+// ═══════ KO BRACKET FUNCTIONS ═══════
+async function fetchKOLiveData() {
+  const now = Date.now();
+  if (now - _koLiveFetchTime < KO_LIVE_CACHE_TTL) return;
+  const BASE = 'https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard';
+  try {
+    const results = await Promise.all(
+      ['20260628-20260708','20260709-20260719'].map(d =>
+        fetch(`${BASE}?dates=${d}&limit=50`).then(r=>r.json()).catch(()=>({events:[]}))
+      )
+    );
+    for (const data of results) {
+      for (const ev of (data.events||[])) {
+        const comps = ev.competitions?.[0];
+        const t1 = comps?.competitors?.[0], t2 = comps?.competitors?.[1];
+        const status = comps?.status?.type?.name;
+        if (status === 'STATUS_SCHEDULED') continue;
+        const abv1 = t1?.team?.abbreviation, abv2 = t2?.team?.abbreviation;
+        _koLive[ev.id] = {
+          t1Name: t1?.team?.displayName, t1Abbrev: abv1, t1Score: t1?.score,
+          t1Cc: _koCcMap(abv1),
+          t2Name: t2?.team?.displayName, t2Abbrev: abv2, t2Score: t2?.score,
+          t2Cc: _koCcMap(abv2),
+          isLive: status==='STATUS_IN_PROGRESS', isFinal: status==='STATUS_FINAL'
+        };
+      }
+    }
+    _koLiveFetchTime = now;
+  } catch(e) { console.warn('KO live fetch failed', e); }
+}
+
+function _koCcMap(a) {
+  if (!a) return null;
+  const m = {'GER':'de','USA':'us','ARG':'ar','MEX':'mx','ESP':'es','FRA':'fr','BRA':'br',
+    'POR':'pt','ENG':'gb-eng','NED':'nl','ITA':'it','COL':'co','SUI':'ch','MAR':'ma',
+    'URU':'uy','BEL':'be','JPN':'jp','KOR':'kr','CRO':'hr','SEN':'sn','ECU':'ec',
+    'AUS':'au','CAN':'ca','QAT':'qa','TUR':'tr','DEN':'dk','NGA':'ng','GHA':'gh',
+    'CMR':'cm','IRN':'ir','PAR':'py','UKR':'ua','MOR':'ma','SRB':'rs','POL':'pl',
+    'CHE':'ch','NOR':'no','SWE':'se','EGY':'eg','ALG':'dz','MAL':'my'};
+  return m[a]||null;
+}
+
+function _koTeamRow(gTeam, live, side, compact) {
+  const lTeam = live ? {
+    a: live[side+'Abbrev'], cc: live[side+'Cc'], n: live[side+'Name'], score: live[side+'Score']
+  } : null;
+  const t = lTeam?.a ? lTeam : gTeam;
+  const flag = t.cc ? _ccToFlag(t.cc) : (t.a && t.a !== '?' && !/^[12][A-L]$/.test(t.a) && t.a !== '3RD' ? '🏳️' : '');
+  const name = t.n || (t.a && t.a !== '?' ? t.a : T('ko_tbd'));
+  const isPlh = !t.cc && !t.n && t.a !== '?';
+  const showScore = live && (live.isLive || live.isFinal);
+  const score = showScore ? `<span class="ko-score">${live[side+'Score']??'-'}</span>` : '<span class="ko-score" style="opacity:.25">—</span>';
+  return `<div class="ko-team">
+    <span class="ko-flag">${flag}</span>
+    <span class="ko-name${isPlh?' placeholder':''}">${name}</span>
+    ${score}
+  </div>`;
+}
+
+function _buildKOMatchCard(espnId, compact) {
+  const g = KO_BRACKET_DATA.games[espnId]; if (!g) return '';
+  const live = _koLive[espnId] || null;
+  const isFinal = live?.isFinal;
+  const s1 = live?.t1Score, s2 = live?.t2Score;
+  const t1Win = isFinal && parseInt(s1) > parseInt(s2);
+  const t2Win = isFinal && parseInt(s2) > parseInt(s1);
+  // Override static teams with live data if available
+  const t1 = (live?.t1Abbrev && !/RD32|RD16|QFW|SFW/.test(live.t1Abbrev))
+    ? {a:live.t1Abbrev,cc:live.t1Cc,n:live.t1Name} : g.t1;
+  const t2 = (live?.t2Abbrev && !/RD32|RD16|QFW|SFW/.test(live.t2Abbrev))
+    ? {a:live.t2Abbrev,cc:live.t2Cc,n:live.t2Name} : g.t2;
+  const cls = compact ? 'ko-match' : 'ko-match-mobile';
+  const liveCls = live?.isLive ? ' live' : '';
+  return `<div class="${cls}${liveCls}" data-id="${espnId}">
+    <div class="ko-team${t1Win?' winner':''}">${_koTeamRow(t1,live,'t1',compact)}</div>
+    <div class="ko-team${t2Win?' winner':''}">${_koTeamRow(t2,live,'t2',compact)}</div>
+    <div class="ko-match-meta">${g.date} · ${g.city}</div>
+  </div>`;
+}
+
+function _buildKODesktop() {
+  const KD = KO_BRACKET_DATA;
+  const rdefs = [
+    {key:'r32',label:T('ko_r32'),clr:'#6366f1'},
+    {key:'r16',label:T('ko_r16'),clr:'#0ea5e9'},
+    {key:'qf', label:T('ko_qf'), clr:'#f59e0b'},
+    {key:'sf', label:T('ko_sf'), clr:'#ef4444'},
+    {key:'final',label:T('ko_final'),clr:'#10b981'}
+  ];
+  let h = '<div class="ko-bracket-wrap"><div class="ko-bracket-desktop">';
+  for (let ri=0; ri<rdefs.length; ri++) {
+    const rd = rdefs[ri]; const ids = KD.rounds[rd.key];
+    h += `<div class="ko-round-col">
+      <div class="ko-round-hdr" style="background:${rd.clr}1a;color:${rd.clr};border:1px solid ${rd.clr}40">${rd.label}</div>
+      <div class="ko-round-col-inner">`;
+    for (const id of ids) h += `<div class="ko-match-wrap">${_buildKOMatchCard(id,true)}</div>`;
+    h += '</div></div>';
+    if (ri < rdefs.length-1) {
+      const nextLen = KD.rounds[rdefs[ri+1].key].length;
+      h += '<div class="ko-connector-col">';
+      for (let j=0; j<nextLen; j++) h += '<div class="ko-conn ko-conn-upper"></div><div class="ko-conn ko-conn-lower"></div>';
+      h += '</div>';
+    }
+  }
+  h += '</div></div>';
+  return h;
+}
+
+function _buildKOMobile() {
+  const KD = KO_BRACKET_DATA;
+  const rdefs = [
+    {key:'r32',label:T('ko_r32')},{key:'r16',label:T('ko_r16')},
+    {key:'qf',label:T('ko_qf')},{key:'sf',label:T('ko_sf')},{key:'final',label:T('ko_final')}
+  ];
+  let h = '<div><div class="ko-round-tabs-wrap">';
+  rdefs.forEach((rd,i) => {
+    h += `<button class="ko-round-tab${i===0?' active':''}" data-round="${rd.key}">${rd.label}</button>`;
+  });
+  h += '</div>';
+  rdefs.forEach((rd,i) => {
+    h += `<div class="ko-mobile-round" data-round="${rd.key}" style="display:${i===0?'block':'none'}"><div class="ko-mobile-matches">`;
+    for (const id of KD.rounds[rd.key]) h += _buildKOMatchCard(id,false);
+    h += '</div></div>';
+  });
+  h += '</div>';
+  return h;
+}
+
+function renderKOBracket() {
+  const root = document.getElementById('ko-bracket-root');
+  if (!root) return;
+  fetchKOLiveData().then(() => {
+    const mob = window.matchMedia('(max-width:900px)').matches;
+    root.innerHTML = mob ? _buildKOMobile() : _buildKODesktop();
+    root.querySelectorAll('.ko-round-tab').forEach(btn => {
+      btn.addEventListener('click', () => {
+        root.querySelectorAll('.ko-round-tab').forEach(b=>b.classList.remove('active'));
+        btn.classList.add('active');
+        root.querySelectorAll('.ko-mobile-round').forEach(el => {
+          el.style.display = el.dataset.round===btn.dataset.round?'block':'none';
+        });
+      });
+    });
+  });
+}
 function switchTab(tabId) {
   document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
   document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
@@ -5665,12 +5940,13 @@ function switchTab(tabId) {
   if (tabId === 'stats' && _lastLb) renderStats(_lastLb);
   if (tabId === 'gruppen') renderGruppen();
   if (tabId === 'database') renderDatabase();
+  if (tabId === 'kobracket') renderKOBracket();
   // Scroll to top on mobile
   if (window.innerWidth <= 600) window.scrollTo({top: 0, behavior: 'smooth'});
 }
 
 // ═══════ WHAT'S NEW ═══════
-const BUILD_VERSION = 'v1.22.1';
+const BUILD_VERSION = 'v1.23.0';
 const BUILD_DATE    = '24.06.2026';
 (function(){ var _hb = document.getElementById('headerVersionBadge'); if(_hb) _hb.textContent = BUILD_VERSION; })();
 const WN_VERSION = 'v1.22';
