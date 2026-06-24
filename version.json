@@ -1,10 +1,9 @@
 {
-  "version": "v1.22.0",
-  "notify": true,
-  "force": false,
+  "version": "v1.22.1",
+  "notify": false,
   "message": {
-    "en": "v1.22.0 is available — Group Classification Points are now scored!",
-    "de": "v1.22.0 verfügbar — Gruppenklassifikations-Punkte werden jetzt gewertet!",
-    "es": "v1.22.0 disponible — ¡Los puntos de clasificación de grupo ya se evalúan!"
+    "en": "",
+    "de": "",
+    "es": ""
   }
 }
