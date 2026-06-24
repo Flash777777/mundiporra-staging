@@ -5083,9 +5083,7 @@ function _renderGruppenUI(container,groups){
   html+='</div>';
   groups.forEach(g=>{
     html+='<div id="grp-'+g.letter+'" class="card" style="margin:8px 10px;overflow:hidden">';
-    const grpPts = calcGroupClassificationPoints(USER.player, g.letter) || 0;
-    const grpPtsDisplay = grpPts > 0 ? `🏅 ${grpPts} Pkt` : '';
-    html+='<div class="card-title">🏟️ Gruppe '+g.letter+' <span style="color:#7c3aed;font-weight:700;margin-left:8px;">'+grpPtsDisplay+'</span></div>';
+        html+='<div class="card-title">🏟️ Gruppe '+g.letter+'</div>';
     html+='<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:0.82rem">';
     html+='<thead><tr style="background:var(--card-header,#f0f4f8)"><th style="text-align:left;padding:5px 4px">#</th><th style="text-align:left;padding:5px 4px">Team</th><th style="padding:5px 4px">'+T('grp_pts')+'</th><th style="padding:5px 4px">'+T('grp_played')+'</th><th style="padding:5px 4px">'+T('grp_won')+'</th><th style="padding:5px 4px">'+T('grp_draw')+'</th><th style="padding:5px 4px">'+T('grp_lost')+'</th><th style="padding:5px 4px">'+T('grp_gf')+'</th><th style="padding:5px 4px">'+T('grp_ga')+'</th><th style="padding:5px 4px">'+T('grp_gd')+'</th></tr></thead><tbody>';
     g.teams.forEach((t,ti)=>{
@@ -5099,7 +5097,7 @@ function _renderGruppenUI(container,groups){
         ic=t.played<3?'⏳':'🤞';
       } else {bg='transparent';ic='❌';}
       html+='<tr style="background:'+bg+';border-bottom:1px solid #eee"><td style="padding:4px;font-weight:600">'+ic+' '+rank+'</td>';
-      html+='<td style="padding:4px">'+(t.logo?'<img src="'+t.logo+'" style="height:16px;vertical-align:middle;margin-right:4px">':'')+'<strong>'+t.name+'</strong></td>';
+      html+='<td style="padding:4px">'+(t.logo?'<img src="'+t.logo+'" style="height:16px;vertical-align:middle;margin-right:4px">':'')+'<strong>'+t.name+'</strong>'+teamPtsDisplay+'</td>';
       html+='<td style="text-align:center;padding:4px;font-weight:700">'+t.pts+'</td>';
       html+='<td style="text-align:center;padding:4px">'+t.played+'</td>';
       html+='<td style="text-align:center;padding:4px">'+t.won+'</td>';
