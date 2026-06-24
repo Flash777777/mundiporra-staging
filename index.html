@@ -1124,7 +1124,13 @@
 <div class="card" style="margin-bottom:14px;">
   <div class="card" style="margin-bottom:14px;">
   <div class="card" style="margin-bottom:14px;">
-  <div class="card-title">v1.23.2 — 24. Juni 2026 (Fix)</div>
+  <div class="card" style="margin-bottom:14px;">
+  <div class="card-title">v1.23.3 — 24. Juni 2026 (Fix)</div>
+  <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
+    <li>🏅 <strong>Classification Points im Ranking</strong> — <code>calcPlayerScore()</code> gibt nun <code>classificationPts</code> zurück; Spalte im Gruppen-Tab ist jetzt mit echten Werten gefüllt</li>
+  </ul>
+</div>
+<div class="card-title">v1.23.2 — 24. Juni 2026 (Fix)</div>
   <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
     <li>🏟️ <strong>Tab-Reihenfolge</strong> — Gruppen-Tab direkt nach ⚔️ Bracket verschoben (Desktop + Mobile)</li>
   </ul>
@@ -5990,8 +5996,8 @@ function switchTab(tabId) {
 }
 
 // ═══════ WHAT'S NEW ═══════
-const BUILD_VERSION = 'v1.23.2';
-const BUILD_DATE = '24.06.2026 23:15';
+const BUILD_VERSION = 'v1.23.3';
+const BUILD_DATE = '24.06.2026 23:30';
 (function(){ var _hb = document.getElementById('headerVersionBadge'); if(_hb) _hb.textContent = BUILD_VERSION; })();
 const WN_VERSION = 'v1.22';
 const WN_STORAGE_KEY = window.location.pathname.includes('staging') ? 'wnSeen_staging' : 'wnSeen_live';
