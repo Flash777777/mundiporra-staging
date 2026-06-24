@@ -3695,10 +3695,12 @@ function assignRanks(arr, key='total') {
   return arr;
 }
 
-async function buildLeaderboard() {
-  // Ensure group classification standings are loaded before calculating scores
+function buildLeaderboard() {
+  // Prefetch group classification standings (async, non-blocking)
   if (!_grupClassCache || (Date.now() - _grupClassFetchTime) >= GRUP_CLASS_CACHE_TTL) {
-    await fetchGrupClassStandings();
+    fetchGrupClassStandings().then(() => {
+      if (_lastLb) { const fresh = buildLeaderboard(); renderLeaderboard(fresh); }
+    });
   }
   const results = [];
   for (const name of Object.keys(ALL_PARTICIPANTS)) {
