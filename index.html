@@ -5800,6 +5800,7 @@ async function refreshDashboard() {
   const _ftCountBefore = ALL_GAMES.filter(g => getActual(g)?.status === 'FT').length;
   // Fetch ESPN scoreboard + goal leaders in parallel
   await fetchESPN(); // scorers aggregated inside fetchESPN via aggregateGoalScorers()
+  fetchGrupClassStandings(); // Early load so ranking includes classificationPts
   const _ftCountAfter = ALL_GAMES.filter(g => getActual(g)?.status === 'FT').length;
   if (_ftCountAfter !== _ftCountBefore) _eloCache = null; // new result → rebuild ELO
   const lb = buildLeaderboard();
@@ -6024,7 +6025,7 @@ function switchTab(tabId) {
 
 // ═══════ WHAT'S NEW ═══════
 const BUILD_VERSION = 'v1.23.6';
-const BUILD_DATE = '24.06.2026 23:55';
+const BUILD_DATE = '24.06.2026 23:58';
 (function(){ var _hb = document.getElementById('headerVersionBadge'); if(_hb) _hb.textContent = BUILD_VERSION; })();
 const WN_VERSION = 'v1.22';
 const WN_STORAGE_KEY = window.location.pathname.includes('staging') ? 'wnSeen_staging' : 'wnSeen_live';
