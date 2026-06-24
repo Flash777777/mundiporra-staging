@@ -688,6 +688,12 @@
   100% { transform: translateY(110vh) rotate(720deg) scale(0.6); opacity: 0; }
 }
 /* ═══════ KO BRACKET ═══════ */
+.ko-zoom-controls{display:flex;align-items:center;gap:8px;margin-bottom:10px;padding:0 4px;}
+.ko-zoom-btn{padding:2px 10px;border:1px solid var(--border,#334155);border-radius:6px;background:var(--card,#1e293b);color:var(--text,#e2e8f0);cursor:pointer;font-size:1rem;line-height:1.5;transition:background .15s,color .15s;}
+.ko-zoom-btn:hover{background:var(--accent,#6366f1);color:#fff;border-color:var(--accent,#6366f1);}
+#ko-zoom-label{font-size:.75rem;color:#94a3b8;min-width:38px;text-align:center;user-select:none;}
+#ko-zoom-wrap{overflow:auto;}
+#ko-bracket-inner{transform-origin:top left;display:inline-block;}
 .ko-bracket-wrap{overflow-x:auto;padding:8px 0;}
 .ko-bracket-desktop{display:flex;gap:0;min-height:1050px;padding:16px 4px;align-items:stretch;}
 .ko-round-col{display:flex;flex-direction:column;flex-shrink:0;}
@@ -812,7 +818,7 @@
   <div class="tab-bar">
     <button class="tab-btn active" data-tab="overview" onclick="switchTab('overview')">📋 Zusammenfassung</button>
     <button class="tab-btn" data-tab="leaderboard" onclick="switchTab('leaderboard')">🏆 Rangliste</button>
-    <button class="tab-btn" data-tab="kobracket" onclick="switchTab('kobracket')" data-i18n="tab_bracket">⚔️ Bracket</button>
+    <button class="tab-btn" data-tab="kobracket" onclick="switchTab('kobracket')" data-i18n="tab_kobracket">⚔️ Bracket</button>
     <button class="tab-btn" data-tab="group" id="groupTabBtn" onclick="switchTab('group')">👥 Meine Gruppe</button>
     <button class="tab-btn" data-tab="h2h" onclick="switchTab('h2h')">⚔️ Vergleich</button>
     <button class="tab-btn" data-tab="games" onclick="switchTab('games')">⚽ Spiele</button>
@@ -827,7 +833,7 @@
   <nav class="mobile-bottom-nav" id="mobileNav">
     <button class="mobile-nav-btn active" onclick="switchTab('overview')" data-tab="overview"><span class="nav-icon">📋</span><span class="nav-label">Zusammenfassung</span></button>
     <button class="mobile-nav-btn" onclick="switchTab('leaderboard')" data-tab="leaderboard"><span class="nav-icon">🏆</span><span class="nav-label">Rangliste</span></button>
-    <button class="mobile-nav-btn" onclick="switchTab('kobracket')" data-tab="kobracket"><span class="nav-icon">⚔️</span><span class="nav-label" data-i18n="tab_bracket">Bracket</span></button>
+    <button class="mobile-nav-btn" onclick="switchTab('kobracket')" data-tab="kobracket"><span class="nav-icon">⚔️</span><span class="nav-label" data-i18n="tab_kobracket">Bracket</span></button>
     <button class="mobile-nav-btn" onclick="switchTab('group')" data-tab="group" id="mobileGroupBtn"><span class="nav-icon">👥</span><span class="nav-label">Meine Gruppe</span></button>
     <button class="mobile-nav-btn" onclick="switchTab('h2h')" data-tab="h2h"><span class="nav-icon">⚔️</span><span class="nav-label">Vergleich</span></button>
     <button class="mobile-nav-btn" onclick="switchTab('games')" data-tab="games"><span class="nav-icon">⚽</span><span class="nav-label">Spiele</span></button>
@@ -1116,7 +1122,14 @@
 
     
 <div class="card" style="margin-bottom:14px;">
-  <div class="card-title">v1.23.0 — 24. Juni 2026 (Feature)</div>
+  <div class="card" style="margin-bottom:14px;">
+  <div class="card-title">v1.23.1 — 24. Juni 2026 (Fix)</div>
+  <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
+    <li>🏷️ <strong>Bracket-Tab-Label Fix</strong> — i18n-Key <code>tab_bracket</code> → <code>tab_kobracket</code> (Namenskonvention korrigiert)</li>
+    <li>🔍 <strong>Bracket Zoom</strong> — Ctrl+Scroll / Mac Trackpad Pinch (0.4×–2×) + <code>+/−/⊞</code> Buttons über dem Desktop-Bracket</li>
+  </ul>
+</div>
+<div class="card-title">v1.23.0 — 24. Juni 2026 (Feature)</div>
   <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
     <li>⚔️ <strong>KO-Bracket Tab</strong> — Neuer Tab mit vollständigem WM-2026-Turnierbaum: Desktop L→R Bracket (5 Runden, mit Connector-Lines), Mobile Round-Tabs (R32 / R16 / QF / SF / Finale). Bekannte Teams mit Flagge angezeigt (🇩🇪 GER, 🇺🇸 USA, 🇦🇷 ARG, 🇲🇽 MEX), Platzhalter grau. ESPN Live-Overlay für Ergebnisse wenn Spiele beginnen. <code>KO_PREDICTIONS = {}</code> als Platzhalter für Nachos Excel-Tipps.</li>
   </ul>
@@ -1946,7 +1959,7 @@ const TRANSLATIONS = {
     // Group scorer col
     grp_scorer_pts: '⚽ Pts',
     grp_classpts_col: '🏅 Class. Pts',
-    tab_bracket: '⚔️ Bracket',
+    tab_kobracket: '⚔️ Bracket',
     ko_r32: 'Round of 32',
     ko_r16: 'Round of 16',
     ko_qf: 'Quarterfinal',
@@ -2179,7 +2192,7 @@ const TRANSLATIONS = {
     // Group scorer col
     grp_scorer_pts: '⚽ Pkt',
     grp_classpts_col: '🏅 Klass. Pkt.',
-    tab_bracket: '⚔️ Bracket',
+    tab_kobracket: '⚔️ Bracket',
     ko_r32: 'Runde 32',
     ko_r16: 'Achtelfinale',
     ko_qf: 'Viertelfinale',
@@ -2427,7 +2440,7 @@ const TRANSLATIONS = {
     // Group scorer col
     grp_scorer_pts: '⚽ Pts',
     grp_classpts_col: '🏅 Pts. Clasif.',
-    tab_bracket: '⚔️ Bracket',
+    tab_kobracket: '⚔️ Bracket',
     ko_r32: 'Ronda 32',
     ko_r16: 'Octavos',
     ko_qf: 'Cuartos',
@@ -3490,6 +3503,18 @@ const KO_BRACKET_DATA = {
 };
 let _koLive = {};
 let _koLiveFetchTime = 0;
+let _koZoom = 1;
+function _koApplyZoom() {
+  const el = document.getElementById('ko-bracket-inner');
+  if (!el) return;
+  el.style.transform = 'scale(' + _koZoom + ')';
+  el.style.width = (100 / _koZoom) + '%';
+  const lbl = document.getElementById('ko-zoom-label');
+  if (lbl) lbl.textContent = Math.round(_koZoom * 100) + '%';
+}
+function _koZoomIn()    { _koZoom = Math.min(2,   _koZoom + 0.1); _koApplyZoom(); }
+function _koZoomOut()   { _koZoom = Math.max(0.4, _koZoom - 0.1); _koApplyZoom(); }
+function _koZoomReset() { _koZoom = 1; _koApplyZoom(); }
 const KO_LIVE_CACHE_TTL = 30000;
 
 let _grupClassCache = null;
@@ -5866,7 +5891,7 @@ function _buildKODesktop() {
     {key:'sf', label:T('ko_sf'), clr:'#ef4444'},
     {key:'final',label:T('ko_final'),clr:'#10b981'}
   ];
-  let h = '<div class="ko-bracket-wrap"><div class="ko-bracket-desktop">';
+  let h = '<div class="ko-zoom-controls"><button class="ko-zoom-btn" onclick="_koZoomOut()">−</button><span id="ko-zoom-label">100%</span><button class="ko-zoom-btn" onclick="_koZoomIn()">+</button><button class="ko-zoom-btn" onclick="_koZoomReset()" title="Reset zoom">⊞</button></div><div class="ko-bracket-wrap"><div id="ko-zoom-wrap"><div id="ko-bracket-inner"><div class="ko-bracket-desktop">';
   for (let ri=0; ri<rdefs.length; ri++) {
     const rd = rdefs[ri]; const ids = KD.rounds[rd.key];
     h += `<div class="ko-round-col">
@@ -5881,7 +5906,7 @@ function _buildKODesktop() {
       h += '</div>';
     }
   }
-  h += '</div></div>';
+  h += '</div></div></div></div></div>';
   return h;
 }
 
@@ -5911,6 +5936,19 @@ function renderKOBracket() {
   fetchKOLiveData().then(() => {
     const mob = window.matchMedia('(max-width:900px)').matches;
     root.innerHTML = mob ? _buildKOMobile() : _buildKODesktop();
+    if (!mob) {
+      _koZoom = 1;
+      const zWrap = document.getElementById('ko-zoom-wrap');
+      if (zWrap) {
+        zWrap.addEventListener('wheel', e => {
+          if (e.ctrlKey || e.metaKey) {
+            e.preventDefault();
+            _koZoom = Math.max(0.4, Math.min(2, _koZoom + (e.deltaY < 0 ? 0.1 : -0.1)));
+            _koApplyZoom();
+          }
+        }, { passive: false });
+      }
+    }
     root.querySelectorAll('.ko-round-tab').forEach(btn => {
       btn.addEventListener('click', () => {
         root.querySelectorAll('.ko-round-tab').forEach(b=>b.classList.remove('active'));
@@ -5946,8 +5984,8 @@ function switchTab(tabId) {
 }
 
 // ═══════ WHAT'S NEW ═══════
-const BUILD_VERSION = 'v1.23.0';
-const BUILD_DATE    = '24.06.2026';
+const BUILD_VERSION = 'v1.23.1';
+const BUILD_DATE = '24.06.2026 23:00';
 (function(){ var _hb = document.getElementById('headerVersionBadge'); if(_hb) _hb.textContent = BUILD_VERSION; })();
 const WN_VERSION = 'v1.22';
 const WN_STORAGE_KEY = window.location.pathname.includes('staging') ? 'wnSeen_staging' : 'wnSeen_live';

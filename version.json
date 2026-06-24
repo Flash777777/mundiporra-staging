@@ -1,9 +1,4 @@
 {
-  "version": "v1.23.0",
-  "notify": false,
-  "message": {
-    "en": "v1.23.0: KO Bracket tab live!",
-    "de": "v1.23.0: KO-Bracket Tab verfügbar!",
-    "es": "v1.23.0: ¡Tab Bracket KO disponible!"
-  }
+  "version": "v1.23.1",
+  "notify": false
 }
