@@ -5039,8 +5039,13 @@ function calcTeamClassificationPoints(playerName, teamName) {
   
   for (const letter of Object.keys(standings)) {
     const teams = standings[letter] || [];
+    console.log('  [LOOP_' + letter + '] teams:', teams.map(t => t.name).join(', '));
     const team = teams.find(t => t.name === teamName);
-    if (!team) continue;
+    if (!team) {
+      console.log('    → ' + teamName + ' NOT FOUND in group ' + letter);
+      continue;
+    }
+    console.log('    ✓ FOUND ' + teamName + ' in group ' + letter);
     
     const len4 = teams.length === 4;
     const all3played = teams.every(t => t.played >= 3);
