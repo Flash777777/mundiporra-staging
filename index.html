@@ -819,11 +819,11 @@
     <button class="tab-btn active" data-tab="overview" onclick="switchTab('overview')">📋 Zusammenfassung</button>
     <button class="tab-btn" data-tab="leaderboard" onclick="switchTab('leaderboard')">🏆 Rangliste</button>
     <button class="tab-btn" data-tab="kobracket" onclick="switchTab('kobracket')" data-i18n="tab_kobracket">⚔️ Bracket</button>
+    <button class="tab-btn" data-tab="gruppen" onclick="switchTab('gruppen')" data-i18n="tab_gruppen">🏟️ Gruppen</button>
     <button class="tab-btn" data-tab="group" id="groupTabBtn" onclick="switchTab('group')">👥 Meine Gruppe</button>
     <button class="tab-btn" data-tab="h2h" onclick="switchTab('h2h')">⚔️ Vergleich</button>
     <button class="tab-btn" data-tab="games" onclick="switchTab('games')">⚽ Spiele</button>
     <button class="tab-btn" data-tab="champions" onclick="switchTab('champions')">⭐ Campeones</button>
-    <button class="tab-btn" data-tab="gruppen" onclick="switchTab('gruppen')" data-i18n="tab_gruppen">🏟️ Gruppen</button>
     <button class="tab-btn" data-tab="stats" onclick="switchTab('stats')">📊 Statistiken</button>
     <button class="tab-btn" data-tab="search" onclick="switchTab('search')">🔍 Suche</button>
     <button class="tab-btn" data-tab="database" onclick="switchTab('database')" data-i18n="tab_database">🗄️ Datenbasis</button>
@@ -834,11 +834,11 @@
     <button class="mobile-nav-btn active" onclick="switchTab('overview')" data-tab="overview"><span class="nav-icon">📋</span><span class="nav-label">Zusammenfassung</span></button>
     <button class="mobile-nav-btn" onclick="switchTab('leaderboard')" data-tab="leaderboard"><span class="nav-icon">🏆</span><span class="nav-label">Rangliste</span></button>
     <button class="mobile-nav-btn" onclick="switchTab('kobracket')" data-tab="kobracket"><span class="nav-icon">⚔️</span><span class="nav-label" data-i18n="tab_kobracket">Bracket</span></button>
+    <button class="mobile-nav-btn" onclick="switchTab('gruppen')" data-tab="gruppen"><span class="nav-icon">🏟️</span><span class="nav-label" data-i18n="tab_gruppen">Gruppen</span></button>
     <button class="mobile-nav-btn" onclick="switchTab('group')" data-tab="group" id="mobileGroupBtn"><span class="nav-icon">👥</span><span class="nav-label">Meine Gruppe</span></button>
     <button class="mobile-nav-btn" onclick="switchTab('h2h')" data-tab="h2h"><span class="nav-icon">⚔️</span><span class="nav-label">Vergleich</span></button>
     <button class="mobile-nav-btn" onclick="switchTab('games')" data-tab="games"><span class="nav-icon">⚽</span><span class="nav-label">Spiele</span></button>
     <button class="mobile-nav-btn" onclick="switchTab('champions')" data-tab="champions"><span class="nav-icon">⭐</span><span class="nav-label">Campeones</span></button>
-    <button class="mobile-nav-btn" onclick="switchTab('gruppen')" data-tab="gruppen"><span class="nav-icon">🏟️</span><span class="nav-label" data-i18n="tab_gruppen">Gruppen</span></button>
     <button class="mobile-nav-btn" onclick="switchTab('stats')" data-tab="stats"><span class="nav-icon">📊</span><span class="nav-label">Statistiken</span></button>
     <button class="mobile-nav-btn" onclick="switchTab('search')" data-tab="search"><span class="nav-icon">🔍</span><span class="nav-label">Suche</span></button>
     <button class="mobile-nav-btn" onclick="switchTab('database')" data-tab="database"><span class="nav-icon">🗄️</span><span class="nav-label" data-i18n="tab_database">Datenbasis</span></button>
@@ -1123,7 +1123,13 @@
     
 <div class="card" style="margin-bottom:14px;">
   <div class="card" style="margin-bottom:14px;">
-  <div class="card-title">v1.23.1 — 24. Juni 2026 (Fix)</div>
+  <div class="card" style="margin-bottom:14px;">
+  <div class="card-title">v1.23.2 — 24. Juni 2026 (Fix)</div>
+  <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
+    <li>🏟️ <strong>Tab-Reihenfolge</strong> — Gruppen-Tab direkt nach ⚔️ Bracket verschoben (Desktop + Mobile)</li>
+  </ul>
+</div>
+<div class="card-title">v1.23.1 — 24. Juni 2026 (Fix)</div>
   <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
     <li>🏷️ <strong>Bracket-Tab-Label Fix</strong> — i18n-Key <code>tab_bracket</code> → <code>tab_kobracket</code> (Namenskonvention korrigiert)</li>
     <li>🔍 <strong>Bracket Zoom</strong> — Ctrl+Scroll / Mac Trackpad Pinch (0.4×–2×) + <code>+/−/⊞</code> Buttons über dem Desktop-Bracket</li>
@@ -5984,8 +5990,8 @@ function switchTab(tabId) {
 }
 
 // ═══════ WHAT'S NEW ═══════
-const BUILD_VERSION = 'v1.23.1';
-const BUILD_DATE = '24.06.2026 23:00';
+const BUILD_VERSION = 'v1.23.2';
+const BUILD_DATE = '24.06.2026 23:15';
 (function(){ var _hb = document.getElementById('headerVersionBadge'); if(_hb) _hb.textContent = BUILD_VERSION; })();
 const WN_VERSION = 'v1.22';
 const WN_STORAGE_KEY = window.location.pathname.includes('staging') ? 'wnSeen_staging' : 'wnSeen_live';
