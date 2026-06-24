@@ -1074,6 +1074,12 @@
 
     
 <div class="card" style="margin-bottom:14px;">
+  <div class="card-title">v1.22.1 — 24. Juni 2026 (Fix)</div>
+  <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
+    <li>🏅 <strong>Gruppen-Tab: Klassifizierungspunkte</strong> — Neue Spalte 🏅 zeigt Gruppenklassifikations-Punkte pro Tipper</li>
+  </ul>
+</div>
+<div class="card" style="margin-bottom:14px;">
   <div class="card-title">v1.22.0 — 24.06.2026 (Feature)</div>
   <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
     <li>🏅 <strong>Gruppenklassifikations-Punkte</strong> — Neue Spalte im Leaderboard. Tipps auf Gruppen-1./2./3.-Platz werden nach Gruppenabschluss automatisch bewertet: +3 (qualifiziert + exakte Position), +1 (qualifiziert, falsche Position), 0 (nicht qualifiziert). 3.-Platz-Auswertung erst wenn alle 12 Gruppen fertig.</li>
@@ -1890,6 +1896,7 @@ const TRANSLATIONS = {
     h2h_games_table: 'All Games',
     // Group scorer col
     grp_scorer_pts: '⚽ Pts',
+    grp_classpts_col: '🏅 Class. Pts',
     members_dropdown: 'members',
     h2h_group_pts: 'Group points',
     h2h_classif_pts: 'Classification points',
@@ -2115,6 +2122,7 @@ const TRANSLATIONS = {
     h2h_games_table: 'Alle Spiele',
     // Group scorer col
     grp_scorer_pts: '⚽ Pkt',
+    grp_classpts_col: '🏅 Klass. Pkt.',
     h2h_group_pts: 'Gruppenpunkte',
     h2h_classif_pts: 'Klassifizierungspunkte',
     h2h_ko_pts: 'KO-Punkte',
@@ -2355,6 +2363,7 @@ const TRANSLATIONS = {
     h2h_games_table: 'Todos los partidos',
     // Group scorer col
     grp_scorer_pts: '⚽ Pts',
+    grp_classpts_col: '🏅 Pts. Clasif.',
     h2h_group_pts: 'Puntos de grupo',
     h2h_classif_pts: 'Puntos de clasificación',
     h2h_ko_pts: 'Puntos KO',
@@ -4617,12 +4626,16 @@ function renderGroupTab(lb) {
       const scorerCell = p.scorerPts > 0
         ? `<span style="color:#2e7d32;font-weight:700;">+${p.scorerPts}</span>`
         : '<span style="color:var(--muted);">—</span>';
+      const classCell = p.classificationPts > 0
+        ? `<span style="color:#7c3aed;font-weight:700;">+${p.classificationPts}</span>`
+        : '<span style="color:var(--muted);">—</span>';
       return `<tr>
         <td class="lb-rank ${p.rank===1?'top1':p.rank===2?'top2':p.rank===3?'top3':''}">${p.rank}</td>
         <td class="lb-name">${p.name}${isYou?`<span class="you-tag">${T("you_tag")}</span>`:""}</td>
         <td class="lb-pts">${p.pts}</td>
         <td class="lb-live-pts">${p.livePts > 0 ? '+'+p.livePts : '—'}</td>
         <td style="font-size:0.8rem;">${scorerCell}</td>
+        <td style="font-size:0.8rem;">${classCell}</td>
         <td><span class="pill pill-green">${p.exact}</span></td>
         <td><span class="pill pill-blue">${p.diff}</span></td>
         <td><span class="pill pill-gold">${p.one}</span></td>
@@ -4632,7 +4645,7 @@ function renderGroupTab(lb) {
       ${myGroups.length > 1 ? `<div class="section-title" style="margin-top:18px;">👥 ${groupName} — ${members.length} ${T('members')}</div>` : `<div class="section-title">👥 ${groupName} — ${members.length} ${T('members')}</div>`}
       <div class="card" style="padding:0; overflow:hidden; margin-bottom:18px;">
         <table class="lb-table">
-          <thead><tr><th>#</th><th>${T('lb_player')}</th><th>${T('pts_col')}</th><th style="color:var(--red);">🔴</th><th title="${T('grp_scorer_pts')}">⚽</th><th>3pts</th><th>2pts</th><th>1pt</th></tr></thead>
+          <thead><tr><th>#</th><th>${T('lb_player')}</th><th>${T('pts_col')}</th><th style="color:var(--red);">🔴</th><th title="${T('grp_scorer_pts')}">⚽</th><th title="${T('grp_classpts_col')}">🏅</th><th>3pts</th><th>2pts</th><th>1pt</th></tr></thead>
           <tbody>${rows}</tbody>
         </table>
       </div>`;
@@ -5657,8 +5670,8 @@ function switchTab(tabId) {
 }
 
 // ═══════ WHAT'S NEW ═══════
-const BUILD_VERSION = 'v1.22.0';
-const BUILD_DATE = '24.06.2026 08:00';
+const BUILD_VERSION = 'v1.22.1';
+const BUILD_DATE    = '24.06.2026';
 (function(){ var _hb = document.getElementById('headerVersionBadge'); if(_hb) _hb.textContent = BUILD_VERSION; })();
 const WN_VERSION = 'v1.22';
 const WN_STORAGE_KEY = window.location.pathname.includes('staging') ? 'wnSeen_staging' : 'wnSeen_live';
