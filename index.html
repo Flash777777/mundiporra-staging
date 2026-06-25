@@ -1129,6 +1129,13 @@
   <div class="card" style="margin-bottom:14px;">
   <div class="card" style="margin-bottom:14px;">
   <div class="card" style="margin-bottom:14px;">
+          <div class="card-title">v1.23.10 — 25.06.2026 (Fix)</div>
+          <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
+            <li>⏱️ <strong>Ranking: Classification-Punkte immer enthalten</strong> — <code>buildLeaderboard()</code> ist jetzt <code>async</code> und wartet auf ESPN-Daten bevor Scores berechnet werden</li>
+            <li>🎯 <strong>Platz 3: Punkte erst wenn alle Gruppen fertig</strong> — <code>calcTeamClassificationPoints()</code> vergibt Drittplatz-Punkte nur wenn alle 12 Gruppen abgeschlossen sind</li>
+          </ul>
+        </div>
+        <div class="card" style="margin-bottom:14px;">
   <div class="card-title">v1.23.9 — 25. Juni 2026 (Fix)</div>
   <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
     <li>🔤 <strong>_normESPN()</strong> — Team-Normalisierung: ESPN UPPERCASE + Sondernamen (Korea Rep., Côte d'Ivoire, Cabo Verde, Turkiye)</li>
@@ -3727,12 +3734,10 @@ function assignRanks(arr, key='total') {
   return arr;
 }
 
-function buildLeaderboard() {
-  // Prefetch group classification standings (async, non-blocking)
+async function buildLeaderboard() {
+  // Ensure group classification cache is ready before computing scores
   if (!_grupClassCache || (Date.now() - _grupClassFetchTime) >= GRUP_CLASS_CACHE_TTL) {
-    fetchGrupClassStandings().then(() => {
-      if (_lastLb) { const fresh = buildLeaderboard(); renderLeaderboard(fresh); }
-    });
+    await fetchGrupClassStandings();
   }
   const results = [];
   for (const name of Object.keys(ALL_PARTICIPANTS)) {
@@ -5062,6 +5067,11 @@ function calcTeamClassificationPoints(playerName, teamName) {
   const normName = _normESPN(teamName);
   const standings = _grupClassCache;
   let pts = 0;
+  const allGroupLetters = Object.keys(standings);
+  const allGroupsDone = allGroupLetters.length === 12 && allGroupLetters.every(letter => {
+    const teams = standings[letter] || [];
+    return teams.length === 4 && teams.every(t => t.played >= 3) && !_hasLiveGameInGroup(letter);
+  });
   for (const letter of Object.keys(standings)) {
     const teams = standings[letter] || [];
     const team = teams.find(t => t.name === normName);
@@ -5069,6 +5079,7 @@ function calcTeamClassificationPoints(playerName, teamName) {
     const groupDone = teams.length === 4 && teams.every(t => t.played >= 3) && !_hasLiveGameInGroup(letter);
     if (!groupDone) continue;
     for (let pos = 1; pos <= 3; pos++) {
+      if (pos === 3 && !allGroupsDone) continue; // 3rd place only when all 12 groups done
       const tipKey = pos + letter;
       const tip = tips[tipKey];
       if (!tip || tip === '-') continue;
@@ -5870,7 +5881,7 @@ async function refreshDashboard() {
   await fetchGrupClassStandings(); // Early load & wait so ranking includes classificationPts
   const _ftCountAfter = ALL_GAMES.filter(g => getActual(g)?.status === 'FT').length;
   if (_ftCountAfter !== _ftCountBefore) _eloCache = null; // new result → rebuild ELO
-  const lb = buildLeaderboard();
+  const lb = await buildLeaderboard();
   renderKPIs(lb);
   renderLastNextMatch();
   renderLatestGameSummary(lb);
@@ -6091,8 +6102,8 @@ function switchTab(tabId) {
 }
 
 // ═══════ WHAT'S NEW ═══════
-const BUILD_VERSION = 'v1.23.9';
-const BUILD_DATE    = '25.06.2026 11:00';
+const BUILD_VERSION = 'v1.23.10';
+const BUILD_DATE = '25.06.2026 14:00';
 (function(){ var _hb = document.getElementById('headerVersionBadge'); if(_hb) _hb.textContent = BUILD_VERSION; })();
 const WN_VERSION = 'v1.22';
 const WN_STORAGE_KEY = window.location.pathname.includes('staging') ? 'wnSeen_staging' : 'wnSeen_live';
@@ -6756,7 +6767,7 @@ function _porraFitName(el){
 }
 async function showMyPorraCard(){
   const mapping=await _loadCardMapping();
-  if(!_lastLb||!_lastLb.length)buildLeaderboard();
+  if(!_lastLb||!_lastLb.length)await buildLeaderboard();
   const lb=_lastLb||[];
   const alias=USER.player||'';
   const me=lb.find(e=>e.name===alias);
@@ -6837,7 +6848,7 @@ async function porraCardDownload(){
 }
 async function showPorraAdminGallery(){
   const mapping=await _loadCardMapping();
-  if(!_lastLb||!_lastLb.length)buildLeaderboard();
+  if(!_lastLb||!_lastLb.length)await buildLeaderboard();
   document.getElementById('porra-admin-gallery').classList.add('open');
   _porraRenderGallery(mapping,_lastLb||[],'');
   document.getElementById('searchInput').value='';
