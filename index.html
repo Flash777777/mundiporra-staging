@@ -1129,6 +1129,12 @@
   <div class="card" style="margin-bottom:14px;">
   <div class="card" style="margin-bottom:14px;">
   <div class="card" style="margin-bottom:14px;">
+          <div class="card-title">v1.23.11 — 25.06.2026 (Fix)</div>
+          <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
+            <li>🔢 <strong>Ranking: Gesamtpunkte-Spalte zeigt jetzt <code>total</code></strong> — bisher wurde <code>pts</code> (ohne Klassifizierungspunkte) angezeigt; jetzt korrekt <code>total = pts + livePts + classificationPts</code></li>
+          </ul>
+        </div>
+        <div class="card" style="margin-bottom:14px;">
           <div class="card-title">v1.23.10 — 25.06.2026 (Fix)</div>
           <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
             <li>⏱️ <strong>Ranking: Classification-Punkte immer enthalten</strong> — <code>buildLeaderboard()</code> ist jetzt <code>async</code> und wartet auf ESPN-Daten bevor Scores berechnet werden</li>
@@ -4737,7 +4743,7 @@ function renderGroupSummary(lb) {
     return `<tr>
       <td class="lb-rank ${p.rank===1?'top1':p.rank===2?'top2':p.rank===3?'top3':''}">${p.rank}</td>
       <td class="lb-name">${p.name}${isYou?`<span class="you-tag">${T('you_tag')}</span>`:""}</td>
-      <td class="lb-pts">${p.pts}</td>
+      <td class="lb-pts">${p.total}</td>
       <td><span class="pill pill-green">${p.exact}×3</span></td>
       <td><span class="pill pill-blue">${p.diff}×2</span></td>
       <td><span class="pill pill-gold">${p.one}×1</span></td>
@@ -6102,8 +6108,8 @@ function switchTab(tabId) {
 }
 
 // ═══════ WHAT'S NEW ═══════
-const BUILD_VERSION = 'v1.23.10';
-const BUILD_DATE = '25.06.2026 14:00';
+const BUILD_VERSION = 'v1.23.11';
+const BUILD_DATE = '25.06.2026 14:30';
 (function(){ var _hb = document.getElementById('headerVersionBadge'); if(_hb) _hb.textContent = BUILD_VERSION; })();
 const WN_VERSION = 'v1.22';
 const WN_STORAGE_KEY = window.location.pathname.includes('staging') ? 'wnSeen_staging' : 'wnSeen_live';
