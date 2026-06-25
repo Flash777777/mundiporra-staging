@@ -1129,6 +1129,12 @@
   <div class="card" style="margin-bottom:14px;">
   <div class="card" style="margin-bottom:14px;">
   <div class="card" style="margin-bottom:14px;">
+          <div class="card-title">v1.23.16 — 25. Juni 2026 (Silent Fix)</div>
+          <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
+            <li>🏅 <strong>Klassifizierungspunkte tip3-Logik Fix</strong> — Wenn getipptes Drittplatz-Team tatsächlich 1. oder 2. wird: 1 Punkt sobald Gruppe fertig (kein allGroupsDone-Wait mehr). Kein Punkt mehr für Platz-3-Teams die sich nicht qualifizieren.</li>
+          </ul>
+        </div>
+        <div class="card" style="margin-bottom:14px;">
           <div class="card-title">v1.23.15 — 25. Juni 2026 (Silent Fix)</div>
           <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
             <li>🏅 <strong>Meine Gruppe lb-pts Fix</strong> — Punkte-Spalte zeigt jetzt <code>total</code> inkl. Klassifizierungspunkte</li>
@@ -3702,20 +3708,23 @@ function calcGroupClassificationPoints(playerName) {
       }
     }
 
-    // ── 3rd place (key: "3A", "3B", ...) — nur wenn alle 12 Gruppen fertig ──
+    // ── 3rd place (key: "3A", "3B", ...) ──
+    // Early: tipped team ended up 1st or 2nd → groupDone reicht (1 Pkt: richtig, falsche Position)
+    // Full:  tipped team at rank 3 + qualifies → allGroupsDone nötig (2 Pkt exakt, 0 Pkt nicht qualifiziert)
     const tip3 = tips['3' + letter];
-    if (tip3 && tip3 !== '-' && allGroupsDone) {
+    if (tip3 && tip3 !== '-') {
       const nTip3 = _normESPN(tip3);
-      const actual3 = teams.find(t => t.rank === 3);
-      if (actual3) {
-        const tip3Qualifies = actual3.noteDesc === 'Advance to Round of 32' && actual3.name === nTip3;
-        const tip3Correct   = actual3.name === nTip3;
-        if (tip3Correct) {
-          total += tip3Qualifies ? 2 : 1;
-        } else {
-          const tipped = teams.find(t => t.name === nTip3);
-          if (tipped && tipped.noteDesc === 'Advance to Round of 32') total += 1;
+      const tipped = teams.find(t => t.name === nTip3);
+      if (groupDone && tipped && (tipped.rank === 1 || tipped.rank === 2)) {
+        // Team qualifiziert sich, aber auf anderem Platz als getippt
+        total += 1;
+      } else if (allGroupsDone) {
+        const actual3 = teams.find(t => t.rank === 3);
+        if (actual3 && actual3.name === nTip3 && actual3.noteDesc === 'Advance to Round of 32') {
+          // Exakt richtig getippt UND qualifiziert
+          total += 2;
         }
+        // sonst: 0 Punkte (Platz 3 nicht qualifiziert, oder Platz 4)
       }
     }
   }
@@ -6135,8 +6144,8 @@ function switchTab(tabId) {
 }
 
 // ═══════ WHAT'S NEW ═══════
-const BUILD_VERSION = 'v1.23.15';
-const BUILD_DATE    = '25.06.2026 14:30';
+const BUILD_VERSION = 'v1.23.16';
+const BUILD_DATE    = '25.06.2026 15:00';
 (function(){ var _hb = document.getElementById('headerVersionBadge'); if(_hb) _hb.textContent = BUILD_VERSION; })();
 const WN_VERSION = 'v1.23';
 const WN_STORAGE_KEY = window.location.pathname.includes('staging') ? 'wnSeen_staging' : 'wnSeen_live';
