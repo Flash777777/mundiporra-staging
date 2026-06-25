@@ -1129,6 +1129,12 @@
   <div class="card" style="margin-bottom:14px;">
   <div class="card" style="margin-bottom:14px;">
   <div class="card" style="margin-bottom:14px;">
+          <div class="card-title">v1.23.17 — 25. Juni 2026 (Silent Fix)</div>
+          <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
+            <li>🎮 <strong>Simulator baseRankMap Fix</strong> — Ausgangsrang stimmt jetzt mit der echten Rangliste überein: Rang-Increment nur noch bei sinkendem <code>total</code>, nicht mehr bei <code>pts</code>/<code>exact</code>-Differenz bei gleichem Total</li>
+          </ul>
+        </div>
+        <div class="card" style="margin-bottom:14px;">
           <div class="card-title">v1.23.16 — 25. Juni 2026 (Silent Fix)</div>
           <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
             <li>🏅 <strong>Klassifizierungspunkte tip3-Logik Fix</strong> — Wenn getipptes Drittplatz-Team tatsächlich 1. oder 2. wird: 1 Punkt sobald Gruppe fertig (kein allGroupsDone-Wait mehr). Kein Punkt mehr für Platz-3-Teams die sich nicht qualifizieren.</li>
@@ -6144,8 +6150,8 @@ function switchTab(tabId) {
 }
 
 // ═══════ WHAT'S NEW ═══════
-const BUILD_VERSION = 'v1.23.16';
-const BUILD_DATE    = '25.06.2026 15:00';
+const BUILD_VERSION = 'v1.23.17';
+const BUILD_DATE    = '25.06.2026 16:00';
 (function(){ var _hb = document.getElementById('headerVersionBadge'); if(_hb) _hb.textContent = BUILD_VERSION; })();
 const WN_VERSION = 'v1.23';
 const WN_STORAGE_KEY = window.location.pathname.includes('staging') ? 'wnSeen_staging' : 'wnSeen_live';
@@ -6549,10 +6555,9 @@ function _renderSimulator(){
   // Re-rank: current pts + sim pts → sorted → simRank
   // Dense rank (same as leaderboard assignRanks) so deltas are consistent
   const baseRankMap={};
-  // Fix: use same 3-tier sort as main leaderboard (total||pts, then pts, then exact)
-  // so simulator base-rank matches the leaderboard rank exactly.
-  { let _r=1; const _sorted=[...lb].sort((a,b)=>(b.total||b.pts||0)-(a.total||a.pts||0)||b.pts-a.pts||b.exact-a.exact);
-    _sorted.forEach((p,idx)=>{ if(idx>0&&((p.total||p.pts||0)<(_sorted[idx-1].total||_sorted[idx-1].pts||0)||p.pts<_sorted[idx-1].pts||p.exact<_sorted[idx-1].exact))_r=idx+1; baseRankMap[p.name]=_r; }); }
+  // Rang erhöhen NUR wenn p.total sinkt — identisch zur assignRanks-Logik des Haupt-Leaderboards
+  { let _r=1; const _sorted=[...lb].sort((a,b)=>(b.total||0)-(a.total||0)||b.pts-a.pts||b.exact-a.exact);
+    _sorted.forEach((p,idx)=>{ if(idx>0&&(p.total||0)<(_sorted[idx-1].total||0))_r=idx+1; baseRankMap[p.name]=_r; }); }
   const simTotals=lb.map(p=>({name:p.name,total:(p.total||0)+_simDelta(p.name,simGames).delta}));
   simTotals.sort((a,b)=>b.total-a.total);
   assignRanks(simTotals);
