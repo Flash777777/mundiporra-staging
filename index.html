@@ -1129,6 +1129,14 @@
   <div class="card" style="margin-bottom:14px;">
   <div class="card" style="margin-bottom:14px;">
   <div class="card" style="margin-bottom:14px;">
+          <div class="card-title">v1.23.12 — 25.06.2026 (Feature + Fix)</div>
+          <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
+            <li>⏱️ <strong>Ranking korrekt beim ersten Load</strong> — <code>initDashboard()</code> async + <code>await refreshDashboard()</code>: Klassifizierungspunkte sofort beim Start verfügbar</li>
+            <li>📊 <strong>KPI-Karten zeigen Gesamtpunkte</strong> — "Deine Punkte", Rückstand, Top-Score und Community-Avg nutzen jetzt <code>total</code> (inkl. Klassifizierungspunkte)</li>
+            <li>🏅 <strong>What's New aktualisiert</strong> — KO-Baum Tab, Gruppen-Tab mit Klassifizierungspunkten, +2/+1 Punkteskala korrekt</li>
+          </ul>
+        </div>
+        <div class="card" style="margin-bottom:14px;">
           <div class="card-title">v1.23.11 — 25.06.2026 (Fix)</div>
           <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
             <li>🔢 <strong>Ranking: Gesamtpunkte-Spalte zeigt jetzt <code>total</code></strong> — bisher wurde <code>pts</code> (ohne Klassifizierungspunkte) angezeigt; jetzt korrekt <code>total = pts + livePts + classificationPts</code></li>
@@ -4013,14 +4021,14 @@ function renderKPIs(lb) {
   const live   = ALL_GAMES.filter(g => getActual(g)?.status === 'LIVE').length;
   const total  = ALL_GAMES.length;
   const left   = total - played - live;
-  const maxPts = lb[0]?.pts || 0;
+  const maxPts = lb[0]?.total || 0;
   const me = USER.player ? lb.find(p => p.name === USER.player) : null;
   const myRankVal = me ? (me.rank || lb.findIndex(p => p.name === USER.player) + 1) : 0;
   const myRank = myRankVal > 0
     ? `${myRankVal}<span style="font-size:0.9rem;font-weight:500;color:var(--muted)"> / ${lb.length}</span>`
     : '—';
-  const myPts    = me ? me.pts : '—';
-  const deficit  = me ? (maxPts - me.pts) : null;
+  const myPts    = me ? me.total : '—';
+  const deficit  = me ? (maxPts - me.total) : null;
   const defStr   = deficit != null ? (deficit === 0 ? '🥇 #1' : `−${deficit}`) : '—';
   const hitRate  = me && played > 0
     ? Math.round(((me.exact + me.diff + me.one) / played) * 100) + '%'
@@ -4029,7 +4037,7 @@ function renderKPIs(lb) {
   const played2 = `${played}<span style="font-size:0.75rem;color:var(--muted)"> ✓ / ${TOTAL_GAMES}</span>`;
   const avgPts   = me && played > 0 ? (me.pts / played).toFixed(1) : '—';
   const commAvg  = played > 0
-    ? (lb.reduce((s,p) => s + p.pts, 0) / lb.length).toFixed(1) : '—';
+    ? (lb.reduce((s,p) => s + p.total, 0) / lb.length).toFixed(1) : '—';
   const exactTips = me ? me.exact : '—';
 
   // New KPIs
@@ -5914,14 +5922,14 @@ async function refreshDashboard() {
   if(document.getElementById('simOverlay')?.classList.contains('active')){_simLb=_lastLb;_renderSimulator();}
 }
 
-function initDashboard() {
+async function initDashboard() {
   applyLang();
   updatePersonaHeader();
   _simInit();
   checkWhatsNew();
   checkVersionJson();
-  refreshDashboard();
-  setTimeout(runSanityChecks, 500); // initial check after data loaded
+  await refreshDashboard(); // await ensures classification pts ready before first render
+  setTimeout(runSanityChecks, 500);
 }
 
 // ══════════════ TAB SWITCHING ══════════════
@@ -6108,17 +6116,18 @@ function switchTab(tabId) {
 }
 
 // ═══════ WHAT'S NEW ═══════
-const BUILD_VERSION = 'v1.23.11';
-const BUILD_DATE = '25.06.2026 14:30';
+const BUILD_VERSION = 'v1.23.12';
+const BUILD_DATE = '25.06.2026 15:30';
 (function(){ var _hb = document.getElementById('headerVersionBadge'); if(_hb) _hb.textContent = BUILD_VERSION; })();
-const WN_VERSION = 'v1.22';
+const WN_VERSION = 'v1.23';
 const WN_STORAGE_KEY = window.location.pathname.includes('staging') ? 'wnSeen_staging' : 'wnSeen_live';
 (function(){ const old = localStorage.getItem('wnSeen'); if(old && !localStorage.getItem(WN_STORAGE_KEY)) localStorage.setItem(WN_STORAGE_KEY, old); })();
 const WN_I18N={
   en:{
     // v1.21
-    wn_classpts:'🏅 <strong>Group Classification Points</strong>: Your group position tips (1st/2nd per group, best 3rd) are now scored automatically. +3 pts for correct team + exact position, +1 pt for correct team but wrong position. 1st/2nd evaluated once all 3 group games are played — 3rd place only after all 48 group games finish.',
-    wn_gruppen:'🏟️ <strong>Group Standings</strong>: Live ESPN standings for all 12 groups — qualification traffic light, jump buttons.',
+    wn_classpts:'🏅 <strong>Group Classification Points</strong>: Your group position tips (1st/2nd per group, best 3rd) are now scored and included in the total ranking. +2 pts for correct team + exact position, +1 pt for correct team but wrong position. 1st/2nd evaluated once all 3 group games are played — 3rd place only after all 48 group games finish.',
+    wn_kobracket:'⚔️ <strong>New Tab: KO Bracket</strong>: The complete knockout bracket — from Round of 32 to the Final — with live results and your tips at a glance.',
+    wn_gruppen:'🏟️ <strong>New Tab: Groups</strong>: Live ESPN standings for all 12 groups — qualification traffic light — now also showing your classification points per team directly in the standings.',
     // v1.20
     wn_confetti:'🎉 <strong>Confetti Rain</strong>: when a match kicks off (ESPN LIVE), a flag confetti shower bursts across the screen — showing the flags of all participants who support each team.',
     // v1.17
@@ -6143,8 +6152,9 @@ const WN_I18N={
   },
   de:{
     // v1.21
-    wn_classpts:'🏅 <strong>Gruppenklassifikations-Punkte</strong>: Deine Tipps auf 1./2.-Platz jeder Gruppe und den besten 3. Plätzen werden jetzt automatisch bewertet. +3 Punkte für richtiges Team + exakte Position, +1 Punkt für richtiges Team aber falsche Position. Auswertung 1./2. sobald alle 3 Gruppenspiele gespielt — 3.-Platz erst nach Ende aller 48 Gruppenspiele.',
-    wn_gruppen:'🏟️ <strong>Gruppenstandings</strong>: Live ESPN-Standings aller 12 Gruppen — Quali-Ampel, Jump-Buttons.',
+    wn_classpts:'🏅 <strong>Gruppenklassifikations-Punkte</strong>: Deine Tipps auf 1./2.-Platz jeder Gruppe und den besten 3. Plätzen werden jetzt korrekt im Gesamtranking mitgezählt. +2 Punkte für richtiges Team + exakte Position, +1 Punkt für richtiges Team aber falsche Position. Auswertung 1./2. sobald alle 3 Gruppenspiele gespielt — 3.-Platz erst nach Ende aller 48 Gruppenspiele.',
+    wn_kobracket:'⚔️ <strong>Neuer Tab: KO-Baum</strong>: Der komplette Bracket der K.O.-Runde — von Achtelfinale bis Finale — mit Live-Ergebnissen und deinen Tipps auf einen Blick.',
+    wn_gruppen:'🏟️ <strong>Neuer Tab: Gruppen</strong>: Live ESPN-Standings aller 12 Gruppen mit Quali-Ampel — jetzt inklusive deiner Klassifizierungspunkte pro Team direkt in der Tabelle sichtbar.',
     // v1.20
     wn_confetti:'🎉 <strong>Konfetti-Regen</strong>: wenn ein Spiel anpfeift (ESPN LIVE), regnet es Flaggen-Konfetti über den gesamten Bildschirm — mit den Flaggen aller Teilnehmer, die das jeweilige Team unterstützen.',
     // v1.17
@@ -6169,7 +6179,8 @@ const WN_I18N={
   },
   es:{
     // v1.21
-    wn_gruppen:'🏟️ <strong>Clasificación de Grupos</strong>: Standings ESPN en vivo — semáforo de clasificación.',
+    wn_kobracket:'⚔️ <strong>Nueva pestaña: KO Bracket</strong>: El cuadro completo de la fase eliminatoria — desde octavos hasta la final — con resultados en vivo y tus pronósticos.',
+    wn_gruppen:'🏟️ <strong>Nueva pestaña: Grupos</strong>: Standings ESPN en vivo de los 12 grupos con semáforo de clasificación — ahora también con tus puntos de clasificación por equipo.',
     // v1.20
     wn_confetti:'🎉 <strong>Lluvia de Confeti</strong>: cuando un partido empieza (ESPN LIVE), explota una lluvia de confeti con banderas por toda la pantalla — mostrando las banderas de todos los participantes que apoyan a cada equipo.',
     // v1.17
@@ -6195,9 +6206,9 @@ const WN_I18N={
 };
 // Icon map für WN-Keys — Reihenfolge & Icons für v1.12
 const WN_ITEMS = [
-  { key: 'wn_classpts', icon: '🏅', highlight: true },
-  { divider: true },
-  { key: 'wn_gruppen', icon: '🏟️', highlight: true },
+  { key: 'wn_kobracket',  icon: '⚔️', highlight: true },
+  { key: 'wn_gruppen',    icon: '🏟️', highlight: true },
+  { key: 'wn_classpts',   icon: '🏅', highlight: true },
   { divider: true },
   // v1.20 items
   { key: 'wn_confetti',    icon: '🎉', highlight: true },
