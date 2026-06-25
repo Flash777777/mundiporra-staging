@@ -1129,6 +1129,12 @@
   <div class="card" style="margin-bottom:14px;">
   <div class="card" style="margin-bottom:14px;">
   <div class="card" style="margin-bottom:14px;">
+          <div class="card-title">v1.23.14 — 25.06.2026 (Fix)</div>
+          <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
+            <li>🔢 <strong>Gesamtrangliste PTS-Spalte korrigiert</strong> — <code>renderLeaderboard()</code> zeigte fälschlicherweise <code>p.pts</code> statt <code>p.total</code>: Klassifizierungspunkte sind jetzt in der angezeigten Punktzahl enthalten und die Sortierung ist konsistent</li>
+          </ul>
+        </div>
+        <div class="card" style="margin-bottom:14px;">
           <div class="card-title">v1.23.13 — 25.06.2026 (Fix)</div>
           <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
             <li>🔢 <strong>Ranking-Sortierung korrigiert</strong> — <code>renderGroupTab()</code> sortierte noch nach <code>pts</code> statt <code>total</code>: Reihenfolge jetzt konsistent mit Gesamtrangliste</li>
@@ -4817,7 +4823,7 @@ function renderLeaderboard(lb) {
         ${isGroup && !isYou?`<span class="group-tag">${groupLabel}</span>`:''}
       </td>
       <td style="font-size:0.72rem; color:var(--muted);">${pGroups}</td>
-      <td class="lb-pts">${p.pts}</td>
+      <td class="lb-pts">${p.total}</td>
       <td class="lb-live-pts">${p.livePts > 0 ? '+'+p.livePts : '—'}</td>
       <td style="color:#2e7d32; font-weight:${p.scorerPts>0?'700':'400'}; font-size:0.8rem;">${p.scorerPts > 0 ? '+'+p.scorerPts : '—'}</td>
       <td style="color:#b8860b; font-weight:${p.classificationPts>0?'700':'400'}; font-size:0.8rem;" title="Gruppenklassifikation: ${p.classificationPts} Pt">${p.classificationPts > 0 ? '+'+p.classificationPts : '—'}</td>
@@ -6122,8 +6128,8 @@ function switchTab(tabId) {
 }
 
 // ═══════ WHAT'S NEW ═══════
-const BUILD_VERSION = 'v1.23.13';
-const BUILD_DATE = '25.06.2026 16:00';
+const BUILD_VERSION = 'v1.23.14';
+const BUILD_DATE = '25.06.2026 16:30';
 (function(){ var _hb = document.getElementById('headerVersionBadge'); if(_hb) _hb.textContent = BUILD_VERSION; })();
 const WN_VERSION = 'v1.23';
 const WN_STORAGE_KEY = window.location.pathname.includes('staging') ? 'wnSeen_staging' : 'wnSeen_live';
