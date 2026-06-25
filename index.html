@@ -1129,6 +1129,16 @@
   <div class="card" style="margin-bottom:14px;">
   <div class="card" style="margin-bottom:14px;">
   <div class="card" style="margin-bottom:14px;">
+  <div class="card-title">v1.23.9 — 25. Juni 2026 (Fix)</div>
+  <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
+    <li>🔤 <strong>_normESPN()</strong> — Team-Normalisierung: ESPN UPPERCASE + Sondernamen (Korea Rep., Côte d'Ivoire, Cabo Verde, Turkiye)</li>
+    <li>⚖️ <strong>Klassifizierungspunkte-Skala</strong> — 0/1/2 statt 0/1/3 (qualifiziert=1 Pkt, qualifiziert+exakt=2 Pkt)</li>
+    <li>🏟️ <strong>KO-Punkte-Bug</strong> — <code>isKO = game.id &gt; 48</code> entfernt; Gruppen I–L nicht mehr falsch als KO gewertet</li>
+    <li>⚔️ <strong>H2H-Tab</strong> — Klassifizierungspunkte sichtbar, KO-Zeile entfernt, Total korrekt</li>
+    <li>⏱️ <strong>Cache-Timing</strong> — <code>fetchGrupClassStandings()</code> in <code>initH2HTab()</code> awaited</li>
+  </ul>
+</div>
+<div class="card" style="margin-bottom:14px;">
   <div class="card-title">v1.23.7 — 24. Juni 2026 (Fix)</div>
   <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
     <li>🔄 <strong>Timing-Fix: await fetchGrupClassStandings</strong> — Klassifikations-Punkte werden jetzt korrekt beim Browser-Refresh eingerechnet (nicht erst nach "Aktualisieren")</li>
@@ -3625,12 +3635,13 @@ function calcGroupClassificationPoints(playerName) {
     // ── 1st place (key: "1A", "1B", ...) ──
     const tip1 = tips['1' + letter];
     if (tip1 && tip1 !== '-' && groupDone) {
+      const nTip1 = _normESPN(tip1);
       const actual1 = teams.find(t => t.rank === 1);
       if (actual1) {
-        if (actual1.name === tip1) {
-          total += 3;
+        if (actual1.name === nTip1) {
+          total += 2;
         } else {
-          const tipped = teams.find(t => t.name === tip1);
+          const tipped = teams.find(t => t.name === nTip1);
           if (tipped && tipped.noteDesc === 'Advance to Round of 32') total += 1;
         }
       }
@@ -3639,12 +3650,13 @@ function calcGroupClassificationPoints(playerName) {
     // ── 2nd place (key: "2A", "2B", ...) ──
     const tip2 = tips['2' + letter];
     if (tip2 && tip2 !== '-' && groupDone) {
+      const nTip2 = _normESPN(tip2);
       const actual2 = teams.find(t => t.rank === 2);
       if (actual2) {
-        if (actual2.name === tip2) {
-          total += 3;
+        if (actual2.name === nTip2) {
+          total += 2;
         } else {
-          const tipped = teams.find(t => t.name === tip2);
+          const tipped = teams.find(t => t.name === nTip2);
           if (tipped && tipped.noteDesc === 'Advance to Round of 32') total += 1;
         }
       }
@@ -3653,14 +3665,15 @@ function calcGroupClassificationPoints(playerName) {
     // ── 3rd place (key: "3A", "3B", ...) — nur wenn alle 12 Gruppen fertig ──
     const tip3 = tips['3' + letter];
     if (tip3 && tip3 !== '-' && allGroupsDone) {
+      const nTip3 = _normESPN(tip3);
       const actual3 = teams.find(t => t.rank === 3);
       if (actual3) {
-        const tip3Qualifies = actual3.noteDesc === 'Advance to Round of 32' && actual3.name === tip3;
-        const tip3Correct   = actual3.name === tip3;
+        const tip3Qualifies = actual3.noteDesc === 'Advance to Round of 32' && actual3.name === nTip3;
+        const tip3Correct   = actual3.name === nTip3;
         if (tip3Correct) {
-          total += tip3Qualifies ? 3 : 1;
+          total += tip3Qualifies ? 2 : 1;
         } else {
-          const tipped = teams.find(t => t.name === tip3);
+          const tipped = teams.find(t => t.name === nTip3);
           if (tipped && tipped.noteDesc === 'Advance to Round of 32') total += 1;
         }
       }
@@ -3678,12 +3691,11 @@ function calcPlayerScore(playerName) {
     const tip = preds[game.id];
     if (!tip) continue;
     const actual = getActual(game);
-    const isKO = game.id > 48;
-    // FT points (confirmed)
+    // FT points (confirmed) — ALL_GAMES = Gruppenspiele (ids 1–72)
     const s = scoreGame(tip, actual);
     if (s !== null) {
       pts += s;
-      if (isKO) koPts += s; else groupPts += s;
+      groupPts += s;
       if (s === 3) exact++; else if (s === 2) diff++; else if (s === 1) one++; else wrong++;
       continue;
     }
@@ -5028,57 +5040,50 @@ function renderGruppen(){
     })
     .catch(err=>{container.innerHTML='<p style="color:red;padding:20px">❌ ESPN: '+err+'</p>';});
 }
+function _normESPN(name) {
+  if (!name) return '';
+  const m = {
+    'south korea':    'KOREA REP.',
+    'korea':          'KOREA REP.',
+    'ivory coast':    "CÔTE D'IVOIRE",
+    "cote d'ivoire":  "CÔTE D'IVOIRE",
+    'cape verde':     'CABO VERDE',
+    'türkiye':        'TURKIYE',
+    'turkiye':        'TURKIYE',
+    'turkey':         'TURKIYE',
+    'usa':            'UNITED STATES',
+    'united states':  'UNITED STATES',
+  };
+  return m[name.toLowerCase().trim()] || name.toUpperCase();
+}
 function calcTeamClassificationPoints(playerName, teamName) {
   const tips = ALL_GROUP_PREDICTIONS[playerName];
   if (!tips || !_grupClassCache) return 0;
-  
-  console.log('[CALC_TEAM]', {playerName, teamName, tipsKeys: Object.keys(tips).slice(0, 10)});
-  
+  const normName = _normESPN(teamName);
   const standings = _grupClassCache;
   let pts = 0;
-  
   for (const letter of Object.keys(standings)) {
     const teams = standings[letter] || [];
-    console.log('  [LOOP_' + letter + '] teams:', teams.map(t => t.name).join(', '));
-    const team = teams.find(t => t.name === teamName);
-    if (!team) {
-      console.log('    → ' + teamName + ' NOT FOUND in group ' + letter);
-      continue;
-    }
-    console.log('    ✓ FOUND ' + teamName + ' in group ' + letter);
-    
-    const len4 = teams.length === 4;
-    const all3played = teams.every(t => t.played >= 3);
-    const noLive = !_hasLiveGameInGroup(letter);
-    const groupDone = len4 && all3played && noLive;
-    console.log('  [CHECK_' + letter + ']', {len4, all3played, noLive, groupDone});
+    const team = teams.find(t => t.name === normName);
+    if (!team) continue;
+    const groupDone = teams.length === 4 && teams.every(t => t.played >= 3) && !_hasLiveGameInGroup(letter);
     if (!groupDone) continue;
-    
-    console.log('[GROUP_' + letter + '_DONE] For', teamName, '→ checking positions');
-    
     for (let pos = 1; pos <= 3; pos++) {
       const tipKey = pos + letter;
       const tip = tips[tipKey];
-      console.log('  tipKey:', tipKey, '→ tip:', tip);
-      
       if (!tip || tip === '-') continue;
-      
+      const normTip = _normESPN(tip);
+      if (normTip !== normName) continue;
       const actualAtPos = teams.find(t => t.rank === pos);
       if (!actualAtPos) continue;
-      
-      if (tip === teamName) {
-        if (actualAtPos.name === teamName) {
-          pts += 3;
-          console.log('    ✓ MATCH! +3');
-        } else if (actualAtPos.noteDesc === 'Advance to Round of 32') {
-          pts += 1;
-          console.log('    ✓ QUALIFIED +1');
-        }
+      if (actualAtPos.name === normName) {
+        pts += 2; // qualified + exact position: 2 pts
+      } else if (team.noteDesc === 'Advance to Round of 32') {
+        pts += 1; // qualified, wrong position: 1 pt
       }
     }
     break;
   }
-  console.log('[RESULT]', teamName, '→', pts, 'pts');
   return pts;
 }
 
@@ -5762,8 +5767,7 @@ function renderH2H() {
     // Points breakdown rows (i18n)
     const rows = [
       { label: T('h2h_group_pts'), val: score.groupPts ?? 0 },
-      { label: T('h2h_classif_pts'), val: '—', muted: true },
-      { label: T('h2h_ko_pts'), val: score.koPts > 0 ? score.koPts : 0, muted: score.koPts === 0 },
+      { label: T('h2h_classif_pts'), val: (score.classificationPts ?? 0) > 0 ? score.classificationPts : 0, highlight: (score.classificationPts ?? 0) > 0 },
       { label: `${T('h2h_scorer1')}: ${score.ts1 || '—'}`, val: score.scorerPts1 > 0 ? `+${score.scorerPts1}` : 0, highlight: score.scorerPts1 > 0 },
       { label: `${T('h2h_scorer2')}: ${score.ts2 || '—'}`, val: score.scorerPts2 > 0 ? `+${score.scorerPts2}` : 0, highlight: score.scorerPts2 > 0 },
       { label: `${T('h2h_champion')}: ${score.champion || '—'}`, val: 0, muted: true },
@@ -5779,12 +5783,12 @@ function renderH2H() {
       <div class="h2h-name" style="text-align:center; margin-bottom:10px;" title="${name}">${name}${isYou?` <span class="you-tag" style="font-size:0.6rem;">DU</span>`:''}</div>
       <div style="text-align:center; margin-bottom:8px;">
         <div style="font-size:0.6rem; text-transform:uppercase; opacity:0.6;">${T('h2h_total_pts')} &nbsp;|&nbsp; ${T('h2h_rank')} #${rank}</div>
-        <div style="font-size:2rem; font-weight:800; line-height:1.1;">${score.pts ?? 0}</div>
+        <div style="font-size:2rem; font-weight:800; line-height:1.1;">${score.total ?? 0}</div>
       </div>
       ${rowsHtml}
       <div style="display:flex; justify-content:space-between; padding-top:5px; font-size:0.78rem; font-weight:800; border-top:2px solid rgba(0,0,0,0.15); margin-top:2px;">
         <span>${T('h2h_total')}</span>
-        <span>${score.pts ?? 0}</span>
+        <span>${score.total ?? 0}</span>
       </div>
     </div>`;
   }).join('');
@@ -5850,8 +5854,9 @@ function renderH2H() {
 }
 
 // ── Init H2H when switching to the tab ──
-function initH2HTab() {
+async function initH2HTab() {
   if (h2hPlayers.every(p => p === null)) h2hInitDefaults();
+  await fetchGrupClassStandings();
   renderH2H();
 }
 
@@ -6086,8 +6091,8 @@ function switchTab(tabId) {
 }
 
 // ═══════ WHAT'S NEW ═══════
-const BUILD_VERSION = 'v1.23.8';
-const BUILD_DATE = '24.06.2026 23:59';
+const BUILD_VERSION = 'v1.23.9';
+const BUILD_DATE    = '25.06.2026 11:00';
 (function(){ var _hb = document.getElementById('headerVersionBadge'); if(_hb) _hb.textContent = BUILD_VERSION; })();
 const WN_VERSION = 'v1.22';
 const WN_STORAGE_KEY = window.location.pathname.includes('staging') ? 'wnSeen_staging' : 'wnSeen_live';
