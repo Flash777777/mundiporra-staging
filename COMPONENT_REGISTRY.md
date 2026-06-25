@@ -1,6 +1,6 @@
 # ⚙️ Mundiporra Dashboard — Component Registry
 > Technische Vollreferenz inkl. Render-Chain für Claude
-> Stand: v1.23.0 · Repo: `Flash777777/mundiporra-staging` + `mundiporra-dashboard`
+> Stand: v1.23.8 · Repo: `Flash777777/mundiporra-staging` + `mundiporra-dashboard`
 > ⚠️ PFLICHT: Diese Datei wird bei jedem Push zu `index.html` im selben Commit aktualisiert.
 
 ---
@@ -11,7 +11,8 @@
 initDashboard()
 └── populateSetupModal()
     └── [User submits Setup Modal]
-        ├── buildLeaderboard()          → schreibt _lastLb
+        ├── fetchGrupClassStandings()   → befüllt _grupClassCache (await!)
+        ├── buildLeaderboard()          → schreibt _lastLb (inkl. classificationPts)
         └── switchTab('overview')
             └── [alle Overview-Renders]
 
@@ -20,271 +21,229 @@ switchTab('overview')
 │   └── getActual(game)
 ├── renderLastNextMatch()
 │   ├── groupByKickoff(games, windowMs)
-│   │   └── getKickoffISO(game)
 │   ├── matchCardFinished(g, a, lb)
-│   │   ├── scoreGame(tip, actual)
-│   │   └── calcPointDist(gameId, s1, s2)
 │   ├── matchCardLive(g, a)
-│   │   ├── fmtLiveStatus(a)
-│   │   ├── calcDisruptorLevel(g, a)
-│   │   │   └── calcPointDist(gameId, s1, s2)
-│   │   ├── getDisruptorLabel(level)
-│   │   ├── teamLogo(name, size)
-│   │   ├── redCardHtml(count)
-│   │   ├── calcPointDist(gameId, s1, s2)
-│   │   ├── _crowdPick(gid)
-│   │   └── scoreGameLive(tip, actual)
 │   └── matchCardUpcoming(g)
-│       ├── fmtCountdown(isoStr)
-│       └── _crowdPick(gid)
 ├── renderLiveGamesSummary(lb)
-│   ├── getActual(game)
-│   ├── getMyGroups()
-│   └── renderGameTipBlock(game, actual, ctx, isLive, lb)
-│       ├── getMyGroups()
-│       ├── fmtLiveStatus(a)
-│       ├── scoreGame(tip, actual)
-│       ├── scoreGameLive(tip, actual)
-│       ├── getSharedGroups(playerName)
-│       │   └── getMyGroups()
-│       ├── _crowdPick(gid)
-│       └── calcPointDist(gameId, s1, s2)
 ├── renderLatestGameSummary(lb)
-│   ├── getActual(game), groupByKickoff(), renderGameTipBlock()
 ├── renderUpcomingGamesSummary(lb)
-│   ├── getActual(game), getKickoffISO(), groupByKickoff(), renderGameTipBlock()
 ├── renderGroupSummary(lb)
-│   └── getMyGroups()
 └── renderKudos(lb)
 
-switchTab('leaderboard') → buildLeaderboard() → renderLeaderboard(lb) → getMyGroups()
-switchTab('group')       → renderGroupTab(lb) → getMyGroups(), renderGroupLatestGame()
-                            └── renderGroupLatestGame(members, lb)
-                                └── getActual, getKickoffISO, groupByKickoff, renderGameTipBlock
-switchTab('h2h')         → initH2HTab() → renderH2H() → getActual()
+switchTab('leaderboard') → buildLeaderboard() → renderLeaderboard(lb)
+switchTab('group')       → renderGroupTab(lb) → renderGroupLatestGame()
+switchTab('h2h')         → initH2HTab() → renderH2H()
 switchTab('games')       → filterGames() → renderGames()
-                            └── getActual, getKickoffISO, fmtLiveStatus, _crowdPick, scoreGame
-                            └── [click] showGameDetail() → getActual, renderGameTipBlock
+switchTab('kobracket')   → renderKOBracket()
+                            └── fetchKOLiveData()
+                            └── _buildKODesktop() / _buildKOMobile()
+                                └── _buildKOMatchCard()
+switchTab('gruppen')     → renderGruppen()
+                            └── fetchGrupClassStandings() → _grupClassCache
+                            └── _renderGruppenUI()
+                                └── calcTeamClassificationPoints(playerName, teamName)
 switchTab('champions')   → renderChampions()
-switchTab('stats')       → renderStats(lb) → getActual(), scoreGame()
-switchTab('search')      → [oninput] doSearch() → showPlayerDetail() → getActual, scoreGame
-switchTab('database')    → renderDatabase() → getActual()
+switchTab('stats')       → renderStats(lb)
+switchTab('search')      → [oninput] doSearch() → showPlayerDetail()
+switchTab('database')    → renderDatabase()
 switchTab('changelog')   → [statisch, kein Render]
 [Porra Card]             → showMyPorraCard() → buildLeaderboard()
+
+refreshDashboard()
+├── await fetchGrupClassStandings()   ← WICHTIG: muss awaited werden!
+├── await fetchESPN(...)
+└── buildLeaderboard() + Tab neu rendern
 ```
 
 ---
 
 ## 2. FUNKTIONS-REFERENZ (alphabetisch)
 
+### `_buildKODesktop(rounds)`
+- **Returns:** HTML-String (Desktop-Bracket, horizontal, zoom-fähig)
+- **Calls:** `_buildKOMatchCard()`
+- **Aufgerufen von:** `renderKOBracket()`
+
+### `_buildKOMobile(rounds)`
+- **Returns:** HTML-String (Mobile-Bracket, vertikal)
+- **Calls:** `_buildKOMatchCard()`
+- **Aufgerufen von:** `renderKOBracket()`
+
+### `_buildKOMatchCard(match, roundKey)`
+- **Returns:** HTML-String (einzelne KO-Match-Card)
+- **Aufgerufen von:** `_buildKODesktop()`, `_buildKOMobile()`
+
 ### `_crowdPick(gid)`
 - **Params:** `gid` — Game-ID (Number oder String, beide akzeptiert)
 - **Returns:** `{score, pct, label}` oder `null`
 - **Reads:** `ALL_PREDICTIONS`
-- **Aufgerufen von:** `matchCardLive`, `matchCardUpcoming`, `renderGames`, `renderGameTipBlock`
+
+### `_koCcMap(teamName)`
+- **Returns:** ISO Country Code (string) für Flagge
+- **Aufgerufen von:** `_koTeamRow()`
+
+### `_koTeamRow(team, score)`
+- **Returns:** HTML-String (Team-Zeile im KO-Bracket)
+- **Aufgerufen von:** `_buildKOMatchCard()`
+
+### `_koZoomIn() / _koZoomOut() / _koZoomReset() / _koApplyZoom()`
+- Desktop-Zoom für KO-Bracket
+
+### `_renderGruppenUI()`
+- Interne Render-Funktion für Gruppen-Tab
+- **Reads:** `_grupClassCache`
+- **Calls:** `calcTeamClassificationPoints()`
+- **DOM schreibt:** `#gruppenContent`
 
 ### `buildLeaderboard()`
 - **Returns:** Array; schreibt in `_lastLb`
-- **Reads:** `ALL_PARTICIPANTS`; **Writes:** `_lastLb`
-- **Aufgerufen von:** `switchTab('leaderboard')`, `showMyPorraCard()`
+- **Beinhaltet:** `classificationPts` → addiert zu `total`
+- **⚠️ Voraussetzung:** `_grupClassCache` muss befüllt sein
 
 ### `calcDisruptorLevel(g, a)`
 - **Returns:** `'upset'` | `'chaos'` | `null`
-- **Calls:** `calcPointDist()`
-- **Aufgerufen von:** `matchCardLive`
+
+### `calcGroupClassificationPoints(playerName, groupLetter)`
+- **Returns:** Number (0, 1, oder 3)
+- **Logik:** 3 Pkt exakte Position, 1 Pkt richtiges Team / falsche Pos, 0 sonst
+- **Reads:** `_grupClassCache`, `ALL_GROUP_PREDICTIONS`
+- **⚠️ Voraussetzung:** `_grupClassCache` befüllt
+
+### `calcPlayerScore(playerName)`
+- **Returns:** `{pts, exact, diff, trend, bonus, classificationPts, total}`
+- **Calls:** `calcGroupClassificationPoints()`
 
 ### `calcPointDist(gameId, s1, s2)`
 - **Returns:** `{p3, p2, p1, p0, pct3, pct2, pct1, pct0}`
-- **Reads:** `ALL_PREDICTIONS`
-- **Aufgerufen von:** `matchCardLive`, `matchCardFinished`, `renderGameTipBlock`, `calcDisruptorLevel`
+
+### `calcTeamClassificationPoints(playerName, teamName)`
+- **Returns:** Number (0, 1, oder 3)
+- **⚠️ Normalisierungs-Map** erforderlich: ESPN-Cache = UPPERCASE + Sondernamen
+  - `'South Korea'` → `'KOREA REP.'`
+  - `'Ivory Coast'` → `'CÔTE D\'IVOIRE'`
+  - `'Cape Verde'` → `'CABO VERDE'`
+  - alle anderen: `.toUpperCase()`
+- **Reads:** `ALL_GROUP_PREDICTIONS`, `_grupClassCache`
+- **Aufgerufen von:** `_renderGruppenUI()`
 
 ### `doSearch(q)`
 - **DOM schreibt:** `#searchResults`
-- **Calls:** `showPlayerDetail()`
-- **Aufgerufen von:** Search-Tab `oninput`
+
+### `fetchGrupClassStandings()`
+- **Returns:** Promise (async)
+- **Writes:** `_grupClassCache`
+- **⚠️ MUSS awaited werden** vor `buildLeaderboard()`
+
+### `fetchKOLiveData()`
+- **Returns:** Promise (async), ESPN KO-Spiele
+- **Aufgerufen von:** `renderKOBracket()`
 
 ### `filterGames(f, btn)`
 - **Calls:** `renderGames()`
-- **Aufgerufen von:** Games-Tab Filter-Buttons
 
-### `fmtCountdown(isoStr)`
-- **Returns:** String ("2h 34m") oder `null`
-- **Aufgerufen von:** `matchCardUpcoming`
-
-### `fmtLiveStatus(a)`
-- **Returns:** HTML-String ("45'" / "HZ" / "90'+3'")
-- **Aufgerufen von:** `matchCardLive`, `renderGames`, `renderGameTipBlock`
+### `fmtCountdown(isoStr)` / `fmtLiveStatus(a)`
+- Hilfsfunktionen für Zeit-/Status-Formatierung
 
 ### `getActual(game)`
 - **Returns:** `{status, s1, s2, ht1, ht2, clock, rc1, rc2, scoringEvents, …}` oder `null`
 - **Reads:** `liveGames`
-- **Aufgerufen von:** fast alle Render-Funktionen
 
-### `getDisruptorLabel(level)`
-- **Reads:** `USER` (für Sprache)
-- **Aufgerufen von:** `matchCardLive`
-
-### `getKickoffISO(game)`
-- **Returns:** ISO-String oder `null`
-- **Calls:** `getActual()`
-
-### `getMyGroups()`
-- **Returns:** Array von Gruppen-Namen des aktuellen Users
-- **Reads:** `USER`
-
-### `getSharedGroups(playerName)`
-- **Returns:** gemeinsame Gruppen von User + playerName
-- **Calls:** `getMyGroups()`
+### `getDisruptorLabel(level)` / `getKickoffISO(game)` / `getMyGroups()` / `getSharedGroups(p)`
+- Standard-Hilfsfunktionen
 
 ### `groupByKickoff(games, windowMs)`
-- **Returns:** Array von Arrays (Spielgruppen je Kickoff-Slot)
-- **Calls:** `getKickoffISO()`
-- **Typisches windowMs:** 8h = 28800000
+- **Returns:** Array von Arrays
 
-### `initDashboard()`
-- **Calls:** `populateSetupModal()`
-
-### `initH2HTab()`
-- **Calls:** `renderH2H()`
+### `initDashboard()` / `initH2HTab()`
+- Einstiegspunkte
 
 ### `matchCardFinished(g, a, lb)` — **FT Match Card**
 - **Returns:** HTML-String (`.match-card`)
-- **Reads:** `ALL_PREDICTIONS`, `USER`
 - **Calls:** `scoreGame()`, `calcPointDist()`, `getKickoffISO()`
-- **Elemente:** Card-Gradient, Points-Badge, FT-Pill, My Tip + Label, Punkteverteilung
 
 ### `matchCardLive(g, a)` — **Live Match Card**
 - **Returns:** HTML-String (`.match-card`)
-- **Reads:** `ALL_PREDICTIONS`, `USER`
-- **Calls:** `fmtLiveStatus`, `calcDisruptorLevel`, `getDisruptorLabel`, `teamLogo`, `redCardHtml`, `calcPointDist`, `_crowdPick`, `scoreGameLive`, `getKickoffISO`
-- **Elemente:** Disruptor Badge, Logos, Live Score, HZ-Score, Red Cards, Scorer Events Grid, My/Community Tip Row (blau), Punkteverteilung
+- **Calls:** `fmtLiveStatus`, `calcDisruptorLevel`, `teamLogo`, `calcPointDist`, `_crowdPick`, `scoreGameLive`
 
 ### `matchCardUpcoming(g)` — **Upcoming Match Card**
 - **Returns:** HTML-String (`.match-card`)
-- **Reads:** `ALL_PREDICTIONS`, `USER`
 - **Calls:** `getKickoffISO()`, `fmtCountdown()`, `_crowdPick()`
-- **Elemente:** Teams, Countdown Pill (`.cd-pill`), My/Community Tip Row
+
+### `refreshDashboard()`
+- **⚠️ MUSS `await fetchGrupClassStandings()`** vor `buildLeaderboard()`
+- Sonst: `classificationPts = 0` in `total`
 
 ### `renderChampions()`
-- **Reads:** `ALL_PREDICTIONS`, `ALL_PARTICIPANTS`, `USER`
 - **DOM schreibt:** `#champGrid`, `#scorerGrid`
 
 ### `renderDatabase()`
-- **Reads:** `ALL_PREDICTIONS`, `ALL_PARTICIPANTS`, `ALL_GAMES`, `GROUP_DATA`, `USER`
-- **DOM liest:** `#dbSearch`, `#dbGroupFilter`, `#dbGameFilter`, `#dbGameSelect`
 - **DOM schreibt:** `#databaseContent`
-- **Calls:** `getActual()`
 
 ### `renderGameTipBlock(game, actual, contextPlayers, isLive, lb)` — **Tip Block**
-- **Returns:** HTML-String (kein `.match-card` — Spieler-Tipp-Liste)
-- **Reads:** `ALL_PREDICTIONS`, `GROUP_DATA`, `USER`
-- **Calls:** `getMyGroups`, `fmtLiveStatus`, `scoreGame`, `scoreGameLive`, `getSharedGroups`, `_crowdPick`, `calcPointDist`
+- **Returns:** HTML-String
 - **CSS je Card:** `.correct-exact` | `.correct-diff` | `.correct-1x2` | `.wrong`
-- **Aufgerufen von:** `renderLiveGamesSummary`, `renderLatestGameSummary`, `renderUpcomingGamesSummary`, `renderGroupLatestGame`, `showGameDetail`
 
 ### `renderGames()`
-- **Reads:** `ALL_PREDICTIONS`, `ALL_GAMES`, `USER`
 - **DOM schreibt:** `#gamesGrid`
-- **Calls:** `getActual`, `getKickoffISO`, `fmtLiveStatus`, `_crowdPick`, `scoreGame`, `showGameDetail`
 
 ### `renderGroupLatestGame(members, lb)`
 - **DOM schreibt:** `#groupLatestGame`
-- **Calls:** `getActual`, `getKickoffISO`, `groupByKickoff`, `renderGameTipBlock`
-
-### `renderGroupSummary(lb)`
-- **DOM schreibt:** `#groupSummaryTitle`, `#groupSummaryContent`
-- **Calls:** `getMyGroups()`
 
 ### `renderGroupTab(lb)`
-- **Reads:** `GROUP_DATA`, `USER`
 - **DOM schreibt:** `#groupTabContent`
-- **Calls:** `getMyGroups()`, `renderGroupLatestGame()`
+- Zeigt Klassifikationspunkte (🏅-Spalte) aus `classificationPts`
+
+### `renderGruppen()`
+- **DOM schreibt:** `#gruppenContent`
+- **Calls:** `fetchGrupClassStandings()`, `_renderGruppenUI()`
+- Zeigt ESPN-Gruppenstandings + Team-Level 🏅 Punkte
 
 ### `renderH2H()`
-- **Reads:** `ALL_PREDICTIONS`, `ALL_GAMES`, `USER`, `_lastLb`
-- **DOM schreibt:** `#h2hSelectorRows`, `#h2hAddBtn`, `#h2hPlayerCount`, `#h2hSummary`, `#h2hGamesWrap`
-- **Calls:** `getActual()`
+- **DOM schreibt:** `#h2hSelectorRows`, `#h2hSummary`, `#h2hGamesWrap`
+
+### `renderKOBracket()`
+- **DOM schreibt:** `#koBracketContent`
+- **Calls:** `fetchKOLiveData()`, `_buildKODesktop()`, `_buildKOMobile()`
+- Features: Desktop-Zoom, Mobile-Ansicht, Tipping-Integration
 
 ### `renderKPIs(lb)`
-- **Reads:** `ALL_GAMES`, `USER`, `_lastLb`
-- **DOM schreibt:** `#kpiGrid`, `#kpiCollapsWrap`, `#kpiToggleBtn`
-- **Calls:** `getActual()`
+- **DOM schreibt:** `#kpiGrid`
 
-### `renderKudos(lb)`
-- **DOM schreibt:** `#kuDosSplit`
-
-### `renderLastNextMatch()`
-- **Reads:** `ALL_GAMES`, `_lastLb`
-- **DOM schreibt:** `#lastMatchTitle`, `#lastMatchContent`, `#nextMatchTitle`, `#nextMatchContent`
-- **Calls:** `getActual`, `getKickoffISO`, `groupByKickoff`, `matchCardFinished`, `matchCardLive`, `matchCardUpcoming`
-
-### `renderLatestGameSummary(lb)`
-- **Reads:** `ALL_GAMES`
-- **DOM schreibt:** `#latestGameSummaryContent`, `#latestGameSummaryTitle`
-- **Calls:** `getActual`, `groupByKickoff`, `renderGameTipBlock`
+### `renderKudos(lb)` / `renderLastNextMatch()` / `renderLatestGameSummary(lb)` / `renderUpcomingGamesSummary(lb)`
+- Standard Overview-Renders
 
 ### `renderLeaderboard(lb)`
-- **Reads:** `GROUP_DATA`, `USER`
 - **DOM schreibt:** `#lbBody`
-- **Calls:** `getMyGroups()`
 
 ### `renderLiveGamesSummary(lb)`
-- **Reads:** `ALL_GAMES`, `GROUP_DATA`, `USER`, `liveGames`
-- **DOM schreibt:** `#liveGamesSummaryBlock` (display), `#liveGamesSummaryContent`
-- **Calls:** `getActual`, `getMyGroups`, `renderGameTipBlock`
-- **Besonderheit:** Zeigt nur Gruppen-Mitglieder + USER
+- **DOM schreibt:** `#liveGamesSummaryBlock`, `#liveGamesSummaryContent`
 
 ### `renderStats(lb)`
-- **Reads:** `ALL_PREDICTIONS`, `ALL_GAMES`, `GROUP_DATA`, `USER`
-- **DOM schreibt:** `#accBars`, `#yourAccTitle`, `#yourAccBars`, `#upsetGrid`, `#contrarianContent`, `#groupRankChart`, `#consensusContent`, `#splitContent`
-- **Calls:** `getActual()`, `scoreGame()`
+- **DOM schreibt:** `#accBars`, `#yourAccBars`, `#upsetGrid`, `#contrarianContent`, `#groupRankChart`, `#consensusContent`, `#splitContent`
 
-### `renderUpcomingGamesSummary(lb)`
-- **Reads:** `ALL_GAMES`
-- **DOM schreibt:** `#upcomingGamesSummaryContent`, `#upcomingGamesSummaryTitle`
-- **Calls:** `getActual`, `getKickoffISO`, `groupByKickoff`, `renderGameTipBlock`
+### `scoreGame(tip, actual)` / `scoreGameLive(tip, actual)`
+- **Returns:** 0 | 1 | 2 | 3
 
-### `scoreGame(tip, actual)`
-- **Returns:** `0` | `1` | `2` | `3`
-- **Aufgerufen von:** `matchCardFinished`, `renderGames`, `renderGameTipBlock`, `renderStats`, `showPlayerDetail`
-
-### `scoreGameLive(tip, actual)`
-- **Returns:** `0` | `1` | `2` | `3` | `null`
-- **Aufgerufen von:** `matchCardLive`, `renderGameTipBlock`
-
-### `showGameDetail(gameId)`
-- **Reads:** `ALL_PREDICTIONS`, `ALL_GAMES`, `_lastLb`
-- **DOM schreibt:** `#gameDetailTitle`, `#gameDetailContent`, `#gameDetailPanel` (visible)
-- **Calls:** `getActual()`, `renderGameTipBlock()`
-
-### `showMyPorraCard()`
-- **Reads:** `USER`, `_lastLb`
-- **DOM schreibt:** `#porra-card-modal`, `#porra-card-modal-card`, `#porraCardNameEl`
-- **Calls:** `buildLeaderboard()`
-
-### `showPlayerDetail(name)`
-- **Reads:** `ALL_PREDICTIONS`, `ALL_PARTICIPANTS`, `ALL_GAMES`
-- **DOM schreibt:** `#searchResults`
-- **Calls:** `getActual()`, `scoreGame()`
+### `showGameDetail(gameId)` / `showMyPorraCard()` / `showPlayerDetail(name)`
+- Detail-Ansichten
 
 ### `teamLogo(name, size)`
 - **Returns:** HTML-String (`<img>` oder Emoji-Fallback)
-- **Aufgerufen von:** `matchCardLive`
 
 ---
 
 ## 3. DOM-ID REGISTER (Kurzreferenz)
 
-| ID                        | Tab          | Schreibt                    |
-|---------------------------|--------------|-----------------------------|
+| ID                        | Tab          | Schreibt                     |
+|---------------------------|--------------|------------------------------|
 | `accBars`                 | stats        | `renderStats`               |
 | `champGrid`               | champions    | `renderChampions`           |
 | `consensusContent`        | stats        | `renderStats`               |
 | `contrarianContent`       | stats        | `renderStats`               |
 | `databaseContent`         | database     | `renderDatabase`            |
-| `dbGameFilter`            | database     | static (filter select)      |
-| `dbGroupFilter`           | database     | static (filter select)      |
-| `dbSearch`                | database     | static (input)              |
+| `dbGameFilter`            | database     | static                       |
+| `dbGroupFilter`           | database     | static                       |
+| `dbSearch`                | database     | static                       |
 | `gameDetailContent`       | games        | `showGameDetail`            |
 | `gameDetailPanel`         | games        | `showGameDetail`            |
 | `gameDetailTitle`         | games        | `showGameDetail`            |
@@ -292,36 +251,27 @@ switchTab('changelog')   → [statisch, kein Render]
 | `groupLatestGame`         | group        | `renderGroupLatestGame`     |
 | `groupRankChart`          | stats        | `renderStats`               |
 | `groupSummaryContent`     | overview     | `renderGroupSummary`        |
-| `groupSummaryTitle`       | overview     | `renderGroupSummary`        |
 | `groupTabContent`         | group        | `renderGroupTab`            |
+| `gruppenContent`          | gruppen      | `_renderGruppenUI`          |
 | `h2hAddBtn`               | h2h          | `renderH2H`                 |
 | `h2hGamesWrap`            | h2h          | `renderH2H`                 |
-| `h2hPlayerCount`          | h2h          | `renderH2H`                 |
-| `h2hSelectorRows`         | h2h          | `renderH2H`                 |
 | `h2hSummary`              | h2h          | `renderH2H`                 |
-| `headerVersionBadge`      | global       | static                      |
-| `kpiCollapsWrap`          | overview     | `renderKPIs`                |
+| `headerVersionBadge`      | global       | static                       |
+| `koBracketContent`        | kobracket    | `renderKOBracket`           |
 | `kpiGrid`                 | overview     | `renderKPIs`                |
-| `kpiToggleBtn`            | overview     | `renderKPIs`                |
 | `kuDosSplit`              | overview     | `renderKudos`               |
 | `lastMatchContent`        | overview     | `renderLastNextMatch`       |
-| `lastMatchTitle`          | overview     | `renderLastNextMatch`       |
 | `latestGameSummaryContent`| overview     | `renderLatestGameSummary`   |
-| `latestGamesBody`         | overview     | collapse-toggle             |
 | `lbBody`                  | leaderboard  | `renderLeaderboard`         |
 | `liveGamesSummaryBlock`   | overview     | `renderLiveGamesSummary`    |
-| `liveGamesSummaryContent` | overview     | `renderLiveGamesSummary`    |
 | `nextMatchContent`        | overview     | `renderLastNextMatch`       |
-| `nextMatchTitle`          | overview     | `renderLastNextMatch`       |
 | `porra-card-modal`        | global       | `showMyPorraCard`           |
-| `porra-card-modal-card`   | global       | `showMyPorraCard`           |
 | `scorerGrid`              | champions    | `renderChampions`           |
-| `searchInput`             | search       | static                      |
+| `searchInput`             | search       | static                       |
 | `searchResults`           | search       | `doSearch`                  |
-| `setupModal`              | global       | static                      |
+| `setupModal`              | global       | static                       |
 | `splitContent`            | stats        | `renderStats`               |
 | `upcomingGamesSummaryContent` | overview | `renderUpcomingGamesSummary` |
-| `upcomingGamesBody`       | overview     | collapse-toggle             |
 | `upsetGrid`               | stats        | `renderStats`               |
 | `yourAccBars`             | stats        | `renderStats`               |
 
@@ -329,19 +279,21 @@ switchTab('changelog')   → [statisch, kein Render]
 
 ## 4. GLOBALE VARIABLEN
 
-| Variable           | Typ    | Inhalt                                               | Schreibt wer          |
-|--------------------|--------|------------------------------------------------------|-----------------------|
-| `ALL_PREDICTIONS`  | Object | Tipps aller 154 Spieler `{name:{gameId:{g1,g2}}}`  | initial (hardcoded)   |
-| `ALL_PARTICIPANTS` | Array  | Spieler-Metadaten (Name, Gruppe, Champion, TS1, TS2) | initial (hardcoded)   |
-| `ALL_GAMES`        | Array  | Spielplan 72 Spiele `{id, team1, team2, group, …}`  | initial (hardcoded)   |
-| `GROUP_DATA`       | Object | Porra-Gruppen → Mitglieder `{Gruppe:[Namen]}`       | initial (hardcoded)   |
-| `USER`             | Object | `{player, group, lang, tz}` aktiver User             | `setupModal` submit  |
-| `_lastLb`          | Array  | Letztes Leaderboard-Ergebnis                         | `buildLeaderboard()` |
-| `liveGames`        | Object | ESPN Live/FT-Daten `{key: actual, keyRev: actual}`   | ESPN-Fetch-Pipeline   |
-| `HARDCODED_RESULTS`| Object | Hardcodierte FT-Ergebnisse ST1/ST2                   | initial (hardcoded)   |
-| `BUILD_VERSION`    | String | z.B. `'v1.19.15'`                                    | Manuell je Push       |
-| `BUILD_DATE`       | String | z.B. `'20.06.2026 14:30'`                            | Manuell je Push       |
-| `WN_VERSION`       | String | z.B. `'v1.19'` (Modal-Trigger)                       | Manuell bei Features  |
+| Variable              | Typ    | Inhalt                                               | Schreibt wer            |
+|-----------------------|--------|------------------------------------------------------|-------------------------|
+| `ALL_PREDICTIONS`     | Object | Tipps aller 154 Spieler `{name:{gameId:{g1,g2}}}`   | initial (hardcoded)     |
+| `ALL_GROUP_PREDICTIONS` | Object | Gruppenphase-Tipps `{name:{pos:{1A,2A,…}}}`        | initial (hardcoded)     |
+| `ALL_PARTICIPANTS`    | Array  | Spieler-Metadaten (Name, Gruppe, Champion, TS1, TS2) | initial (hardcoded)     |
+| `ALL_GAMES`           | Array  | Spielplan 72 Spiele                                  | initial (hardcoded)     |
+| `GROUP_DATA`          | Object | Porra-Gruppen → Mitglieder                           | initial (hardcoded)     |
+| `USER`                | Object | `{player, group, lang, tz}`                          | `setupModal` submit     |
+| `_lastLb`             | Array  | Letztes Leaderboard-Ergebnis                         | `buildLeaderboard()`   |
+| `liveGames`           | Object | ESPN Live/FT-Daten `{key: actual, keyRev: actual}`   | ESPN-Fetch-Pipeline     |
+| `_grupClassCache`     | Object | ESPN-Gruppenstandings `{A:[{name,pos,…}],…}`         | `fetchGrupClassStandings()` |
+| `HARDCODED_RESULTS`   | Object | Hardcodierte FT-Ergebnisse ST1/ST2                   | initial (hardcoded)     |
+| `BUILD_VERSION`       | String | z.B. `'v1.23.8'`                                     | Manuell je Push         |
+| `BUILD_DATE`          | String | z.B. `'25.06.2026 08:00'`                            | Manuell je Push         |
+| `WN_VERSION`          | String | z.B. `'v1.23'`                                       | Manuell bei Features    |
 
 ---
 
@@ -349,27 +301,23 @@ switchTab('changelog')   → [statisch, kein Render]
 
 | Klasse                    | Kontext                 | Bedeutung                                    |
 |---------------------------|-------------------------|----------------------------------------------|
-| `.card` / `.card-title` | global                  | Standard-Card / Überschrift                  |
+| `.card` / `.card-title`   | global                  | Standard-Card / Überschrift                  |
 | `.match-card`             | matchCard-Funktionen    | Basis-Klasse aller Spiel-Karten              |
 | `.kpi-card`               | KPI Grid                | Einzelne KPI-Kachel                          |
-| `.kpi-pin-btn.pinned`     | KPI Grid                | Fixierter Pin (`color: var(--accent)`)       |
-| `.you-row` / `.you-tag`   | Leaderboard, global     | Eigene Zeile hervorgehoben / "Du"-Badge      |
+| `.you-row` / `.you-tag`   | Leaderboard, global     | Eigene Zeile / "Du"-Badge                    |
 | `.player-tip-card`        | `renderGameTipBlock`    | Tipp-Karte je Kontext-Spieler                |
 | `.correct-exact`          | `.player-tip-card`      | 3 Punkte (exakt)                             |
 | `.correct-diff`           | `.player-tip-card`      | 2 Punkte (Tordifferenz)                      |
 | `.correct-1x2`            | `.player-tip-card`      | 1 Punkt (Tendenz)                            |
 | `.wrong`                  | `.player-tip-card`      | 0 Punkte                                     |
-| `.badge-exact/diff/trend/wrong` | Games-Tab        | Tipp-Bewertungs-Badges                       |
 | `.disruptor-badge`        | Live Match Card         | upset / chaos Badge                          |
-| `.disruptor-badge.blink`  | Live Match Card         | Blinkt ab Minute 75 (chaos)                  |
 | `.live-badge`             | global                  | Rotes "LIVE"-Badge                           |
-| `.match-status-live`      | Live Match Card         | Live-Status-Anzeige                          |
-| `.rank-badge`             | `renderGameTipBlock`    | "#N" Rang-Badge                              |
-| `.group-tag`              | `renderGameTipBlock`    | Gruppen-Kürzel-Tag                           |
-| `.cd-pill` / `.cd-val`    | Upcoming Match Card     | Countdown-Pill (Live-Update via `data-kickoff`) |
+| `.cd-pill` / `.cd-val`    | Upcoming Match Card     | Countdown-Pill                               |
 | `.pill.pill-green`        | FT Match Card           | "FT"-Status-Pill                             |
 | `.staging-banner`         | global                  | Roter Staging-Hinweis (nur staging-URL)      |
 | `.tab-btn.active`         | Tab-Nav                 | Aktiver Tab                                  |
+| `.ko-bracket-wrap`        | KO-Bracket Tab          | Wrapper für Bracket-Ansicht                  |
+| `.ko-match-card`          | KO-Bracket Tab          | Einzelne KO-Match-Card                       |
 
 ---
 
@@ -382,8 +330,21 @@ switchTab('changelog')   → [statisch, kein Render]
 | `group`      | 👥 Meine Gruppe       | `renderGroupTab()`              |
 | `h2h`        | ⚔️ Vergleich          | `initH2HTab()`                  |
 | `games`      | ⚽ Spiele             | `filterGames()`                 |
+| `kobracket`  | ⚔️ KO-Bracket         | `renderKOBracket()`             |
+| `gruppen`    | 🏟️ Gruppen            | `renderGruppen()`               |
 | `champions`  | ⭐ Campeones          | `renderChampions()`             |
 | `stats`      | 📊 Statistiken        | `renderStats(_lastLb)`          |
 | `search`     | 🔍 Suche              | passiv — `doSearch()` on input  |
 | `database`   | 🗄️ Datenbasis         | `renderDatabase()`              |
 | `changelog`  | 📝 Changelog          | statisch — kein Render           |
+
+---
+
+## 7. BEKANNTE OFFENE BUGS
+
+| # | Bug | Prio | Fix-Ansatz |
+|---|-----|------|------------|
+| B1 | `calcTeamClassificationPoints`: ESPN UPPERCASE vs. Mixed-Case Tipper-Namen → immer 0 | 🔴 | Normalisierungs-Map + `.toUpperCase()` |
+| B2 | `total` im Ranking falsch: `classificationPts` = 0 wegen Timing | 🔴 | `fetchGrupClassStandings()` awaiten vor `buildLeaderboard()` |
+| B3 | Live-Button zeigt ×2 | 🟠 | `Set` mit kanonischem Key |
+| B4 | KPI „Gespielt" zeigt falschen Wert | 🟢 | `TOTAL_GAMES = 72` hardcoden |

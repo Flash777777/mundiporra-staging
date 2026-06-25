@@ -1,6 +1,6 @@
 # 🗺️ Mundiporra Dashboard — UI Map
 > Kanonische Komponentennamen für Patrick ↔ Claude Kommunikation
-> Stand: v1.23.0 · Repo: `Flash777777/mundiporra-staging` + `mundiporra-dashboard`
+> Stand: v1.23.8 · Repo: `Flash777777/mundiporra-staging` + `mundiporra-dashboard`
 
 **Konvention:** `Kanonischer Name` → `fn()` / `#id` / `.class`
 Wenn Patrick "X" sagt → Claude adressiert exakt den Code hinter "X". Keine Interpretation.
@@ -18,8 +18,9 @@ Wenn Patrick "X" sagt → Claude adressiert exakt den Code hinter "X". Keine Int
 │─────────────────────────────────────────────────────────│
 │  TAB-NAV BAR                                            │
 │  [📋 Zusammenfassung] [🏆 Rangliste] [👥 Gruppe]        │
-│  [⚔️ Vergleich] [⚽ Spiele] [⭐ Campeones]              │
-│  [📊 Statistiken] [🔍 Suche] [🗄️ Datenbasis] [📝 Log]  │
+│  [⚔️ Vergleich] [⚽ Spiele] [⚔️ Bracket] [🏟️ Gruppen]   │
+│  [⭐ Campeones] [📊 Statistiken] [🔍 Suche]             │
+│  [🗄️ Datenbasis] [📝 Log]                               │
 └─────────────────────────────────────────────────────────┘
 ```
 
@@ -94,7 +95,7 @@ Wenn Patrick "X" sagt → Claude adressiert exakt den Code hinter "X". Keine Int
 
 | Kanonischer Name              | Funktion / ID                  | Beschreibung                      |
 |-------------------------------|--------------------------------|-----------------------------------|
-| **Group Tab Leaderboard**     | `renderGroupTab()` / `#groupTabContent` | Gruppen-interne Rangliste  |
+| **Group Tab Leaderboard**     | `renderGroupTab()` / `#groupTabContent` | Gruppen-interne Rangliste inkl. Klassifikationspunkte (🏅) |
 | **Latest Game in Group**      | `renderGroupLatestGame()` / `#groupLatestGame` | Letztes Spiel mit Gruppen-Tipps |
 
 ---
@@ -118,7 +119,52 @@ Wenn Patrick "X" sagt → Claude adressiert exakt den Code hinter "X". Keine Int
 
 ---
 
-## TAB 6 — ⭐ Campeones (`#tab-champions`)
+## TAB 6 — ⚔️ KO-Bracket (`#tab-kobracket`) ← NEU seit v1.23.0
+
+```
+┌─────────────────────────────────────────────────────────┐
+│  KO BRACKET VIEW         #koBracketContent              │
+│  Desktop: horizontales Bracket-Layout (zoom-fähig)      │
+│  Mobile:  vertikales Bracket-Layout                     │
+│─────────────────────────────────────────────────────────│
+│  Runden: Achtelfinale → Viertelfinale → Halbfinale      │
+│           → Spiel um Platz 3 → Finale                   │
+│  Jede Matchcard: Team A vs Team B, Ergebnis/Tipp        │
+└─────────────────────────────────────────────────────────┘
+```
+
+| Kanonischer Name          | Funktion / ID                   | Beschreibung                          |
+|---------------------------|---------------------------------|---------------------------------------|
+| **KO Bracket Container**  | `renderKOBracket()` / `#koBracketContent` | Gesamter Bracket-View         |
+| **KO Match Card**         | `_buildKOMatchCard()`           | Einzelne Match-Card im Bracket        |
+| **KO Desktop Layout**     | `_buildKODesktop()`             | Desktop-Bracket (horizontal, zoom)    |
+| **KO Mobile Layout**      | `_buildKOMobile()`              | Mobile-Bracket (vertikal)             |
+| **KO Zoom Controls**      | `_koZoomIn/Out/Reset()`         | Zoom-Buttons Desktop                  |
+
+---
+
+## TAB 7 — 🏟️ Gruppen (`#tab-gruppen`) ← NEU seit v1.21.0
+
+```
+┌─────────────────────────────────────────────────────────┐
+│  GROUP STANDINGS (ESPN)  #gruppenContent                │
+│  Gruppe A … Gruppe L                                    │
+│  Je Gruppe: Tabelle mit Pos/Team/Sp/S/U/N/Tore/Punkte   │
+│  Team-Name + 🏅 <Klassifikationspunkte> des Users       │
+│  Quali-Ampel (grün/gelb/rot)                            │
+└─────────────────────────────────────────────────────────┘
+```
+
+| Kanonischer Name              | Funktion / ID                      | Beschreibung                               |
+|-------------------------------|------------------------------------|--------------------------------------------|
+| **Gruppen Container**         | `renderGruppen()` / `#gruppenContent` | Alle 12 Gruppen-Tabellen                |
+| **Gruppen Render UI**         | `_renderGruppenUI()`               | Interne Render-Funktion für Standings-UI   |
+| **Group Classification Pts**  | `calcTeamClassificationPoints()`   | Punkte pro Team für den User (ESPN-basiert)|
+| **Group Class Standings Fetch** | `fetchGrupClassStandings()`      | ESPN-Standings in `_grupClassCache` laden  |
+
+---
+
+## TAB 8 — ⭐ Campeones (`#tab-champions`)
 
 | Kanonischer Name      | Funktion / ID                  | Beschreibung                          |
 |-----------------------|--------------------------------|---------------------------------------|
@@ -127,7 +173,7 @@ Wenn Patrick "X" sagt → Claude adressiert exakt den Code hinter "X". Keine Int
 
 ---
 
-## TAB 7 — 📊 Statistiken (`#tab-stats`)
+## TAB 9 — 📊 Statistiken (`#tab-stats`)
 
 | Kanonischer Name          | ID                    | Beschreibung                                    |
 |---------------------------|-----------------------|-------------------------------------------------|
@@ -141,25 +187,25 @@ Wenn Patrick "X" sagt → Claude adressiert exakt den Code hinter "X". Keine Int
 
 ---
 
-## TAB 8 — 🔍 Suche (`#tab-search`)
+## TAB 10 — 🔍 Suche (`#tab-search`)
 
 | Kanonischer Name      | Funktion / ID            | Beschreibung                       |
-|-----------------------|--------------------------|------------------------------------|
-| **Search Input**      | `#searchInput`           | Freitext-Eingabe Spielername       |
+|-----------------------|--------------------------|-------------------------------------|
+| **Search Input**      | `#searchInput`           | Freitext-Eingabe Spielername        |
 | **Player Detail Card**| `doSearch()` / `#searchResults` | Dynamische Detail-Card je Spieler |
 
 ---
 
-## TAB 9 — 🗄️ Datenbasis (`#tab-database`)
+## TAB 11 — 🗄️ Datenbasis (`#tab-database`)
 
 | Kanonischer Name      | Funktion / ID            | Beschreibung                       |
-|-----------------------|--------------------------|------------------------------------|
+|-----------------------|--------------------------|-------------------------------------|
 | **Filter Bar**        | `#dbSearch`, `#dbGroupFilter`, `#dbGameFilter` | Such- und Filter-Leiste |
 | **Database Table**    | `renderDatabase()` / `#databaseContent` | Alle 154 Spieler × Tipps |
 
 ---
 
-## TAB 10 — 📝 Changelog (`#tab-changelog`)
+## TAB 12 — 📝 Changelog (`#tab-changelog`)
 
 Statisches HTML. Keine Render-Funktion. Karten chronologisch (neueste oben), eine Karte (`.card`) je Version.
 
