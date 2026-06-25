@@ -1,6 +1,5 @@
 {
-  "version": "v1.23.12",
-  "notify": true,
-  "force": true,
-  "message": "🆕 Update v1.23.12: Neuer KO-Baum Tab ⚔️, Gruppen-Tab mit Klassifizierungspunkten 🏟️, und Klassifizierungspunkte sind jetzt korrekt im Gesamtranking und allen KPI-Karten enthalten 🏅. Bitte Seite neu laden!"
+  "version": "v1.23.13",
+  "notify": false,
+  "force": false
 }
