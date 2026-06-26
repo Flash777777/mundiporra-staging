@@ -1129,7 +1129,13 @@
   <div class="card" style="margin-bottom:14px;">
   <div class="card" style="margin-bottom:14px;">
   <div class="card" style="margin-bottom:14px;">
-          <div class="card-title">v1.23.17 — 25. Juni 2026 (Silent Fix)</div>
+          <div class="card-title">v1.23.19 — 26. Juni 2026 (Silent Fix)</div>
+          <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
+            <li>🔧 <strong>_normESPN USA-Mapping Fix</strong> — 'USA'/'United States' wurde fälschlicherweise auf 'UNITED STATES' normiert; korrekte USA-Platzierungstipps erhielten dadurch 0 statt 2 Klassifikationspunkte</li>
+          </ul>
+        </div>
+        <div class="card" style="margin-bottom:14px;">
+        <div class="card-title">v1.23.17 — 25. Juni 2026 (Silent Fix)</div>
           <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
             <li>🎮 <strong>Simulator baseRankMap Fix</strong> — Ausgangsrang stimmt jetzt mit der echten Rangliste überein: Rang-Increment nur noch bei sinkendem <code>total</code>, nicht mehr bei <code>pts</code>/<code>exact</code>-Differenz bei gleichem Total</li>
           </ul>
@@ -5104,8 +5110,8 @@ function _normESPN(name) {
     'türkiye':        'TURKIYE',
     'turkiye':        'TURKIYE',
     'turkey':         'TURKIYE',
-    'usa':            'UNITED STATES',
-    'united states':  'UNITED STATES',
+    'usa':            'USA',
+    'united states':  'USA',
   };
   return m[name.toLowerCase().trim()] || name.toUpperCase();
 }
@@ -6150,8 +6156,8 @@ function switchTab(tabId) {
 }
 
 // ═══════ WHAT'S NEW ═══════
-const BUILD_VERSION = 'v1.23.18';
-const BUILD_DATE    = '26.06.2026 11:00';
+const BUILD_VERSION = 'v1.23.19';
+const BUILD_DATE    = '26.06.2026 14:30';
 (function(){ var _hb = document.getElementById('headerVersionBadge'); if(_hb) _hb.textContent = BUILD_VERSION; })();
 const WN_VERSION = 'v1.23';
 const WN_STORAGE_KEY = window.location.pathname.includes('staging') ? 'wnSeen_staging' : 'wnSeen_live';
