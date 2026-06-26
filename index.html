@@ -6150,8 +6150,8 @@ function switchTab(tabId) {
 }
 
 // ═══════ WHAT'S NEW ═══════
-const BUILD_VERSION = 'v1.23.17';
-const BUILD_DATE    = '25.06.2026 16:00';
+const BUILD_VERSION = 'v1.23.18';
+const BUILD_DATE    = '26.06.2026 11:00';
 (function(){ var _hb = document.getElementById('headerVersionBadge'); if(_hb) _hb.textContent = BUILD_VERSION; })();
 const WN_VERSION = 'v1.23';
 const WN_STORAGE_KEY = window.location.pathname.includes('staging') ? 'wnSeen_staging' : 'wnSeen_live';
@@ -6420,14 +6420,19 @@ function _simPool(lb){
 function _simDelta(name,games){
   const preds=ALL_PREDICTIONS[name]||{};
   let simPts=0;
+  let currentLivePts=0;
   for(const g of games){
     const st=SIM_STATE[String(g.id)];
     // Only count games that are toggled ON by the user
     if(!st||!st.active)continue;
     const t=preds[String(g.id)];if(!t)continue;
     simPts+=(_calcScore(t,{s1:st.s1,s2:st.s2})||0);
+    // Subtract live pts already counted in p.total for this active game
+    const actual=getActual(g);
+    const cl=scoreGameLive(t,actual);
+    if(cl!==null)currentLivePts+=cl;
   }
-  return{simPts,delta:simPts};
+  return{simPts,currentLivePts,delta:simPts-currentLivePts};
 }
 function _crowdPick(gid){
   const gidStr=String(gid);
