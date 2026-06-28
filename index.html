@@ -1344,6 +1344,13 @@
 <div class="page">
   <div class="section-title">📝 Changelog</div>
 
+<div class="card" style="margin-bottom:14px;">
+  <div class="card-title">v2.0.46-cc-col — 29. Juni 2026 (Feature + Fix)</div>
+  <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
+    <li>⚠️ <strong>Champion-Change-Spalte</strong> — Neue Spalte in der Rangliste (KO-Modus): zeigt −5 für Spieler die ihren Champion-Tipp geändert haben (mit Tooltip)</li>
+    <li>🔔 <strong>KO-Phasen-Modal Reset</strong> — localStorage-Key an WN_VERSION gekoppelt; Modal erscheint wieder bei neuem Release</li>
+  </ul>
+</div>
 <div class="card" style="margin-bottom:14px;border-left:3px solid #ccc;">
   <div class="card" style="margin-bottom:14px;">
   <div class="card-title">v2.0.46 — 28. Juni 2026 (Feature)</div>
@@ -2853,6 +2860,7 @@ const TRANSLATIONS = {
     br_method_greedy: '~ Greedy',
     kpi_best_rank_tooltip: 'Best achievable final rank (Greedy estimate based on open KO slots)',
     ko_lb_best_rank: '↑ Max',
+    lb_cc_tooltip: 'Champion changed − 5pt penalty',
     kpi_ko_games: 'KO Games left',
     kpi_ko_pts_total: '⚔️ KO PTS',
     kpi_ko_pts_game: 'KO Game Pts',
@@ -3240,6 +3248,7 @@ const TRANSLATIONS = {
     br_method_greedy: '~ Greedy',
     kpi_best_rank_tooltip: 'Bester erreichbarer Endrang (Greedy-Schätzung über offene KO-Slots)',
     ko_lb_best_rank: '↑ Max',
+    lb_cc_tooltip: 'Champion geändert − 5 Punkte Abzug',
     kpi_ko_games: 'KO-Spiele',
     kpi_ko_pts_total: '⚔️ KO PTS',
     kpi_ko_pts_game: 'KO Spielpunkte',
@@ -3624,6 +3633,7 @@ const TRANSLATIONS = {
     br_method_greedy: '~ Greedy',
     kpi_best_rank_tooltip: 'Mejor clasificación final alcanzable (estimación Greedy)',
     ko_lb_best_rank: '↑ Máx',
+    lb_cc_tooltip: 'Campeón cambiado − 5 puntos de penalización',
     kpi_ko_games: 'Partidos KO',
     kpi_ko_pts_total: '⚔️ PTS KO',
     kpi_ko_pts_game: 'Pts partido KO',
@@ -6385,7 +6395,8 @@ function renderLeaderboard(lb) {
         <th title="KO Scorer-Bonus (×Multiplikator)" style="color:var(--blue-light);font-size:0.68rem;">KO🎯</th>
         <th title="Vorläufige Live-Punkte (laufendes Spiel)" style="color:var(--red);font-size:0.68rem;">🔴</th>
         <th title="Champion-Bonus" style="color:#d4af37;font-size:0.68rem;">🏆</th>
-        <th title="${T('kpi_best_rank_tooltip')}" style="color:var(--muted);font-size:0.68rem;">${T('ko_lb_best_rank')}</th>`;
+        <th title="${T('kpi_best_rank_tooltip')}" style="color:var(--muted);font-size:0.68rem;">${T('ko_lb_best_rank')}</th>
+        <th title="${T('lb_cc_tooltip')}" style="color:#e53935;font-size:0.68rem;">⚠️</th>`;
     } else {
       theadRow.innerHTML = `
         <th>#</th><th>Player</th><th>Group</th><th>Pts</th>
@@ -6433,6 +6444,7 @@ function renderLeaderboard(lb) {
     : `<span title="Greedy estimate" style="font-size:0.55rem;color:#6b7bbf;margin-left:2px;">~</span>`;
   return `#${br}${badge}`;
 } catch(e) { return '—'; } })()}</td>
+        <td style="font-size:0.78rem;text-align:center;">${(ALL_PARTICIPANTS[p.name]&&ALL_PARTICIPANTS[p.name].champion_changed)?'<span style="color:#e53935;font-weight:700;font-size:0.9rem;" title="'+T('lb_cc_tooltip')+'">−5</span>':'<span style="color:var(--muted);">—</span>'}</td>
       </tr>`;
     } else {
       // ── Gruppenphase Zeile (unverändert) ──────────────────────────────────
@@ -9114,8 +9126,8 @@ function switchTab(tabId) {
 }
 
 // ═══════ WHAT'S NEW ═══════
-const BUILD_VERSION = 'v2.0.46-champ-change';
-const BUILD_DATE    = '28.06.2026 14:00';
+const BUILD_VERSION = 'v2.0.46-cc-col';
+const BUILD_DATE    = '29.06.2026 12:00';
 (function(){ var _hb = document.getElementById('headerVersionBadge'); if(_hb) _hb.textContent = BUILD_VERSION; })();
 
 
@@ -9328,7 +9340,7 @@ function closeWhatsNew(){
 function checkKoLaunch(){
   if(typeof PHASE === 'undefined' || PHASE !== 'KO') return;
   if(!USER || !USER.player) return;
-  const key = 'ko_launch_seen_v1';
+  const key = 'ko_launch_seen_' + (typeof WN_VERSION !== 'undefined' ? WN_VERSION : 'v1');
   if(localStorage.getItem(key)) return;
   localStorage.setItem(key, '1');
   setTimeout(openKoLaunch, 800);
