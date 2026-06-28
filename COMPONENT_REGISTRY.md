@@ -1,7 +1,7 @@
-# ⚙️ Mundiporra Dashboard — Component Registry
-> Technische Vollreferenz inkl. Render-Chain für Claude
-> Stand: v1.23.20 · Repo: `Flash777777/mundiporra-staging` + `mundiporra-dashboard`
-> ⚠️ PFLICHT: Diese Datei wird bei jedem Push zu `index.html` im selben Commit aktualisiert.
+# âï¸ Mundiporra Dashboard â Component Registry
+> Technische Vollreferenz inkl. Render-Chain fÃ¼r Claude
+> Stand: v1.23.20 Â· Repo: `Flash777777/mundiporra-staging` + `mundiporra-dashboard`
+> â ï¸ PFLICHT: Diese Datei wird bei jedem Push zu `index.html` im selben Commit aktualisiert.
 
 ---
 
@@ -9,50 +9,50 @@
 
 ```
 initDashboard()
-└── populateSetupModal()
-    └── [User submits Setup Modal]
-        ├── fetchGrupClassStandings()   → befüllt _grupClassCache (await!)
-        ├── buildLeaderboard()          → schreibt _lastLb (inkl. classificationPts)
-        └── switchTab('overview')
-            └── [alle Overview-Renders]
+âââ populateSetupModal()
+    âââ [User submits Setup Modal]
+        âââ fetchGrupClassStandings()   â befÃ¼llt _grupClassCache (await!)
+        âââ buildLeaderboard()          â schreibt _lastLb (inkl. classificationPts)
+        âââ switchTab('overview')
+            âââ [alle Overview-Renders]
 
 switchTab('overview')
-├── renderKPIs(lb)
-│   └── getActual(game)
-├── renderLastNextMatch()
-│   ├── groupByKickoff(games, windowMs)
-│   ├── matchCardFinished(g, a, lb)
-│   ├── matchCardLive(g, a)
-│   └── matchCardUpcoming(g)
-├── renderLiveGamesSummary(lb)
-├── renderLatestGameSummary(lb)
-├── renderUpcomingGamesSummary(lb)
-├── renderGroupSummary(lb)
-└── renderKudos(lb)
+âââ renderKPIs(lb)
+â   âââ getActual(game)
+âââ renderLastNextMatch()
+â   âââ groupByKickoff(games, windowMs)
+â   âââ matchCardFinished(g, a, lb)
+â   âââ matchCardLive(g, a)
+â   âââ matchCardUpcoming(g)
+âââ renderLiveGamesSummary(lb)
+âââ renderLatestGameSummary(lb)
+âââ renderUpcomingGamesSummary(lb)
+âââ renderGroupSummary(lb)
+âââ renderKudos(lb)
 
-switchTab('leaderboard') → buildLeaderboard() → renderLeaderboard(lb)
-switchTab('group')       → renderGroupTab(lb) → renderGroupLatestGame()
-switchTab('h2h')         → initH2HTab() → renderH2H()
-switchTab('games')       → filterGames() → renderGames()
-switchTab('kobracket')   → renderKOBracket()
-                            └── fetchKOLiveData()
-                            └── _buildKODesktop() / _buildKOMobile()
-                                └── _buildKOMatchCard()
-switchTab('gruppen')     → renderGruppen()
-                            └── fetchGrupClassStandings() → _grupClassCache
-                            └── _renderGruppenUI()
-                                └── calcTeamClassificationPoints(playerName, teamName)
-switchTab('champions')   → renderChampions()
-switchTab('stats')       → renderStats(lb)
-switchTab('search')      → [oninput] doSearch() → showPlayerDetail()
-switchTab('database')    → renderDatabase()
-switchTab('changelog')   → [statisch, kein Render]
-[Porra Card]             → showMyPorraCard() → buildLeaderboard()
+switchTab('leaderboard') â buildLeaderboard() â renderLeaderboard(lb)
+switchTab('group')       â renderGroupTab(lb) â renderGroupLatestGame()
+switchTab('h2h')         â initH2HTab() â renderH2H()
+switchTab('games')       â filterGames() â renderGames()
+switchTab('kobracket')   â renderKOBracket()
+                            âââ fetchKOLiveData()
+                            âââ _buildKODesktop() / _buildKOMobile()
+                                âââ _buildKOMatchCard()
+switchTab('gruppen')     â renderGruppen()
+                            âââ fetchGrupClassStandings() â _grupClassCache
+                            âââ _renderGruppenUI()
+                                âââ calcTeamClassificationPoints(playerName, teamName)
+switchTab('champions')   â renderChampions()
+switchTab('stats')       â renderStats(lb)
+switchTab('search')      â [oninput] doSearch() â showPlayerDetail()
+switchTab('database')    â renderDatabase()
+switchTab('changelog')   â [statisch, kein Render]
+[Porra Card]             â showMyPorraCard() â buildLeaderboard()
 
 refreshDashboard()
-├── await fetchGrupClassStandings()   ← WICHTIG: muss awaited werden!
-├── await fetchESPN(...)
-└── buildLeaderboard() + Tab neu rendern
+âââ await fetchGrupClassStandings()   â WICHTIG: muss awaited werden!
+âââ await fetchESPN(...)
+âââ buildLeaderboard() + Tab neu rendern
 ```
 
 ---
@@ -60,7 +60,7 @@ refreshDashboard()
 ## 2. FUNKTIONS-REFERENZ (alphabetisch)
 
 ### `_buildKODesktop(rounds)`
-- **Returns:** HTML-String (Desktop-Bracket, horizontal, zoom-fähig)
+- **Returns:** HTML-String (Desktop-Bracket, horizontal, zoom-fÃ¤hig)
 - **Calls:** `_buildKOMatchCard()`
 - **Aufgerufen von:** `renderKOBracket()`
 
@@ -74,12 +74,12 @@ refreshDashboard()
 - **Aufgerufen von:** `_buildKODesktop()`, `_buildKOMobile()`
 
 ### `_crowdPick(gid)`
-- **Params:** `gid` — Game-ID (Number oder String, beide akzeptiert)
+- **Params:** `gid` â Game-ID (Number oder String, beide akzeptiert)
 - **Returns:** `{score, pct, label}` oder `null`
 - **Reads:** `ALL_PREDICTIONS`
 
 ### `_koCcMap(teamName)`
-- **Returns:** ISO Country Code (string) für Flagge
+- **Returns:** ISO Country Code (string) fÃ¼r Flagge
 - **Aufgerufen von:** `_koTeamRow()`
 
 ### `_koTeamRow(team, score)`
@@ -87,18 +87,18 @@ refreshDashboard()
 - **Aufgerufen von:** `_buildKOMatchCard()`
 
 ### `_koZoomIn() / _koZoomOut() / _koZoomReset() / _koApplyZoom()`
-- Desktop-Zoom für KO-Bracket
+- Desktop-Zoom fÃ¼r KO-Bracket
 
 ### `_renderGruppenUI()`
-- Interne Render-Funktion für Gruppen-Tab
+- Interne Render-Funktion fÃ¼r Gruppen-Tab
 - **Reads:** `_grupClassCache`
 - **Calls:** `calcTeamClassificationPoints()`
 - **DOM schreibt:** `#gruppenContent`
 
 ### `buildLeaderboard()`
 - **Returns:** Array; schreibt in `_lastLb`
-- **Beinhaltet:** `classificationPts` → addiert zu `total`
-- **⚠️ Voraussetzung:** `_grupClassCache` muss befüllt sein
+- **Beinhaltet:** `classificationPts` â addiert zu `total`
+- **â ï¸ Voraussetzung:** `_grupClassCache` muss befÃ¼llt sein
 
 ### `calcDisruptorLevel(g, a)`
 - **Returns:** `'upset'` | `'chaos'` | `null`
@@ -107,7 +107,7 @@ refreshDashboard()
 - **Returns:** Number (0, 1, oder 3)
 - **Logik:** 3 Pkt exakte Position, 1 Pkt richtiges Team / falsche Pos, 0 sonst
 - **Reads:** `_grupClassCache`, `ALL_GROUP_PREDICTIONS`
-- **⚠️ Voraussetzung:** `_grupClassCache` befüllt
+- **â ï¸ Voraussetzung:** `_grupClassCache` befÃ¼llt
 
 ### `calcPlayerScore(playerName)`
 - **Returns:** `{pts, exact, diff, trend, bonus, classificationPts, total}`
@@ -118,10 +118,10 @@ refreshDashboard()
 
 ### `calcTeamClassificationPoints(playerName, teamName)`
 - **Returns:** Number (0, 1, oder 3)
-- **⚠️ Normalisierungs-Map** erforderlich: ESPN-Cache = UPPERCASE + Sondernamen
-  - `'South Korea'` → `'KOREA REP.'`
-  - `'Ivory Coast'` → `'CÔTE D\'IVOIRE'`
-  - `'Cape Verde'` → `'CABO VERDE'`
+- **â ï¸ Normalisierungs-Map** erforderlich: ESPN-Cache = UPPERCASE + Sondernamen
+  - `'South Korea'` â `'KOREA REP.'`
+  - `'Ivory Coast'` â `'CÃTE D\'IVOIRE'`
+  - `'Cape Verde'` â `'CABO VERDE'`
   - alle anderen: `.toUpperCase()`
 - **Reads:** `ALL_GROUP_PREDICTIONS`, `_grupClassCache`
 - **Aufgerufen von:** `_renderGruppenUI()`
@@ -132,7 +132,7 @@ refreshDashboard()
 ### `fetchGrupClassStandings()`
 - **Returns:** Promise (async)
 - **Writes:** `_grupClassCache`
-- **⚠️ MUSS awaited werden** vor `buildLeaderboard()`
+- **â ï¸ MUSS awaited werden** vor `buildLeaderboard()`
 
 ### `fetchKOLiveData()`
 - **Returns:** Promise (async), ESPN KO-Spiele
@@ -142,10 +142,10 @@ refreshDashboard()
 - **Calls:** `renderGames()`
 
 ### `fmtCountdown(isoStr)` / `fmtLiveStatus(a)`
-- Hilfsfunktionen für Zeit-/Status-Formatierung
+- Hilfsfunktionen fÃ¼r Zeit-/Status-Formatierung
 
 ### `getActual(game)`
-- **Returns:** `{status, s1, s2, ht1, ht2, clock, rc1, rc2, scoringEvents, …}` oder `null`
+- **Returns:** `{status, s1, s2, ht1, ht2, clock, rc1, rc2, scoringEvents, â¦}` oder `null`
 - **Reads:** `liveGames`
 
 ### `getDisruptorLabel(level)` / `getKickoffISO(game)` / `getMyGroups()` / `getSharedGroups(p)`
@@ -157,20 +157,20 @@ refreshDashboard()
 ### `initDashboard()` / `initH2HTab()`
 - Einstiegspunkte
 
-### `matchCardFinished(g, a, lb)` — **FT Match Card**
+### `matchCardFinished(g, a, lb)` â **FT Match Card**
 - **Returns:** HTML-String (`.match-card`)
 - **Calls:** `scoreGame()`, `calcPointDist()`, `getKickoffISO()`
 
-### `matchCardLive(g, a)` — **Live Match Card**
+### `matchCardLive(g, a)` â **Live Match Card**
 - **Returns:** HTML-String (`.match-card`)
 - **Calls:** `fmtLiveStatus`, `calcDisruptorLevel`, `teamLogo`, `calcPointDist`, `_crowdPick`, `scoreGameLive`
 
-### `matchCardUpcoming(g)` — **Upcoming Match Card**
+### `matchCardUpcoming(g)` â **Upcoming Match Card**
 - **Returns:** HTML-String (`.match-card`)
 - **Calls:** `getKickoffISO()`, `fmtCountdown()`, `_crowdPick()`
 
 ### `refreshDashboard()`
-- **⚠️ MUSS `await fetchGrupClassStandings()`** vor `buildLeaderboard()`
+- **â ï¸ MUSS `await fetchGrupClassStandings()`** vor `buildLeaderboard()`
 - Sonst: `classificationPts = 0` in `total`
 
 ### `renderChampions()`
@@ -179,7 +179,7 @@ refreshDashboard()
 ### `renderDatabase()`
 - **DOM schreibt:** `#databaseContent`
 
-### `renderGameTipBlock(game, actual, contextPlayers, isLive, lb)` — **Tip Block**
+### `renderGameTipBlock(game, actual, contextPlayers, isLive, lb)` â **Tip Block**
 - **Returns:** HTML-String
 - **CSS je Card:** `.correct-exact` | `.correct-diff` | `.correct-1x2` | `.wrong`
 
@@ -191,12 +191,12 @@ refreshDashboard()
 
 ### `renderGroupTab(lb)`
 - **DOM schreibt:** `#groupTabContent`
-- Zeigt Klassifikationspunkte (🏅-Spalte) aus `classificationPts`
+- Zeigt Klassifikationspunkte (ð-Spalte) aus `classificationPts`
 
 ### `renderGruppen()`
 - **DOM schreibt:** `#gruppenContent`
 - **Calls:** `fetchGrupClassStandings()`, `_renderGruppenUI()`
-- Zeigt ESPN-Gruppenstandings + Team-Level 🏅 Punkte
+- Zeigt ESPN-Gruppenstandings + Team-Level ð Punkte
 
 ### `renderH2H()`
 - **DOM schreibt:** `#h2hSelectorRows`, `#h2hSummary`, `#h2hGamesWrap`
@@ -282,14 +282,14 @@ refreshDashboard()
 | Variable              | Typ    | Inhalt                                               | Schreibt wer            |
 |-----------------------|--------|------------------------------------------------------|-------------------------|
 | `ALL_PREDICTIONS`     | Object | Tipps aller 154 Spieler `{name:{gameId:{g1,g2}}}`   | initial (hardcoded)     |
-| `ALL_GROUP_PREDICTIONS` | Object | Gruppenphase-Tipps `{name:{pos:{1A,2A,…}}}`        | initial (hardcoded)     |
+| `ALL_GROUP_PREDICTIONS` | Object | Gruppenphase-Tipps `{name:{pos:{1A,2A,â¦}}}`        | initial (hardcoded)     |
 | `ALL_PARTICIPANTS`    | Array  | Spieler-Metadaten (Name, Gruppe, Champion, TS1, TS2) | initial (hardcoded)     |
 | `ALL_GAMES`           | Array  | Spielplan 72 Spiele                                  | initial (hardcoded)     |
-| `GROUP_DATA`          | Object | Porra-Gruppen → Mitglieder                           | initial (hardcoded)     |
+| `GROUP_DATA`          | Object | Porra-Gruppen â Mitglieder                           | initial (hardcoded)     |
 | `USER`                | Object | `{player, group, lang, tz}`                          | `setupModal` submit     |
 | `_lastLb`             | Array  | Letztes Leaderboard-Ergebnis                         | `buildLeaderboard()`   |
 | `liveGames`           | Object | ESPN Live/FT-Daten `{key: actual, keyRev: actual}`   | ESPN-Fetch-Pipeline     |
-| `_grupClassCache`     | Object | ESPN-Gruppenstandings `{A:[{name,pos,…}],…}`         | `fetchGrupClassStandings()` |
+| `_grupClassCache`     | Object | ESPN-Gruppenstandings `{A:[{name,pos,â¦}],â¦}`         | `fetchGrupClassStandings()` |
 | `HARDCODED_RESULTS`   | Object | Hardcodierte FT-Ergebnisse ST1/ST2                   | initial (hardcoded)     |
 | `BUILD_VERSION`       | String | z.B. `'v1.23.8'`                                     | Manuell je Push         |
 | `BUILD_DATE`          | String | z.B. `'25.06.2026 08:00'`                            | Manuell je Push         |
@@ -297,11 +297,11 @@ refreshDashboard()
 
 ---
 
-## 5. CSS-KLASSEN REGISTER (Schlüssel-Klassen)
+## 5. CSS-KLASSEN REGISTER (SchlÃ¼ssel-Klassen)
 
 | Klasse                    | Kontext                 | Bedeutung                                    |
 |---------------------------|-------------------------|----------------------------------------------|
-| `.card` / `.card-title`   | global                  | Standard-Card / Überschrift                  |
+| `.card` / `.card-title`   | global                  | Standard-Card / Ãberschrift                  |
 | `.match-card`             | matchCard-Funktionen    | Basis-Klasse aller Spiel-Karten              |
 | `.kpi-card`               | KPI Grid                | Einzelne KPI-Kachel                          |
 | `.you-row` / `.you-tag`   | Leaderboard, global     | Eigene Zeile / "Du"-Badge                    |
@@ -316,7 +316,7 @@ refreshDashboard()
 | `.pill.pill-green`        | FT Match Card           | "FT"-Status-Pill                             |
 | `.staging-banner`         | global                  | Roter Staging-Hinweis (nur staging-URL)      |
 | `.tab-btn.active`         | Tab-Nav                 | Aktiver Tab                                  |
-| `.ko-bracket-wrap`        | KO-Bracket Tab          | Wrapper für Bracket-Ansicht                  |
+| `.ko-bracket-wrap`        | KO-Bracket Tab          | Wrapper fÃ¼r Bracket-Ansicht                  |
 | `.ko-match-card`          | KO-Bracket Tab          | Einzelne KO-Match-Card                       |
 
 ---
@@ -325,18 +325,18 @@ refreshDashboard()
 
 | Tab-ID       | Label                 | `switchTab()` ruft auf          |
 |--------------|-----------------------|----------------------------------|
-| `overview`   | 📋 Zusammenfassung    | `renderOverview()`              |
-| `leaderboard`| 🏆 Rangliste          | `buildLeaderboard()`            |
-| `group`      | 👥 Meine Gruppe       | `renderGroupTab()`              |
-| `h2h`        | ⚔️ Vergleich          | `initH2HTab()`                  |
-| `games`      | ⚽ Spiele             | `filterGames()`                 |
-| `kobracket`  | ⚔️ KO-Bracket         | `renderKOBracket()`             |
-| `gruppen`    | 🏟️ Gruppen            | `renderGruppen()`               |
-| `champions`  | ⭐ Campeones          | `renderChampions()`             |
-| `stats`      | 📊 Statistiken        | `renderStats(_lastLb)`          |
-| `search`     | 🔍 Suche              | passiv — `doSearch()` on input  |
-| `database`   | 🗄️ Datenbasis         | `renderDatabase()`              |
-| `changelog`  | 📝 Changelog          | statisch — kein Render           |
+| `overview`   | ð Zusammenfassung    | `renderOverview()`              |
+| `leaderboard`| ð Rangliste          | `buildLeaderboard()`            |
+| `group`      | ð¥ Meine Gruppe       | `renderGroupTab()`              |
+| `h2h`        | âï¸ Vergleich          | `initH2HTab()`                  |
+| `games`      | â½ Spiele             | `filterGames()`                 |
+| `kobracket`  | âï¸ KO-Bracket         | `renderKOBracket()`             |
+| `gruppen`    | ðï¸ Gruppen            | `renderGruppen()`               |
+| `champions`  | â­ Campeones          | `renderChampions()`             |
+| `stats`      | ð Statistiken        | `renderStats(_lastLb)`          |
+| `search`     | ð Suche              | passiv â `doSearch()` on input  |
+| `database`   | ðï¸ Datenbasis         | `renderDatabase()`              |
+| `changelog`  | ð Changelog          | statisch â kein Render           |
 
 ---
 
@@ -344,7 +344,7 @@ refreshDashboard()
 
 | # | Bug | Prio | Fix-Ansatz |
 |---|-----|------|------------|
-| B1 | `calcTeamClassificationPoints`: ESPN UPPERCASE vs. Mixed-Case Tipper-Namen → immer 0 | 🔴 | Normalisierungs-Map + `.toUpperCase()` |
-| B2 | `total` im Ranking falsch: `classificationPts` = 0 wegen Timing | 🔴 | `fetchGrupClassStandings()` awaiten vor `buildLeaderboard()` |
-| B3 | Live-Button zeigt ×2 | 🟠 | `Set` mit kanonischem Key |
-| B4 | KPI „Gespielt" zeigt falschen Wert | 🟢 | `TOTAL_GAMES = 72` hardcoden |
+| B1 | `calcTeamClassificationPoints`: ESPN UPPERCASE vs. Mixed-Case Tipper-Namen â immer 0 | ð´ | Normalisierungs-Map + `.toUpperCase()` |
+| B2 | `total` im Ranking falsch: `classificationPts` = 0 wegen Timing | ð´ | `fetchGrupClassStandings()` awaiten vor `buildLeaderboard()` |
+| B3 | Live-Button zeigt Ã2 | ð  | `Set` mit kanonischem Key |
+| B4 | KPI âGespielt" zeigt falschen Wert | ð¢ | `TOTAL_GAMES = 72` hardcoden |
