@@ -1,32 +1,32 @@
-# ðºï¸ Mundiporra Dashboard â UI Map
-> Kanonische Komponentennamen fÃ¼r Patrick â Claude Kommunikation
-> Stand: v1.23.20 Â· Repo: `Flash777777/mundiporra-staging` + `mundiporra-dashboard`
+# Ã°ÂÂÂºÃ¯Â¸Â Mundiporra Dashboard Ã¢ÂÂ UI Map
+> Kanonische Komponentennamen fÃÂ¼r Patrick Ã¢ÂÂ Claude Kommunikation
+> Stand: v1.23.20 ÃÂ· Repo: `Flash777777/mundiporra-staging` + `mundiporra-dashboard`
 
-**Konvention:** `Kanonischer Name` â `fn()` / `#id` / `.class`
-Wenn Patrick "X" sagt â Claude adressiert exakt den Code hinter "X". Keine Interpretation.
+**Konvention:** `Kanonischer Name` Ã¢ÂÂ `fn()` / `#id` / `.class`
+Wenn Patrick "X" sagt Ã¢ÂÂ Claude adressiert exakt den Code hinter "X". Keine Interpretation.
 
 ---
 
 ## GLOBALE SHELL
 
 ```
-âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
-â  STAGING BANNER          .staging-banner                â  â nur staging-URL sichtbar
-âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
-â  HEADER                                                 â
-â    App-Titel (statisch)  Version Badge  #headerVersionBadge â
-âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
-â  TAB-NAV BAR                                            â
-â  [ð Zusammenfassung] [ð Rangliste] [ð¥ Gruppe]        â
-â  [âï¸ Vergleich] [â½ Spiele] [âï¸ Bracket] [ðï¸ Gruppen]   â
-â  [â­ Campeones] [ð Statistiken] [ð Suche]             â
-â  [ðï¸ Datenbasis] [ð Log]                               â
-âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
+Ã¢ÂÂ  STAGING BANNER          .staging-banner                Ã¢ÂÂ  Ã¢ÂÂ nur staging-URL sichtbar
+Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
+Ã¢ÂÂ  HEADER                                                 Ã¢ÂÂ
+Ã¢ÂÂ    App-Titel (statisch)  Version Badge  #headerVersionBadge Ã¢ÂÂ
+Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
+Ã¢ÂÂ  TAB-NAV BAR                                            Ã¢ÂÂ
+Ã¢ÂÂ  [Ã°ÂÂÂ Zusammenfassung] [Ã°ÂÂÂ Rangliste] [Ã°ÂÂÂ¥ Gruppe]        Ã¢ÂÂ
+Ã¢ÂÂ  [Ã¢ÂÂÃ¯Â¸Â Vergleich] [Ã¢ÂÂ½ Spiele] [Ã¢ÂÂÃ¯Â¸Â Bracket] [Ã°ÂÂÂÃ¯Â¸Â Gruppen]   Ã¢ÂÂ
+Ã¢ÂÂ  [Ã¢Â­Â Campeones] [Ã°ÂÂÂ Statistiken] [Ã°ÂÂÂ Suche]             Ã¢ÂÂ
+Ã¢ÂÂ  [Ã°ÂÂÂÃ¯Â¸Â Datenbasis] [Ã°ÂÂÂ Log]                               Ã¢ÂÂ
+Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
 ```
 
-### Globale Modals (immer verfÃ¼gbar, tab-unabhÃ¤ngig)
+### Globale Modals (immer verfÃÂ¼gbar, tab-unabhÃÂ¤ngig)
 
-| Kanonischer Name     | ID / Funktion         | Ãffnet sich wennâ¦                     |
+| Kanonischer Name     | ID / Funktion         | ÃÂffnet sich wennÃ¢ÂÂ¦                     |
 |----------------------|-----------------------|---------------------------------------|
 | **Setup Modal**      | `#setupModal`         | Erstaufruf / kein User gesetzt        |
 | **Force Reload Modal** | `#forceReloadModal` | User klickt Reload-Button             |
@@ -35,82 +35,82 @@ Wenn Patrick "X" sagt â Claude adressiert exakt den Code hinter "X". Keine 
 
 ---
 
-## TAB 1 â ð Zusammenfassung (`#tab-overview`)
+## TAB 1 Ã¢ÂÂ Ã°ÂÂÂ Zusammenfassung (`#tab-overview`)
 
 ```
-âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
-â  KPI GRID                           #kpiGrid            â
-â  ââââââââ ââââââââ ââââââââ ââââââââ ââââââââ ...     â
-â  â Rang â â Pts  â â Form â âMomt. â âRÃ¼ckstâ         â
-â  ââââââââ ââââââââ ââââââââ ââââââââ ââââââââ         â
-â  [Toggle: Mehr/Weniger KPIs]                            â
-âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
-â  ââââââââââââââââââââââââ  ââââââââââââââââââââââââââââ â
-â  â  LAST RESULT CARD    â  â  NEXT MATCH CARD         â â
-â  â  #lastMatchCard      â  â  #nextMatchCard          â â
-â  â  â FT Match Card(s)  â  â  â Live/Upcoming Card(s) â â
-â  ââââââââââââââââââââââââ  ââââââââââââââââââââââââââââ â
-âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
-â  LIVE GAMES SUMMARY BLOCK           #liveGamesSummaryBlock â
-â  (nur sichtbar wenn â¥1 Spiel LIVE)                      â
-â  ââââââââââââââââââââââââââââââââââââââââââââââââââââ   â
-â  â  ð´ Live â N Spiele  (animiert)                  â   â
-â  â  â Tip Block (je Live-Spiel, nur Gruppe + User)  â   â
-â  ââââââââââââââââââââââââââââââââââââââââââââââââââââ   â
-âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
-â  â¼ LATEST GAME SUMMARY (collapsible) #latestGamesBody   â
-â  â¼ UPCOMING GAMES SUMMARY (collapsible) #upcomingGamesBody â
-âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
-â  ââââââââââââââââââââââââ  ââââââââââââââââââââââââââââ â
-â  â  GROUP SUMMARY CARD  â  â  KUDOS POOL CARD         â â
-â  â  #groupSummaryContentâ  â  #kuDosSplit             â â
-â  ââââââââââââââââââââââââ  ââââââââââââââââââââââââââââ â
-âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
+Ã¢ÂÂ  KPI GRID                           #kpiGrid            Ã¢ÂÂ
+Ã¢ÂÂ  Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ ...     Ã¢ÂÂ
+Ã¢ÂÂ  Ã¢ÂÂ Rang Ã¢ÂÂ Ã¢ÂÂ Pts  Ã¢ÂÂ Ã¢ÂÂ Form Ã¢ÂÂ Ã¢ÂÂMomt. Ã¢ÂÂ Ã¢ÂÂRÃÂ¼ckstÃ¢ÂÂ         Ã¢ÂÂ
+Ã¢ÂÂ  Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ         Ã¢ÂÂ
+Ã¢ÂÂ  [Toggle: Mehr/Weniger KPIs]                            Ã¢ÂÂ
+Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
+Ã¢ÂÂ  Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ  Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ Ã¢ÂÂ
+Ã¢ÂÂ  Ã¢ÂÂ  LAST RESULT CARD    Ã¢ÂÂ  Ã¢ÂÂ  NEXT MATCH CARD         Ã¢ÂÂ Ã¢ÂÂ
+Ã¢ÂÂ  Ã¢ÂÂ  #lastMatchCard      Ã¢ÂÂ  Ã¢ÂÂ  #nextMatchCard          Ã¢ÂÂ Ã¢ÂÂ
+Ã¢ÂÂ  Ã¢ÂÂ  Ã¢ÂÂ FT Match Card(s)  Ã¢ÂÂ  Ã¢ÂÂ  Ã¢ÂÂ Live/Upcoming Card(s) Ã¢ÂÂ Ã¢ÂÂ
+Ã¢ÂÂ  Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ  Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ Ã¢ÂÂ
+Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
+Ã¢ÂÂ  LIVE GAMES SUMMARY BLOCK           #liveGamesSummaryBlock Ã¢ÂÂ
+Ã¢ÂÂ  (nur sichtbar wenn Ã¢ÂÂ¥1 Spiel LIVE)                      Ã¢ÂÂ
+Ã¢ÂÂ  Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ   Ã¢ÂÂ
+Ã¢ÂÂ  Ã¢ÂÂ  Ã°ÂÂÂ´ Live Ã¢ÂÂ N Spiele  (animiert)                  Ã¢ÂÂ   Ã¢ÂÂ
+Ã¢ÂÂ  Ã¢ÂÂ  Ã¢ÂÂ Tip Block (je Live-Spiel, nur Gruppe + User)  Ã¢ÂÂ   Ã¢ÂÂ
+Ã¢ÂÂ  Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ   Ã¢ÂÂ
+Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
+Ã¢ÂÂ  Ã¢ÂÂ¼ LATEST GAME SUMMARY (collapsible) #latestGamesBody   Ã¢ÂÂ
+Ã¢ÂÂ  Ã¢ÂÂ¼ UPCOMING GAMES SUMMARY (collapsible) #upcomingGamesBody Ã¢ÂÂ
+Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
+Ã¢ÂÂ  Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ  Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ Ã¢ÂÂ
+Ã¢ÂÂ  Ã¢ÂÂ  GROUP SUMMARY CARD  Ã¢ÂÂ  Ã¢ÂÂ  KUDOS POOL CARD         Ã¢ÂÂ Ã¢ÂÂ
+Ã¢ÂÂ  Ã¢ÂÂ  #groupSummaryContentÃ¢ÂÂ  Ã¢ÂÂ  #kuDosSplit             Ã¢ÂÂ Ã¢ÂÂ
+Ã¢ÂÂ  Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ  Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ Ã¢ÂÂ
+Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
 ```
 
 | Kanonischer Name              | Funktion / ID                         | Beschreibung                              |
 |-------------------------------|---------------------------------------|-------------------------------------------|
-| **KPI Grid**                  | `renderKPIs()` / `#kpiGrid`           | Kennzahlen-Kacheln (Rang, Pts, Formâ¦)     |
+| **KPI Grid**                  | `renderKPIs()` / `#kpiGrid`           | Kennzahlen-Kacheln (Rang, Pts, FormÃ¢ÂÂ¦)     |
 | **KPI Toggle**                | `#kpiCollapsWrap` / `#kpiToggleBtn`   | Mehr/Weniger KPIs ein-/ausblenden         |
 | **Last Result Card**          | `#lastMatchCard` / `#lastMatchContent`| Letzter abgeschlossener Spieltag-Slot     |
-| **Next Match Card**           | `#nextMatchCard` / `#nextMatchContent`| NÃ¤chster Kick-off oder laufende Spiele    |
-| **Live Games Summary Block**  | `#liveGamesSummaryBlock`              | Erscheint nur wenn â¥1 Spiel LIVE          |
+| **Next Match Card**           | `#nextMatchCard` / `#nextMatchContent`| NÃÂ¤chster Kick-off oder laufende Spiele    |
+| **Live Games Summary Block**  | `#liveGamesSummaryBlock`              | Erscheint nur wenn Ã¢ÂÂ¥1 Spiel LIVE          |
 | **Latest Game Summary**       | `#latestGamesBody` (collapsible)      | Letzte abgeschlossene Spiele (aufklappbar)|
-| **Upcoming Games Summary**    | `#upcomingGamesBody` (collapsible)    | NÃ¤chste Spiele (aufklappbar)              |
+| **Upcoming Games Summary**    | `#upcomingGamesBody` (collapsible)    | NÃÂ¤chste Spiele (aufklappbar)              |
 | **Group Summary Card**        | `#groupSummaryContent`                | Mini-Leaderboard der eigenen Gruppe       |
 | **Kudos Pool Card**           | `#kuDosSplit`                         | Preisgeld-Verteilungs-Balken              |
 
 ---
 
-## TAB 2 â ð Rangliste (`#tab-leaderboard`)
+## TAB 2 Ã¢ÂÂ Ã°ÂÂÂ Rangliste (`#tab-leaderboard`)
 
 | Kanonischer Name          | Funktion / ID                | Beschreibung                   |
 |---------------------------|------------------------------|--------------------------------|
-| **Leaderboard Table**     | `renderLeaderboard()` / `#lbTable` / `#lbBody` | VollstÃ¤ndige Rangliste aller 154 Spieler |
-| **You-Legend**            | `#lbYouLegend` / `#lbYouTag` | Legende fÃ¼r eigene Zeile       |
+| **Leaderboard Table**     | `renderLeaderboard()` / `#lbTable` / `#lbBody` | VollstÃÂ¤ndige Rangliste aller 154 Spieler |
+| **You-Legend**            | `#lbYouLegend` / `#lbYouTag` | Legende fÃÂ¼r eigene Zeile       |
 
 ---
 
-## TAB 3 â ð¥ Meine Gruppe (`#tab-group`)
+## TAB 3 Ã¢ÂÂ Ã°ÂÂÂ¥ Meine Gruppe (`#tab-group`)
 
 | Kanonischer Name              | Funktion / ID                  | Beschreibung                      |
 |-------------------------------|--------------------------------|-----------------------------------|
-| **Group Tab Leaderboard**     | `renderGroupTab()` / `#groupTabContent` | Gruppen-interne Rangliste inkl. Klassifikationspunkte (ð) |
+| **Group Tab Leaderboard**     | `renderGroupTab()` / `#groupTabContent` | Gruppen-interne Rangliste inkl. Klassifikationspunkte (Ã°ÂÂÂ) |
 | **Latest Game in Group**      | `renderGroupLatestGame()` / `#groupLatestGame` | Letztes Spiel mit Gruppen-Tipps |
 
 ---
 
-## TAB 4 â âï¸ Vergleich / H2H (`#tab-h2h`)
+## TAB 4 Ã¢ÂÂ Ã¢ÂÂÃ¯Â¸Â Vergleich / H2H (`#tab-h2h`)
 
 | Kanonischer Name          | Funktion / ID               | Beschreibung                        |
 |---------------------------|-----------------------------|-------------------------------------|
 | **H2H Player Selectors**  | `#h2hSelectorRows` / `#h2hAddBtn` | Spieler-Auswahl-Zeilen        |
 | **H2H Summary Table**     | `#h2hSummary`               | Punkte-Vergleich je Kategorie       |
-| **H2H Games Table**       | `#h2hGamesWrap`             | Spiel-fÃ¼r-Spiel Vergleich           |
+| **H2H Games Table**       | `#h2hGamesWrap`             | Spiel-fÃÂ¼r-Spiel Vergleich           |
 
 ---
 
-## TAB 5 â â½ Spiele (`#tab-games`)
+## TAB 5 Ã¢ÂÂ Ã¢ÂÂ½ Spiele (`#tab-games`)
 
 | Kanonischer Name      | Funktion / ID                   | Beschreibung                         |
 |-----------------------|---------------------------------|--------------------------------------|
@@ -119,18 +119,18 @@ Wenn Patrick "X" sagt â Claude adressiert exakt den Code hinter "X". Keine 
 
 ---
 
-## TAB 6 â âï¸ KO-Bracket (`#tab-kobracket`) â NEU seit v1.23.0
+## TAB 6 Ã¢ÂÂ Ã¢ÂÂÃ¯Â¸Â KO-Bracket (`#tab-kobracket`) Ã¢ÂÂ NEU seit v1.23.0
 
 ```
-âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
-â  KO BRACKET VIEW         #koBracketContent              â
-â  Desktop: horizontales Bracket-Layout (zoom-fÃ¤hig)      â
-â  Mobile:  vertikales Bracket-Layout                     â
-âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
-â  Runden: Achtelfinale â Viertelfinale â Halbfinale      â
-â           â Spiel um Platz 3 â Finale                   â
-â  Jede Matchcard: Team A vs Team B, Ergebnis/Tipp        â
-âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
+Ã¢ÂÂ  KO BRACKET VIEW         #koBracketContent              Ã¢ÂÂ
+Ã¢ÂÂ  Desktop: horizontales Bracket-Layout (zoom-fÃÂ¤hig)      Ã¢ÂÂ
+Ã¢ÂÂ  Mobile:  vertikales Bracket-Layout                     Ã¢ÂÂ
+Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
+Ã¢ÂÂ  Runden: Achtelfinale Ã¢ÂÂ Viertelfinale Ã¢ÂÂ Halbfinale      Ã¢ÂÂ
+Ã¢ÂÂ           Ã¢ÂÂ Spiel um Platz 3 Ã¢ÂÂ Finale                   Ã¢ÂÂ
+Ã¢ÂÂ  Jede Matchcard: Team A vs Team B, Ergebnis/Tipp        Ã¢ÂÂ
+Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
 ```
 
 | Kanonischer Name          | Funktion / ID                   | Beschreibung                          |
@@ -143,51 +143,51 @@ Wenn Patrick "X" sagt â Claude adressiert exakt den Code hinter "X". Keine 
 
 ---
 
-## TAB 7 â ðï¸ Gruppen (`#tab-gruppen`) â NEU seit v1.21.0
+## TAB 7 Ã¢ÂÂ Ã°ÂÂÂÃ¯Â¸Â Gruppen (`#tab-gruppen`) Ã¢ÂÂ NEU seit v1.21.0
 
 ```
-âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
-â  GROUP STANDINGS (ESPN)  #gruppenContent                â
-â  Gruppe A â¦ Gruppe L                                    â
-â  Je Gruppe: Tabelle mit Pos/Team/Sp/S/U/N/Tore/Punkte   â
-â  Team-Name + ð <Klassifikationspunkte> des Users       â
-â  Quali-Ampel (grÃ¼n/gelb/rot)                            â
-âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
+Ã¢ÂÂ  GROUP STANDINGS (ESPN)  #gruppenContent                Ã¢ÂÂ
+Ã¢ÂÂ  Gruppe A Ã¢ÂÂ¦ Gruppe L                                    Ã¢ÂÂ
+Ã¢ÂÂ  Je Gruppe: Tabelle mit Pos/Team/Sp/S/U/N/Tore/Punkte   Ã¢ÂÂ
+Ã¢ÂÂ  Team-Name + Ã°ÂÂÂ <Klassifikationspunkte> des Users       Ã¢ÂÂ
+Ã¢ÂÂ  Quali-Ampel (grÃÂ¼n/gelb/rot)                            Ã¢ÂÂ
+Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
 ```
 
 | Kanonischer Name              | Funktion / ID                      | Beschreibung                               |
 |-------------------------------|------------------------------------|--------------------------------------------|
 | **Gruppen Container**         | `renderGruppen()` / `#gruppenContent` | Alle 12 Gruppen-Tabellen                |
-| **Gruppen Render UI**         | `_renderGruppenUI()`               | Interne Render-Funktion fÃ¼r Standings-UI   |
-| **Group Classification Pts**  | `calcTeamClassificationPoints()`   | Punkte pro Team fÃ¼r den User (ESPN-basiert)|
+| **Gruppen Render UI**         | `_renderGruppenUI()`               | Interne Render-Funktion fÃÂ¼r Standings-UI   |
+| **Group Classification Pts**  | `calcTeamClassificationPoints()`   | Punkte pro Team fÃÂ¼r den User (ESPN-basiert)|
 | **Group Class Standings Fetch** | `fetchGrupClassStandings()`      | ESPN-Standings in `_grupClassCache` laden  |
 
 ---
 
-## TAB 8 â â­ Campeones (`#tab-champions`)
+## TAB 8 Ã¢ÂÂ Ã¢Â­Â Campeones (`#tab-champions`)
 
 | Kanonischer Name      | Funktion / ID                  | Beschreibung                          |
 |-----------------------|--------------------------------|---------------------------------------|
-| **Champion Grid**     | `renderChampions()` / `#champGrid` | LÃ¤nder-Kacheln mit Tipper-Anzahl  |
-| **Scorer Grid**       | `#scorerGrid`                  | TorschÃ¼tzen-Cards mit ESPN-Tore       |
+| **Champion Grid**     | `renderChampions()` / `#champGrid` | LÃÂ¤nder-Kacheln mit Tipper-Anzahl  |
+| **Scorer Grid**       | `#scorerGrid`                  | TorschÃÂ¼tzen-Cards mit ESPN-Tore       |
 
 ---
 
-## TAB 9 â ð Statistiken (`#tab-stats`)
+## TAB 9 Ã¢ÂÂ Ã°ÂÂÂ Statistiken (`#tab-stats`)
 
 | Kanonischer Name          | ID                    | Beschreibung                                    |
 |---------------------------|-----------------------|-------------------------------------------------|
 | **Overall Accuracy Card** | `#accBars`            | Exact/Diff/Trend/Wrong-Verteilung aller Spieler |
 | **Your Accuracy Card**    | `#yourAccBars`        | Eigene Trefferquote                             |
 | **Upset Card**            | `#upsetGrid`          | Spieler die gegen Mehrheit lagen und Recht hatten |
-| **Contrarian Card**       | `#contrarianContent`  | Top 15 KontrÃ¤r-Spieler                          |
-| **Group Rank Card**       | `#groupRankChart`     | Ã Score je Porra-Gruppe (Balken)                |
-| **Consensus Card**        | `#consensusContent`   | Spiele mit hÃ¶chstem Community-Konsens           |
-| **Split Card**            | `#splitContent`       | Umstrittenste Spiele (gleichmÃ¤Ãige Verteilung)  |
+| **Contrarian Card**       | `#contrarianContent`  | Top 15 KontrÃÂ¤r-Spieler                          |
+| **Group Rank Card**       | `#groupRankChart`     | ÃÂ Score je Porra-Gruppe (Balken)                |
+| **Consensus Card**        | `#consensusContent`   | Spiele mit hÃÂ¶chstem Community-Konsens           |
+| **Split Card**            | `#splitContent`       | Umstrittenste Spiele (gleichmÃÂ¤ÃÂige Verteilung)  |
 
 ---
 
-## TAB 10 â ð Suche (`#tab-search`)
+## TAB 10 Ã¢ÂÂ Ã°ÂÂÂ Suche (`#tab-search`)
 
 | Kanonischer Name      | Funktion / ID            | Beschreibung                       |
 |-----------------------|--------------------------|-------------------------------------|
@@ -196,22 +196,22 @@ Wenn Patrick "X" sagt â Claude adressiert exakt den Code hinter "X". Keine 
 
 ---
 
-## TAB 11 â ðï¸ Datenbasis (`#tab-database`)
+## TAB 11 Ã¢ÂÂ Ã°ÂÂÂÃ¯Â¸Â Datenbasis (`#tab-database`)
 
 | Kanonischer Name      | Funktion / ID            | Beschreibung                       |
 |-----------------------|--------------------------|-------------------------------------|
 | **Filter Bar**        | `#dbSearch`, `#dbGroupFilter`, `#dbGameFilter` | Such- und Filter-Leiste |
-| **Database Table**    | `renderDatabase()` / `#databaseContent` | Alle 154 Spieler Ã Tipps |
+| **Database Table**    | `renderDatabase()` / `#databaseContent` | Alle 154 Spieler ÃÂ Tipps |
 
 ---
 
-## TAB 12 â ð Changelog (`#tab-changelog`)
+## TAB 12 Ã¢ÂÂ Ã°ÂÂÂ Changelog (`#tab-changelog`)
 
 Statisches HTML. Keine Render-Funktion. Karten chronologisch (neueste oben), eine Karte (`.card`) je Version.
 
 ---
 
-## ð MATCH CARD TYPEN (Shared Components)
+## Ã°ÂÂÂ MATCH CARD TYPEN (Shared Components)
 
 | Kanonischer Name        | Funktion                      | Eingesetzt in                                     |
 |-------------------------|-------------------------------|---------------------------------------------------|
@@ -220,14 +220,14 @@ Statisches HTML. Keine Render-Funktion. Karten chronologisch (neueste oben), ein
 | **Upcoming Match Card** | `matchCardUpcoming(g)`        | Next Match Card (wenn upcoming)                   |
 | **Tip Block**           | `renderGameTipBlock(...)`     | Live Games Summary, Latest/Upcoming Summary, Group, Games Detail |
 
-### Live Match Card â Elemente
-`matchCardLive(g, a)`: Disruptor Badge Â· Team Logos Â· Live Score Â· HZ-Score Â· Rote Karten Â· Live-Status Â· Scorer Events Grid (TV-Style, 2-spaltig) Â· **My/Community Tip Row** (blau) Â· Live Punkteverteilung (4 Boxen) Â· Match Meta
+### Live Match Card Ã¢ÂÂ Elemente
+`matchCardLive(g, a)`: Disruptor Badge ÃÂ· Team Logos ÃÂ· Live Score ÃÂ· HZ-Score ÃÂ· Rote Karten ÃÂ· Live-Status ÃÂ· Scorer Events Grid (TV-Style, 2-spaltig) ÃÂ· **My/Community Tip Row** (blau) ÃÂ· Live Punkteverteilung (4 Boxen) ÃÂ· Match Meta
 
-### FT Match Card â Elemente
-`matchCardFinished(g, a, lb)`: Farbgradient (Punkte) Â· Points Badge Â· Teams/Score Â· FT-Pill Â· My Tip Display + Label (Exakt/Diff/Trend/Falsch) Â· FT Punkteverteilung Â· Match Meta
+### FT Match Card Ã¢ÂÂ Elemente
+`matchCardFinished(g, a, lb)`: Farbgradient (Punkte) ÃÂ· Points Badge ÃÂ· Teams/Score ÃÂ· FT-Pill ÃÂ· My Tip Display + Label (Exakt/Diff/Trend/Falsch) ÃÂ· FT Punkteverteilung ÃÂ· Match Meta
 
-### Upcoming Match Card â Elemente
-`matchCardUpcoming(g)`: Teams Â· Countdown Pill (`.cd-pill`, Live-Update) Â· **My/Community Tip Row** (blau) Â· Match Meta
+### Upcoming Match Card Ã¢ÂÂ Elemente
+`matchCardUpcoming(g)`: Teams ÃÂ· Countdown Pill (`.cd-pill`, Live-Update) ÃÂ· **My/Community Tip Row** (blau) ÃÂ· Match Meta
 
-### Tip Block â Elemente
-`renderGameTipBlock(...)`: Score Label (FT/LIVE/â) Â· My/Community Tip Row Â· Player Tip Cards (`.player-tip-card`, sortiert nach Rang, farbig nach Punkte)
+### Tip Block Ã¢ÂÂ Elemente
+`renderGameTipBlock(...)`: Score Label (FT/LIVE/Ã¢ÂÂ) ÃÂ· My/Community Tip Row ÃÂ· Player Tip Cards (`.player-tip-card`, sortiert nach Rang, farbig nach Punkte)
