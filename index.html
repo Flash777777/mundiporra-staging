@@ -1345,7 +1345,14 @@
   <div class="section-title">📝 Changelog</div>
 
 <div class="card" style="margin-bottom:14px;border-left:3px solid #ccc;">
-  <div class="card-title">v2.0.44-ko-staging — 28. Juni 2026 (Fix)</div>
+  <div class="card" style="margin-bottom:14px;border-left:3px solid #ccc;">
+  <div class="card-title">v2.0.45 — 29. Juni 2026 (Fix)</div>
+  <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
+    <li>🐛 <strong>KO-Sortierungs-Fix</strong> — <code>buildLeaderboard()</code> berechnete beim ersten Laden GP-Punkte aus dem alten <code>_lastLb</code> (war <code>null</code>) statt aus den frisch berechneten Scores → Ranking sortierte nur nach KO-Punkten ohne Gruppenphase. Fix: GP direkt aus <code>calcKOPoints()</code></li>
+    <li>🔧 <strong>UTF-8 Encoding-Repair</strong> — Double-Encoding-Bug behoben: alle Emojis, Umlaute und Sonderzeichen werden jetzt korrekt gerendert</li>
+  </ul>
+</div>
+<div class="card-title">v2.0.44-ko-staging — 28. Juni 2026 (Fix)</div>
   <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
     <li>🔴 <strong>KO Live-Punkte in Rangliste</strong> — Laufende KO-Spiele fließen vorläufig in die Ranglisten-Sortierung ein (Multiplikator gilt sofort)</li>
     <li>📊 <strong>🔴-Spalte in KO-Rangliste</strong> — Neue Spalte zeigt vorläufige Live-Punkte pro Spieler (analog Gruppenphase)</li>
