@@ -1,5 +1,4 @@
 {
-  "version": "v2.0.43-ko-staging",
-  "notify": true,
-  "message": "🚀 KO-Phase ist live! Neues What's New Modal, Live-Spielkarten, Bracket & Multiplikatoren."
+  "version": "v2.0.46-champ-change",
+  "notify": true
 }
