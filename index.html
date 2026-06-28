@@ -1344,6 +1344,15 @@
 <div class="page">
   <div class="section-title">📝 Changelog</div>
 
+<div class="card" style="margin-bottom:14px;border-left:3px solid #ccc;">
+  <div class="card-title">v2.0.44-ko-staging — 28. Juni 2026 (Fix)</div>
+  <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
+    <li>🔴 <strong>KO Live-Punkte in Rangliste</strong> — Laufende KO-Spiele fließen vorläufig in die Ranglisten-Sortierung ein (Multiplikator gilt sofort)</li>
+    <li>📊 <strong>🔴-Spalte in KO-Rangliste</strong> — Neue Spalte zeigt vorläufige Live-Punkte pro Spieler (analog Gruppenphase)</li>
+    <li>⏱️ <strong>90-min Score für Live</strong> — <code>refreshKOGamesFromLive</code> setzt <code>homeScore90/awayScore90</code> auch bei LIVE; ET/PEN-Stände werden ignoriert</li>
+    <li>🔢 <strong>buildLeaderboard KO-Sort</strong> — Im KO-Modus nutzt <code>buildLeaderboard</code> <code>calcTotalPointsKO</code> für <code>total</code> (GP + KO + Live)</li>
+  </ul>
+</div>
 <div class="card" style="margin-bottom:14px;border-left:4px solid var(--accent);">
   <div class="card-title">v2.0.43-ko-staging — 29.06.2026 (Release)</div>
   <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
@@ -2511,32 +2520,40 @@ function calcResultPtsKO(predH, predA, actualH, actualA) {
 }
 
 function calcKOPoints(playerName) {
-  const result = { ko_game_pts:0, ko_scorer_pts:0, champion_pts:0, breakdown:{} };
+  const result = { ko_game_pts:0, ko_live_pts:0, ko_scorer_pts:0, champion_pts:0, breakdown:{} };
   if (typeof KO_PREDICTIONS === 'undefined' || !KO_PREDICTIONS[playerName]) return result;
   const pred = KO_PREDICTIONS[playerName];
 
   if (pred.slots) {
     for (const [slot, tip] of Object.entries(pred.slots)) {
       const game = KO_GAMES.find(g => g.slot === slot);
-      if (!game || game.status !== 'FT') continue;
+      if (!game || (game.status !== 'FT' && game.status !== 'LIVE')) continue;
       const mult = (SLOT_META[slot] && SLOT_META[slot].multiplier) || 1;
       const actualT1 = normalizeTeamKO(game.home), actualT2 = normalizeTeamKO(game.away);
       const predT1   = normalizeTeamKO(tip.t1),    predT2   = normalizeTeamKO(tip.t2);
       const t1Correct = !!(predT1 && (predT1===actualT1 || predT1===actualT2));
       const t2Correct = !!(predT2 && (predT2===actualT1 || predT2===actualT2));
       const bothCorrect = t1Correct && t2Correct && predT1 !== predT2;
-      // Alle Runden: Spielpunkte nur bei korrekter Paarung beider Teams (kein R32-Sonderfall)
       const pairingOk = bothCorrect;
-      let gamePts = 0;
-      // homeScore90 = 90-min Score (korrekt für Tipp-Vergleich laut Regelwerk)
-      // Fallback auf homeScore wenn homeScore90 nicht verfügbar (normale 90-min-Spiele)
+      // homeScore90 = 90-min Score (kein ET/PEN); bei LIVE durch refreshKOGamesFromLive gesetzt
       const sc90_1 = game.homeScore90 ?? game.homeScore;
       const sc90_2 = game.awayScore90 ?? game.awayScore;
-      if (pairingOk && sc90_1 !== null && sc90_2 !== null) {
-        gamePts = calcResultPtsKO(tip.s1, tip.s2, sc90_1, sc90_2);
-        result.ko_game_pts += gamePts * mult;
+      if (game.status === 'FT') {
+        let gamePts = 0;
+        if (pairingOk && sc90_1 !== null && sc90_2 !== null) {
+          gamePts = calcResultPtsKO(tip.s1, tip.s2, sc90_1, sc90_2);
+          result.ko_game_pts += gamePts * mult;
+        }
+        result.breakdown[slot] = { gamePts, mult, bothCorrect };
+      } else if (game.status === 'LIVE') {
+        // Vorläufige Live-Punkte — Multiplikator gilt sofort
+        let livePts = 0;
+        if (pairingOk && sc90_1 !== null && sc90_2 !== null) {
+          livePts = calcResultPtsKO(tip.s1, tip.s2, sc90_1, sc90_2);
+          result.ko_live_pts += livePts * mult;
+        }
+        result.breakdown[slot] = { gamePts: 0, livePts, mult, bothCorrect, isLive: true };
       }
-      result.breakdown[slot] = { gamePts, mult, bothCorrect };
     }
   }
 
@@ -2573,10 +2590,10 @@ function calcTotalPointsKO(playerName) {
   }
   return {
     gp_game:gpGame, gp_scorer:gpScorer, gp_classif:gpClassif,
-    ko_game:koPts.ko_game_pts, ko_qual:0,
+    ko_game:koPts.ko_game_pts, ko_live:koPts.ko_live_pts, ko_qual:0,
     ko_scorer:koPts.ko_scorer_pts, champion:koPts.champion_pts,
     breakdown:koPts.breakdown,
-    total: gpGame+gpScorer+gpClassif+koPts.ko_game_pts+koPts.ko_scorer_pts+koPts.champion_pts
+    total: gpGame+gpScorer+gpClassif+koPts.ko_game_pts+koPts.ko_live_pts+koPts.ko_scorer_pts+koPts.champion_pts
   };
 }
 
@@ -4877,7 +4894,16 @@ async function buildLeaderboard() {
   }
   const results = [];
   for (const name of Object.keys(ALL_PARTICIPANTS)) {
-    results.push({name, ...calcPlayerScore(name)});
+    const score = calcPlayerScore(name);
+    if (typeof PHASE !== 'undefined' && PHASE === 'KO') {
+      // KO-Modus: total inkl. KO-Punkte + Live-Punkte für korrekte Sortierung
+      try {
+        const koTotal = calcTotalPointsKO(name);
+        score.total = koTotal.total;
+        score.ko_live = koTotal.ko_live || 0;
+      } catch(e) { /* graceful fallback */ }
+    }
+    results.push({name, ...score});
   }
   // All players already in ALL_PARTICIPANTS via unified data load
   results.sort((a,b) => b.total - a.total || b.pts - a.pts || b.exact - a.exact);
@@ -6330,6 +6356,7 @@ function renderLeaderboard(lb) {
         <th title="GP Klassifikation" style="color:var(--muted);font-size:0.68rem;">GP🏅</th>
         <th title="KO Spielpunkte (×Multiplikator)" style="color:var(--blue-light);font-size:0.68rem;">KO⚽</th>
         <th title="KO Scorer-Bonus (×Multiplikator)" style="color:var(--blue-light);font-size:0.68rem;">KO🎯</th>
+        <th title="Vorläufige Live-Punkte (laufendes Spiel)" style="color:var(--red);font-size:0.68rem;">🔴</th>
         <th title="Champion-Bonus" style="color:#d4af37;font-size:0.68rem;">🏆</th>
         <th title="${T('kpi_best_rank_tooltip')}" style="color:var(--muted);font-size:0.68rem;">${T('ko_lb_best_rank')}</th>`;
     } else {
@@ -6368,6 +6395,7 @@ function renderLeaderboard(lb) {
         <td style="font-size:0.78rem;color:#b8860b;">${fmt(koPts.gp_classif)}</td>
         <td style="font-size:0.78rem;color:var(--blue-light);font-weight:${koPts.ko_game>0?'700':'400'}">${fmt(koPts.ko_game)}</td>
         <td style="font-size:0.78rem;color:var(--blue-light);">${fmt(koPts.ko_scorer)}</td>
+        <td style="font-size:0.78rem;color:var(--red);font-weight:${(koPts.ko_live||0)>0?'700':'400'}">${(koPts.ko_live||0)>0?'<span style="animation:pulse 1s infinite">🔴 +('+koPts.ko_live+')</span>':'<span style="color:var(--muted);">—</span>'}</td>
         <td style="font-size:0.78rem;color:#d4af37;">${fmt(koPts.champion)}</td>
         <td style="font-size:0.72rem;color:var(--muted);font-weight:600;">${(() => { try {
   const br = calcBestRank(p.name, lb);
@@ -8986,6 +9014,9 @@ function refreshKOGamesFromLive() {
       if (_isPlaceholder(game.away) && live.t2Name) game.away = live.t2Name;
       game.homeScore = parseInt(live.t1Score);
       game.awayScore = parseInt(live.t2Score);
+      // 90-min Score für Live-Tipp-Vergleich (kein ET/PEN)
+      game.homeScore90 = parseInt(live.t1Score);
+      game.awayScore90 = parseInt(live.t2Score);
     } else {
       // Fallback: Zeitfenster-Check — wenn Spiel laut KO_GAMES vor <130min begann → als LIVE werten
       const _kickoff = game.date ? new Date(game.date).getTime() : 0;
@@ -9056,8 +9087,8 @@ function switchTab(tabId) {
 }
 
 // ═══════ WHAT'S NEW ═══════
-const BUILD_VERSION = 'v2.0.43-ko-staging';
-const BUILD_DATE    = '29.06.2026 00:00';
+const BUILD_VERSION = 'v2.0.44-ko-staging';
+const BUILD_DATE    = '28.06.2026 23:30';
 (function(){ var _hb = document.getElementById('headerVersionBadge'); if(_hb) _hb.textContent = BUILD_VERSION; })();
 
 
