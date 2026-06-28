@@ -1345,6 +1345,14 @@
   <div class="section-title">📝 Changelog</div>
 
 <div class="card" style="margin-bottom:14px;">
+  <div class="card-title">v2.0.47 — 29. Juni 2026 (Bug-Fix + Feature)</div>
+  <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
+    <li>🔧 <strong>CC Penalty Berechnungs-Fix</strong> — −5 Punkte für Champion-Wechsel wurde in <code>buildLeaderboard()</code> vom nachfolgenden KO-Block überschrieben. Penalty wird jetzt erst nach dem KO-Block angewendet.</li>
+    <li>🔧 <strong>calcTotalPointsKO Fix</strong> — Rückgabewert dieser Funktion (u.a. für Profilansicht) berücksichtigt jetzt ebenfalls die −5 Punkte CC-Penalty.</li>
+    <li>🔁 <strong>KO-Modal: Einmalig für immer</strong> — localStorage-Key auf <code>ko_launch_seen_kophase2026</code> geändert (war zuvor versionsabhängig). Das Modal erscheint jetzt genau einmal pro Spieler — unabhängig von Versions-Bumps.</li>
+  </ul>
+</div>
+<div class="card" style="margin-bottom:14px;">
   <div class="card-title">v2.0.46-cc-col — 29. Juni 2026 (Feature + Fix)</div>
   <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
     <li>⚠️ <strong>Champion-Change-Spalte</strong> — Neue Spalte in der Rangliste (KO-Modus): zeigt −5 für Spieler die ihren Champion-Tipp geändert haben (mit Tooltip)</li>
@@ -2615,7 +2623,10 @@ function calcTotalPointsKO(playerName) {
     ko_game:koPts.ko_game_pts, ko_live:koPts.ko_live_pts, ko_qual:0,
     ko_scorer:koPts.ko_scorer_pts, champion:koPts.champion_pts,
     breakdown:koPts.breakdown,
-    total: gpGame+gpScorer+gpClassif+koPts.ko_game_pts+koPts.ko_live_pts+koPts.ko_scorer_pts+koPts.champion_pts
+    total: (function(){
+      const _cc = (typeof ALL_PARTICIPANTS !== 'undefined' && ALL_PARTICIPANTS[playerName] && ALL_PARTICIPANTS[playerName].champion_changed) ? -5 : 0;
+      return gpGame+gpScorer+gpClassif+koPts.ko_game_pts+koPts.ko_live_pts+koPts.ko_scorer_pts+koPts.champion_pts+_cc;
+    })()
   };
 }
 
@@ -2644,6 +2655,7 @@ for (const [gname, members] of Object.entries(GROUP_DATA)) {
 // ══════════════ i18n TRANSLATIONS ══════════════
 const TRANSLATIONS = {
   en: {
+    wn_cc_fix: '🔧 <strong>CC Penalty Calculation Fix</strong>: Fixed a bug where the −5 champion change penalty was not correctly applied in the KO leaderboard ranking. All affected players are now sorted and displayed correctly. The KO phase launch modal now appears exactly once per player.',
     wn_champ_penalty: '⚠️ <strong>Champion Change Penalty</strong>: Players who changed their champion tip receive a <strong>−5 pt deduction</strong> and max +5 pts champion bonus. Missing tips for Adriel Fernandes have also been added.',
     porra_card_points: 'PTS',
     porra_card_exact: 'Exact',
@@ -3048,6 +3060,7 @@ const TRANSLATIONS = {
     // ── KO Insights (Kat. 1-5) ──
   },
   de: {
+    wn_cc_fix: '🔧 <strong>CC Penalty Berechnungs-Fix</strong>: Fehler behoben, bei dem der −5 Punkte Abzug für Champion-Wechsel im KO-Leaderboard nicht korrekt berechnet wurde. Alle betroffenen Spieler werden jetzt korrekt sortiert und angezeigt. Das KO-Phase-Modal erscheint ab sofort genau einmal pro Spieler.',
     wn_champ_penalty: '⚠️ <strong>Champion-Wechsel Penalty</strong>: Spieler die ihren Champion-Tipp geändert haben erhalten <strong>−5 Punkte Abzug</strong> und max. +5 Pkt. Champion-Bonus. Fehlende KO-Tipps von Adriel Fernandes wurden ergänzt.',
     porra_card_points: 'PKT',
     porra_card_exact: 'Exact',
@@ -3425,6 +3438,7 @@ const TRANSLATIONS = {
     ko_personal_ts1:           '⚽ Dein TS1: <strong>{name}</strong> — {n} tippen ihn auch',
   },
   es: {
+    wn_cc_fix: '🔧 <strong>Fix Cálculo Penalización CC</strong>: Corregido un error por el que la penalización de −5 pts por cambio de campeón no se aplicaba correctamente en el ranking KO. Todos los jugadores afectados se muestran y ordenan ahora correctamente. El modal de fase KO aparece exactamente una vez por jugador.',
     wn_champ_penalty: '⚠️ <strong>Penalización Cambio de Campeón</strong>: Los jugadores que cambiaron su pronóstico de campeón reciben una <strong>deducción de −5 pts</strong> y máximo +5 pts de bonus. Se han añadido los pronósticos KO faltantes de Adriel Fernandes.',
     porra_card_points: 'PKT',
     porra_card_exact: 'Exact',
@@ -4923,9 +4937,6 @@ async function buildLeaderboard() {
   const results = [];
   for (const name of Object.keys(ALL_PARTICIPANTS)) {
     const score = calcPlayerScore(name);
-    // Champion change penalty: -5 pts
-    const _champInfo = ALL_PARTICIPANTS[name];
-    if (_champInfo && _champInfo.champion_changed) score.total -= 5;
     if (typeof PHASE !== 'undefined' && PHASE === 'KO') {
       // KO-Modus: total inkl. KO-Punkte + Live-Punkte für korrekte Sortierung
       try {
@@ -4940,6 +4951,9 @@ async function buildLeaderboard() {
         score.ko_live = koPts.ko_live_pts || 0;
       } catch(e) { /* graceful fallback */ }
     }
+    // Champion change penalty: -5 pts (applied AFTER KO-block to not be overwritten)
+    const _champInfo = ALL_PARTICIPANTS[name];
+    if (_champInfo && _champInfo.champion_changed) score.total -= 5;
     results.push({name, ...score});
   }
   // All players already in ALL_PARTICIPANTS via unified data load
@@ -9126,13 +9140,13 @@ function switchTab(tabId) {
 }
 
 // ═══════ WHAT'S NEW ═══════
-const BUILD_VERSION = 'v2.0.46-cc-col';
-const BUILD_DATE    = '29.06.2026 12:00';
+const BUILD_VERSION = 'v2.0.47';
+const BUILD_DATE    = '29.06.2026 20:00';
 (function(){ var _hb = document.getElementById('headerVersionBadge'); if(_hb) _hb.textContent = BUILD_VERSION; })();
 
 
 
-const WN_VERSION = 'v2.0.46';
+const WN_VERSION = 'v2.0.47';
 const WN_STORAGE_KEY = window.location.pathname.includes('staging') ? 'wnSeen_staging' : 'wnSeen_live';
 (function(){ const old = localStorage.getItem('wnSeen'); if(old && !localStorage.getItem(WN_STORAGE_KEY)) localStorage.setItem(WN_STORAGE_KEY, old); })();
 const WN_I18N={
@@ -9234,6 +9248,9 @@ const WN_I18N={
 };
 // Icon map für WN-Keys — Reihenfolge & Icons für v1.12
 const WN_ITEMS = [
+  // v2.0.47 — CC Penalty Bug Fix + KO Modal fix
+  { key: 'wn_cc_fix', icon: '🔧', highlight: true },
+  { divider: true },
   // v2.0.46 — Champion Change Penalty
   { key: 'wn_champ_penalty', icon: '⚠️', highlight: true },
   { divider: true },
@@ -9340,7 +9357,7 @@ function closeWhatsNew(){
 function checkKoLaunch(){
   if(typeof PHASE === 'undefined' || PHASE !== 'KO') return;
   if(!USER || !USER.player) return;
-  const key = 'ko_launch_seen_' + (typeof WN_VERSION !== 'undefined' ? WN_VERSION : 'v1');
+  const key = 'ko_launch_seen_kophase2026';
   if(localStorage.getItem(key)) return;
   localStorage.setItem(key, '1');
   setTimeout(openKoLaunch, 800);
