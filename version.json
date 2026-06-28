@@ -1,1 +1,5 @@
-{"version":"v1.23.18","notify":false,"force":false}
+{
+  "version": "v2.0.43-ko-staging",
+  "notify": true,
+  "message": "🚀 KO-Phase ist live! Neue Spielkarten, Bracket & Multiplikatoren."
+}
