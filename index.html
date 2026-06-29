@@ -1345,6 +1345,12 @@
   <div class="section-title">📝 Changelog</div>
 
 <div class="card" style="margin-bottom:14px;">
+  <div class="card-title">v2.0.48 — 30. Juni 2026 (Fix)</div>
+  <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
+    <li>🔴 <strong>KO-Live Zeitfenster-Fallback entfernt</strong> — Spiele die laut ESPN weder LIVE noch FT sind, wurden fälschlicherweise als LIVE angezeigt wenn der Anpfiff-Zeitstempel im 130-Minuten-Fenster lag (z.B. NL–Marokko um 03:00 Uhr erschien um 19:41 als live mit fremdem ESPN-Score). Fix: Zeitfenster-Check entfernt; ESPN-Status ist alleinige Quelle der Wahrheit.</li>
+  </ul>
+</div>
+<div class="card" style="margin-bottom:14px;">
   <div class="card-title">v2.0.47 — 29. Juni 2026 (Bug-Fix + Feature)</div>
   <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
     <li>🔧 <strong>CC Penalty Berechnungs-Fix</strong> — −5 Punkte für Champion-Wechsel wurde in <code>buildLeaderboard()</code> vom nachfolgenden KO-Block überschrieben. Penalty wird jetzt erst nach dem KO-Block angewendet.</li>
@@ -9071,15 +9077,7 @@ function refreshKOGamesFromLive() {
       game.homeScore90 = parseInt(live.t1Score);
       game.awayScore90 = parseInt(live.t2Score);
     } else {
-      // Fallback: Zeitfenster-Check — wenn Spiel laut KO_GAMES vor <130min begann → als LIVE werten
-      const _kickoff = game.date ? new Date(game.date).getTime() : 0;
-      const _elapsed = _kickoff > 0 ? (Date.now() - _kickoff) / 60000 : -1;
-      if (_kickoff > 0 && _elapsed >= 0 && _elapsed < 130 && !live.isFinal) {
-        console.log('[KO-LIVE] Zeitfenster-Fallback: slot='+game.slot+' elapsed='+Math.round(_elapsed)+'min → LIVE');
-        game.status = 'LIVE';
-        game.homeScore = parseInt(live.t1Score) || 0;
-        game.awayScore = parseInt(live.t2Score) || 0;
-      }
+      // ESPN meldet weder LIVE noch FT → Spiel noch nicht gestartet (NS), Status nicht ändern
       if (_isPlaceholder(game.home) && live.t1Name) game.home = live.t1Name;
       if (_isPlaceholder(game.away) && live.t2Name) game.away = live.t2Name;
     }
@@ -9140,8 +9138,8 @@ function switchTab(tabId) {
 }
 
 // ═══════ WHAT'S NEW ═══════
-const BUILD_VERSION = 'v2.0.47';
-const BUILD_DATE    = '29.06.2026 20:00';
+const BUILD_VERSION = 'v2.0.48';
+const BUILD_DATE    = '30.06.2026 20:00';
 (function(){ var _hb = document.getElementById('headerVersionBadge'); if(_hb) _hb.textContent = BUILD_VERSION; })();
 
 
