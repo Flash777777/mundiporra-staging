@@ -1345,6 +1345,13 @@
   <div class="section-title">📝 Changelog</div>
 
 <div class="card" style="margin-bottom:14px;">
+  <div class="card-title">v2.0.49 — 29. Juni 2026 (Fix)</div>
+  <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
+    <li>🔧 <strong>ESPN-IDs vollständig korrigiert</strong> — 12 von 16 KO-Spielen hatten falsch zugeordnete ESPN-Event-IDs (systematischer Fehler beim Dateneintrag). Betroffen: R3203–R3212, R3215, R3232. Live-Scores, Ergebnisse und Torschützen werden jetzt dem richtigen Spiel zugeordnet.</li>
+  </ul>
+</div>
+
+<div class="card" style="margin-bottom:14px;">
   <div class="card-title">v2.0.48 — 30. Juni 2026 (Fix)</div>
   <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
     <li>🔴 <strong>KO-Live Zeitfenster-Fallback entfernt</strong> — Spiele die laut ESPN weder LIVE noch FT sind, wurden fälschlicherweise als LIVE angezeigt wenn der Anpfiff-Zeitstempel im 130-Minuten-Fenster lag (z.B. NL–Marokko um 03:00 Uhr erschien um 19:41 als live mit fremdem ESPN-Score). Fix: Zeitfenster-Check entfernt; ESPN-Status ist alleinige Quelle der Wahrheit.</li>
