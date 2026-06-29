@@ -1,1 +1,5 @@
-{"version":"v2.0.47","notify":true,"date":"2026-06-29"}
+{
+  "version": "v2.0.49",
+  "notify": true,
+  "message": "ESPN-IDs für KO-Spiele korrigiert (12 Fixes)"
+}
