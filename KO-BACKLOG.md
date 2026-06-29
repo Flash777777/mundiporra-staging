@@ -23,6 +23,7 @@
 |---|---|---|---|
 | KO-F1 | **KO-Simulator** | Analog zum Gruppenphase-Simulator: KO-Spielergebnisse simulieren, Auswirkung auf Rangliste live berechnen. Berücksichtigt KO-Multiplikatoren (×2 bis ×6) | 🟡 Mittel |
 | KO-F2 | **Countdown nächste KO-Spiele** | Wie im Gruppen-Modus: Countdown-Timer zum nächsten KO-Spiel auf dem Übersicht-Tab, mit Rundenbezeichnung (z.B. "Viertelfinale in 2h 15min") | 🟢 Low |
+| KO-F3 | **Gruppen-Zusammenfassungen: alle Punkte-Klassen anzeigen** | In den verschiedenen Spiel-/Gruppen-Zusammenfassungen (z.B. "Letzte Spiele", "Meine Gruppe") werden aktuell nicht immer alle vier Punkte-Klassen (3 PKT / 2 PKT / 1 PKT / 0 PKT) angezeigt — leere Klassen werden weggelassen. Alle 4 Klassen sollen immer sichtbar sein, auch wenn eine Klasse 0 Spieler enthält, um die Verteilung vollständig ablesbar zu machen | 🟢 Low |
 
 ---
 
