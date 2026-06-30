@@ -9516,7 +9516,7 @@ function switchTab(tabId) {
 
 // ═══════ WHAT'S NEW ═══════
 const BUILD_VERSION = 'v2.0.64';
-const BUILD_DATE    = '30.06.2026 19:02';
+const BUILD_DATE='30.06.2026 22:00';
 (function(){ var _hb = document.getElementById('headerVersionBadge'); if(_hb) _hb.textContent = BUILD_VERSION; })();
 
 
@@ -10122,22 +10122,22 @@ function _renderKOSimulator(){
         var c1=ts.ts1Pickers.length,c2=ts.ts2Pickers.length;
         var summary=[c1>0?c1+'× TS1 (+'+(2*mult)+')':'',c2>0?c2+'× TS2 (+'+(1*mult)+')':''].filter(Boolean).join(' · ');
         var minId=reg('s',slot,ts.name,-1),plusId=reg('s',slot,ts.name,1);
-        var tsColor=gc>0?'#4ade80':'rgba(255,255,255,.75)';
+        var tsColor=gc>0?'#16a34a':'rgba(15,23,42,.65)';
         var evts=isActive?'auto':'none';
         return '<div style="display:flex;align-items:center;gap:5px;padding:3px 0;">'
-          +'<button onclick="_k('+minId+')" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.5);border-radius:4px;padding:1px 7px;font-size:.82rem;cursor:pointer;pointer-events:'+evts+';line-height:1.4;">−</button>'
+          +'<button onclick="_k('+minId+')" style="background:rgba(15,23,42,.06);border:1px solid rgba(15,23,42,.18);color:rgba(15,23,42,.6);border-radius:4px;padding:1px 7px;font-size:.82rem;cursor:pointer;pointer-events:'+evts+';line-height:1.4;">−</button>'
           +'<span style="font-size:.75rem;min-width:14px;text-align:center;color:'+tsColor+';font-weight:700;">'+gc+'</span>'
-          +'<button onclick="_k('+plusId+')" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.5);border-radius:4px;padding:1px 7px;font-size:.82rem;cursor:pointer;pointer-events:'+evts+';line-height:1.4;">+</button>'
+          +'<button onclick="_k('+plusId+')" style="background:rgba(15,23,42,.06);border:1px solid rgba(15,23,42,.18);color:rgba(15,23,42,.6);border-radius:4px;padding:1px 7px;font-size:.82rem;cursor:pointer;pointer-events:'+evts+';line-height:1.4;">+</button>'
           +'<span style="font-size:.7rem;color:'+tsColor+';">'+ts.name+'</span>'
           +(gc>0?'<span style="font-size:.65rem;color:#4ade80;margin-left:2px;">⚽×'+gc+'</span>':'')
-          +'<span style="font-size:.6rem;color:rgba(255,255,255,.35);margin-left:auto;">'+summary+'</span>'
+          +'<span style="font-size:.6rem;color:rgba(15,23,42,.4);margin-left:auto;">'+summary+'</span>'
           +'</div>';
       });
-      return '<div style="margin-top:6px;"><div style="font-size:.6rem;color:rgba(255,255,255,.4);font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;">'+teamName+'</div>'+rows.join('')+'</div>';
+      return '<div style="margin-top:6px;"><div style="font-size:.6rem;color:rgba(15,23,42,.45);font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;">'+teamName+'</div>'+rows.join('')+'</div>';
     }
 
     var tsSectionHtml=(homeTsArr.length||awayTsArr.length)
-      ?'<div style="border-top:1px solid rgba(255,255,255,.1);margin-top:7px;padding-top:6px;opacity:'+(isActive?1:.45)+';">'+renderTsTeam(homeTsArr,kg.home)+renderTsTeam(awayTsArr,kg.away)+'</div>'
+      ?'<div style="border-top:1px solid rgba(15,23,42,.1);margin-top:7px;padding-top:6px;opacity:'+(isActive?1:.45)+';">'+renderTsTeam(homeTsArr,kg.home)+renderTsTeam(awayTsArr,kg.away)+'</div>'
       :'';
 
     var rstTarget=isLive&&kg.homeScore!=null?(kg.homeScore+':'+kg.awayScore):'0:0';
@@ -10247,7 +10247,7 @@ function _renderKOSimulator(){
 }
 
 function openSimulator(){
-  if(typeof _wnTimerId!=='undefined'&&_wnTimerId){clearTimeout(_wnTimerId);_wnTimerId=null;}const _existingWn=document.getElementById('_wnModal');if(_existingWn)_existingWn.remove();
+  if(typeof _wnTimerId!=='undefined'&&_wnTimerId){clearTimeout(_wnTimerId);_wnTimerId=null;}const _wnOvEl=document.getElementById('whatsNewOverlay');if(_wnOvEl&&_wnOvEl.classList.contains('active')){_wnOvEl.classList.remove('active');}const _existingWn=document.getElementById('_wnModal');if(_existingWn)_existingWn.remove();
   if(typeof PHASE!=='undefined'&&PHASE==='KO'){
     _simLb=_lastLb||[];
     try{_koSimInit();}catch(e){console.error('[SIM] _koSimInit error:',e);return;}
