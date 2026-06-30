@@ -1345,6 +1345,15 @@
   <div class="section-title">📝 Changelog</div>
 
 <div class="card" style="margin-bottom:14px;">
+          <div class="card-title">v2.0.61 — 30. Juni 2026 (Fix)</div>
+          <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
+            <li>🔔 <strong>What&#x27;s New Modal i18n Fix</strong> — <code>wn_ko_sim</code>, <code>wn_cc_fix</code>, <code>wn_champ_penalty</code> in <code>WN_I18N</code> für alle 3 Sprachen nachgetragen. Modal zeigte vorher Rohkeys statt Texte.</li>
+            <li>🔄 <strong>WN_VERSION → v2.0.61</strong> — Modal erscheint erneut mit korrekten Texten für alle Spieler.</li>
+            <li>🎮 <strong>Simulator Refresh-Fix</strong> — <code>refreshDashboard()</code> rief im KO-Modus fälschlicherweise <code>_renderSimulator()</code> statt <code>_renderKOSimulator()</code> auf.</li>
+            <li>🌐 <strong>Simulator Toggle i18n</strong> — Hardcodierte DE-Strings &#x27;✅ aktiv&#x27; / &#x27;⬜ aus&#x27; durch <code>T(&#x27;sim_tog_on/off&#x27;)</code> ersetzt.</li>
+          </ul>
+        </div>
+        <div class="card" style="margin-bottom:14px;">
           <div class="card-title">v2.0.60 — 30. Juni 2026 (Feature)</div>
           <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
             <li>🎮 <strong>KO-Simulator (KO-F1)</strong> — Neuer KO-Simulator: slot-basiert mit Multiplikatoren, Torschützen-Toggles, Punkt-Verteilung und Rang-Delta in Echtzeit. Ersetzt Group-Simulator im KO-Modus.</li>
@@ -2710,6 +2719,7 @@ for (const [gname, members] of Object.entries(GROUP_DATA)) {
 // ══════════════ i18n TRANSLATIONS ══════════════
 const TRANSLATIONS = {
   en: {
+    sim_tog_on:'✅ Active',sim_tog_off:'⬜ Off',
     wn_ko_sim: '🎮 <strong>KO-Simulator is back!</strong> Simulate remaining KO-round outcomes, toggle scorer goals, see point distributions with multipliers and your rank impact.',
     wn_cc_fix: '🔧 <strong>CC Penalty Calculation Fix</strong>: Fixed a bug where the −5 champion change penalty was not correctly applied in the KO leaderboard ranking. All affected players are now sorted and displayed correctly. The KO phase launch modal now appears exactly once per player.',
     wn_champ_penalty: '⚠️ <strong>Champion Change Penalty</strong>: Players who changed their champion tip receive a <strong>−5 pt deduction</strong> and max +5 pts champion bonus. Missing tips for Adriel Fernandes have also been added.',
@@ -3116,6 +3126,7 @@ const TRANSLATIONS = {
     // ── KO Insights (Kat. 1-5) ──
   },
   de: {
+    sim_tog_on:'✅ Aktiv',sim_tog_off:'⬜ Aus',
     wn_ko_sim: '🎮 <strong>KO-Simulator ist zurück!</strong> Simuliere ausstehende KO-Runden, toggle Torschützen-Tore, sieh Punkt-Verteilungen mit Multiplikatoren und Rang-Impact.',
     wn_cc_fix: '🔧 <strong>CC Penalty Berechnungs-Fix</strong>: Fehler behoben, bei dem der −5 Punkte Abzug für Champion-Wechsel im KO-Leaderboard nicht korrekt berechnet wurde. Alle betroffenen Spieler werden jetzt korrekt sortiert und angezeigt. Das KO-Phase-Modal erscheint ab sofort genau einmal pro Spieler.',
     wn_champ_penalty: '⚠️ <strong>Champion-Wechsel Penalty</strong>: Spieler die ihren Champion-Tipp geändert haben erhalten <strong>−5 Punkte Abzug</strong> und max. +5 Pkt. Champion-Bonus. Fehlende KO-Tipps von Adriel Fernandes wurden ergänzt.',
@@ -3495,6 +3506,7 @@ const TRANSLATIONS = {
     ko_personal_ts1:           '⚽ Dein TS1: <strong>{name}</strong> — {n} tippen ihn auch',
   },
   es: {
+    sim_tog_on:'✅ Activo',sim_tog_off:'⬜ Off',
     wn_ko_sim: '🎮 <strong>¡El Simulador ha vuelto!</strong> Simula resultados KO, activa goles de artilleros, ve distribuciones de puntos con multiplicadores y tu impacto en la clasificación.',
     wn_cc_fix: '🔧 <strong>Fix Cálculo Penalización CC</strong>: Corregido un error por el que la penalización de −5 pts por cambio de campeón no se aplicaba correctamente en el ranking KO. Todos los jugadores afectados se muestran y ordenan ahora correctamente. El modal de fase KO aparece exactamente una vez por jugador.',
     wn_champ_penalty: '⚠️ <strong>Penalización Cambio de Campeón</strong>: Los jugadores que cambiaron su pronóstico de campeón reciben una <strong>deducción de −5 pts</strong> y máximo +5 pts de bonus. Se han añadido los pronósticos KO faltantes de Adriel Fernandes.',
@@ -8437,7 +8449,7 @@ async function refreshDashboard() {
   const _simHasGames = (typeof PHASE!=='undefined'&&PHASE==='KO') ? KO_GAMES.some(g=>g.status==='LIVE'||(g.status==='pre'&&g.date&&new Date(g.date).getTime()>Date.now()-4*3600000)) : ALL_GAMES.some(g=>{const a=getActual(g);return a?.status==='LIVE'||(a?.status!=='FT'&&getKickoffISO(g)&&new Date(getKickoffISO(g)).getTime()>Date.now()-4*3600000);});
   const _simBtn2=document.getElementById('simHeaderBtn'); if(_simBtn2) _simBtn2.classList.toggle('visible',_simHasGames);
   for(const g of ALL_GAMES){const a=getActual(g);if(a?.status==='FT'&&SIM_STATE[g.id]?.dirty){SIM_STATE[g.id]={s1:a.s1,s2:a.s2,dirty:false};try{sessionStorage.setItem('sim_'+g.id,JSON.stringify(SIM_STATE[g.id]));}catch(e){}}}
-  if(document.getElementById('simOverlay')?.classList.contains('active')){_simLb=_lastLb;_renderSimulator();}
+  if(document.getElementById('simOverlay')?.classList.contains('active')){_simLb=_lastLb;if(typeof PHASE!=='undefined'&&PHASE==='KO'){try{_renderKOSimulator();}catch(e){console.error('_renderKOSimulator refresh err:',e);}}else{_renderSimulator();}}
 }
 
 async function initDashboard() {
@@ -9452,17 +9464,21 @@ function switchTab(tabId) {
 }
 
 // ═══════ WHAT'S NEW ═══════
-const BUILD_VERSION = 'v2.0.60';
-const BUILD_DATE    = '30.06.2026 18:00';
+const BUILD_VERSION = 'v2.0.61';
+const BUILD_DATE    = '30.06.2026 19:30';
 (function(){ var _hb = document.getElementById('headerVersionBadge'); if(_hb) _hb.textContent = BUILD_VERSION; })();
 
 
 
-const WN_VERSION = 'v2.0.60';
+const WN_VERSION = 'v2.0.61';
 const WN_STORAGE_KEY = window.location.pathname.includes('staging') ? 'wnSeen_staging' : 'wnSeen_live';
 (function(){ const old = localStorage.getItem('wnSeen'); if(old && !localStorage.getItem(WN_STORAGE_KEY)) localStorage.setItem(WN_STORAGE_KEY, old); })();
 const WN_I18N={
   en:{
+    // v2.0.60
+    wn_ko_sim:'🎮 <strong>KO-Simulator is back!</strong> Simulate remaining KO-round outcomes, toggle scorer goals, see point distributions with multipliers and your rank impact.',
+    wn_cc_fix:'🔧 <strong>CC Penalty Calculation Fix</strong>: Fixed a bug where the −5 champion change penalty was not correctly applied in the KO leaderboard ranking. All affected players are now sorted and displayed correctly. The KO phase launch modal now appears exactly once per player.',
+    wn_champ_penalty:'⚠️ <strong>Champion Change Penalty</strong>: Players who changed their champion tip receive a <strong>−5 pt deduction</strong> and max +5 pts champion bonus. Missing tips for Adriel Fernandes have also been added.',
     // v2.0 — KO-Phase
     wn_ko_launch:'🚀 <strong>KO Phase is LIVE!</strong>: The Group Phase is over — the knockout rounds have begun. Round of 32, Round of 16, Quarterfinals, Semis and the Final await. Your tips are locked in — may the best predictor win!',
     wn_ko_bracket:'⚔️ <strong>KO Bracket with Live Scores</strong>: The Bracket tab shows all KO matches with real-time scores, your tips, pairing predictions and the community distribution — updated every 60 seconds.',
@@ -9495,6 +9511,10 @@ const WN_I18N={
     wn_fetch:'⚡ <strong>8× faster reload</strong>: weekly batch fetching replaces 38 daily requests. Scorer data straight from match events.',
   },
   de:{
+    // v2.0.60
+    wn_ko_sim:'🎮 <strong>KO-Simulator ist zurück!</strong> Simuliere ausstehende KO-Runden, toggle Torschützen-Tore, sieh Punkt-Verteilungen mit Multiplikatoren und Rang-Impact.',
+    wn_cc_fix:'🔧 <strong>CC Penalty Berechnungs-Fix</strong>: Fehler behoben, bei dem der −5 Punkte Abzug für Champion-Wechsel im KO-Leaderboard nicht korrekt berechnet wurde. Alle betroffenen Spieler werden jetzt korrekt sortiert und angezeigt. Das KO-Phase-Modal erscheint ab sofort genau einmal pro Spieler.',
+    wn_champ_penalty:'⚠️ <strong>Champion-Wechsel Penalty</strong>: Spieler die ihren Champion-Tipp geändert haben erhalten <strong>−5 Punkte Abzug</strong> und max. +5 Pkt. Champion-Bonus. Fehlende KO-Tipps von Adriel Fernandes wurden ergänzt.',
     // v2.0 — KO-Phase
     wn_ko_launch:'🚀 <strong>KO-Phase ist LIVE!</strong>: Die Gruppenphase ist vorbei — die K.o.-Runden haben begonnen. Achtelfinale, Viertelfinale, Halbfinale und das Finale warten. Deine Tipps sind gesetzt — möge der beste Tipper gewinnen!',
     wn_ko_bracket:'⚔️ <strong>KO-Bracket mit Live-Ergebnissen</strong>: Der Bracket-Tab zeigt alle K.o.-Spiele mit Echtzeit-Ergebnissen, deinen Tipps, Paarungsvorhersagen und der Community-Verteilung — Aktualisierung alle 60 Sekunden.',
@@ -9527,6 +9547,10 @@ const WN_I18N={
     wn_fetch:'⚡ <strong>8× schnellerer Reload</strong>: Wöchentliche Batches statt 38 täglicher Requests. Torschützen direkt aus Match-Events.',
   },
   es:{
+    // v2.0.60
+    wn_ko_sim:'🎮 <strong>¡El Simulador ha vuelto!</strong> Simula resultados KO, activa goles de artilleros, ve distribuciones de puntos con multiplicadores y tu impacto en la clasificación.',
+    wn_cc_fix:'🔧 <strong>Fix Cálculo Penalización CC</strong>: Corregido un error por el que la penalización de −5 pts por cambio de campeón no se aplicaba correctamente en el ranking KO. Todos los jugadores afectados se muestran y ordenan ahora correctamente. El modal de fase KO aparece exactamente una vez por jugador.',
+    wn_champ_penalty:'⚠️ <strong>Penalización Cambio de Campeón</strong>: Los jugadores que cambiaron su pronóstico de campeón reciben una <strong>deducción de −5 pts</strong> y máximo +5 pts de bonus. Se han añadido los pronósticos KO faltantes de Adriel Fernandes.',
     // v2.0 — KO-Phase
     wn_ko_launch:'🚀 <strong>¡La Fase KO está EN VIVO!</strong>: La fase de grupos ha terminado — han comenzado las rondas eliminatorias. Octavos, cuartos, semis y la final te esperan. ¡Tus pronósticos están fijos — que gane el mejor!',
     wn_ko_bracket:'⚔️ <strong>Bracket KO con Resultados en Vivo</strong>: La pestaña Bracket muestra todos los partidos KO con marcadores en tiempo real, tus pronósticos, predicciones de emparejamiento y la distribución de la comunidad — actualización cada 60 segundos.',
@@ -10066,7 +10090,7 @@ function _renderKOSimulator(){
       +(dateStr?'<span style="font-size:.6rem;color:rgba(255,255,255,.3);">'+dateStr+'</span>':'')
       +'</div>'
       +'<button onclick="_k('+togId+')" style="background:'+togBg+';border:1px solid '+togBd+';color:'+togClr+';border-radius:6px;padding:3px 9px;font-size:.65rem;cursor:pointer;font-weight:600;">'
-      +(isActive?'✅ aktiv':'⬜ aus')+'</button></div>'
+      +(isActive?T('sim_tog_on'):T('sim_tog_off'))+'</button></div>'
       +'<div style="font-weight:700;font-size:.85rem;margin-bottom:4px;'+(isLive?'color:#f87171;':'')+'">'+kg.home+' vs '+kg.away+'</div>'
       +liveHtml
       +'<div class="sim-score-row" style="'+(isActive?'':'opacity:.35;pointer-events:none;')+'">'
