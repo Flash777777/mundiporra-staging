@@ -1345,6 +1345,16 @@
   <div class="section-title">📝 Changelog</div>
 
 <div class="card" style="margin-bottom:14px;">
+          <div class="card-title">v2.0.63t — 30. Juni 2026 (Feature + Fix)</div>
+          <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
+            <li>⚡ <strong>WN_VERSION v2.0.63t</strong> — What's New Modal erscheint erneut mit neuem KO-Simulator-Eintrag (⚡) als oberstem Item.</li>
+            <li>🔧 <strong>WN-Timer Fix</strong> — <code>openSimulator()</code> cancelt den auto-openWhatsNew-Timer; <code>openWhatsNew()</code> öffnet nicht wenn Simulator bereits aktiv ist.</li>
+            <li>🐛 <strong>KO-7 Fix</strong> — "Nächste Spiele" verschwand wenn ein Spiel LIVE war oder Teams noch nicht feststehen. Filter korrigiert: <code>kg.date</code> statt <code>kg.home&&kg.away</code>.</li>
+            <li>🃏 <strong>renderKOTipBlock</strong> — Upcoming-Games zeigen jetzt eine Fixture-Card (⏰ Anstoss + Runde) statt leerem Block.</li>
+            <li>🧹 <strong>Debug-Logs</strong> — Alle <code>console.log('[SIM]')</code>-Traces aus <code>openSimulator()</code> entfernt.</li>
+          </ul>
+        </div>
+        <div class="card" style="margin-bottom:14px;">
           <div class="card-title">v2.0.62t — 30. Juni 2026 (Debug-Trace)</div>
           <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
             <li>🔍 <strong>Simulator Trace</strong> — Console-Logs in <code>openSimulator()</code> zur Diagnose des KO-Simulator-Bugs.</li>
@@ -2851,6 +2861,7 @@ const TRANSLATIONS = {
     ko_details: '▼ Details',
     ko_top_tip: 'Top tip',
     ko_tipper: 'tippers',
+    ko_up_no_score: 'No score yet — this fixture is still being determined.',
     ko_all_pairing: 'All correct pairings',
     members: 'members',
     avg_pts: 'avg pts',
@@ -3251,6 +3262,7 @@ const TRANSLATIONS = {
     ko_details: '▼ Details',
     ko_top_tip: 'Top-Tipp',
     ko_tipper: 'Tipper',
+    ko_up_no_score: 'Noch kein Ergebnis — Paarung wird noch ermittelt.',
     ko_all_pairing: 'Alle Paarungstreffer',
     members: 'Mitglieder',
     avg_pts: 'Ø Pkt',
@@ -3631,6 +3643,7 @@ const TRANSLATIONS = {
     ko_details: '▼ Detalles',
     ko_top_tip: 'Tipp favorito',
     ko_tipper: 'apostadores',
+    ko_up_no_score: 'Aún sin resultado — el emparejamiento está por determinarse.',
     ko_all_pairing: 'Todos los emparejamientos',
     members: 'miembros',
     avg_pts: 'pts medios',
@@ -6246,6 +6259,16 @@ function renderKOTipBlock(kg, lb) {
   const mult   = kg.multiplier || 1;
   const sc1    = kg.homeScore90 ?? kg.homeScore;
   const sc2    = kg.awayScore90 ?? kg.awayScore;
+  // Upcoming fixture guard (teams/score not yet known)
+  if(sc1==null&&sc2==null){
+    const hLabel=kg.home||'TBD';const aLabel=kg.away||'TBD';
+    const kickoff=kg.date?new Date(kg.date).toLocaleString(lang,{weekday:'short',day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}):'';
+    return `<div style="margin-bottom:12px;padding:8px 10px;border-radius:8px;border:1px solid var(--border);background:var(--card-bg);">
+      <div style="font-size:.82rem;font-weight:700;margin-bottom:2px;">${hLabel} vs ${aLabel} <span style="font-size:.7rem;font-weight:400;color:var(--muted);">${kg.roundLabel||kg.round||''} ×${mult}</span></div>
+      ${kickoff?'<div style="font-size:.75rem;color:var(--muted);">⏰ '+kickoff+'</div>':''}
+      <div style="font-size:.75rem;color:var(--muted);margin-top:2px;">${T('ko_up_no_score')}</div>
+    </div>`;
+  }
   const myGroups = getMyGroups();
   const groupMemberSet = new Set();
   for (const g of myGroups) for (const m of (GROUP_DATA[g] || [])) groupMemberSet.add(m);
@@ -6871,7 +6894,7 @@ function renderGroupLatestGame(members, lb) {
     }
     // Next upcoming KO slot
     const nowTs = Date.now();
-    const koUp = KO_GAMES.filter(kg => kg.status !== 'FT' && kg.status !== 'LIVE' && kg.home && kg.away);
+    const koUp = KO_GAMES.filter(kg => kg.status !== 'FT' && kg.status !== 'LIVE' && kg.date);
     koUp.sort((a, b) => new Date(a.date || 0) - new Date(b.date || 0));
     if (koUp.length) {
       const nextKoSlot = [];
@@ -9470,17 +9493,19 @@ function switchTab(tabId) {
 }
 
 // ═══════ WHAT'S NEW ═══════
-const BUILD_VERSION = 'v2.0.62t';
-const BUILD_DATE    = '30.06.2026 20:00';
+const BUILD_VERSION = 'v2.0.63t';
+const BUILD_DATE    = '30.06.2026 02:00';
 (function(){ var _hb = document.getElementById('headerVersionBadge'); if(_hb) _hb.textContent = BUILD_VERSION; })();
 
 
 
-const WN_VERSION = 'v2.0.61';
+const WN_VERSION = 'v2.0.63t';
 const WN_STORAGE_KEY = window.location.pathname.includes('staging') ? 'wnSeen_staging' : 'wnSeen_live';
 (function(){ const old = localStorage.getItem('wnSeen'); if(old && !localStorage.getItem(WN_STORAGE_KEY)) localStorage.setItem(WN_STORAGE_KEY, old); })();
 const WN_I18N={
   en:{
+    // v2.0.63t
+    wn_sim_v63:'⚡ <strong>KO-Simulator Live!</strong> Simulate remaining KO rounds — set scores per game, adjust scorer goal counts (0/1/2/3…) with multiplier-based scoring and see your rank impact in real time.',
     // v2.0.60
     wn_ko_sim:'🎮 <strong>KO-Simulator is back!</strong> Simulate remaining KO-round outcomes, toggle scorer goals, see point distributions with multipliers and your rank impact.',
     wn_cc_fix:'🔧 <strong>CC Penalty Calculation Fix</strong>: Fixed a bug where the −5 champion change penalty was not correctly applied in the KO leaderboard ranking. All affected players are now sorted and displayed correctly. The KO phase launch modal now appears exactly once per player.',
@@ -9518,6 +9543,7 @@ const WN_I18N={
   },
   de:{
     // v2.0.60
+    wn_sim_v63:'⚡ <strong>KO-Simulator Live!</strong> Simuliere verbleibende KO-Runden — setze Ergebnisse pro Spiel, passe Torschützen-Tore (0/1/2/3…) mit Multiplikatoren an und sieh deinen Rang-Impact in Echtzeit.',
     wn_ko_sim:'🎮 <strong>KO-Simulator ist zurück!</strong> Simuliere ausstehende KO-Runden, toggle Torschützen-Tore, sieh Punkt-Verteilungen mit Multiplikatoren und Rang-Impact.',
     wn_cc_fix:'🔧 <strong>CC Penalty Berechnungs-Fix</strong>: Fehler behoben, bei dem der −5 Punkte Abzug für Champion-Wechsel im KO-Leaderboard nicht korrekt berechnet wurde. Alle betroffenen Spieler werden jetzt korrekt sortiert und angezeigt. Das KO-Phase-Modal erscheint ab sofort genau einmal pro Spieler.',
     wn_champ_penalty:'⚠️ <strong>Champion-Wechsel Penalty</strong>: Spieler die ihren Champion-Tipp geändert haben erhalten <strong>−5 Punkte Abzug</strong> und max. +5 Pkt. Champion-Bonus. Fehlende KO-Tipps von Adriel Fernandes wurden ergänzt.',
@@ -9554,6 +9580,7 @@ const WN_I18N={
   },
   es:{
     // v2.0.60
+    wn_sim_v63:'⚡ <strong>¡Simulador KO en Vivo!</strong> Simula las rondas KO restantes — ajusta marcadores, goles de goleadores (0/1/2/3…) con multiplicadores y ve el impacto en tu clasificación en tiempo real.',
     wn_ko_sim:'🎮 <strong>¡El Simulador ha vuelto!</strong> Simula resultados KO, activa goles de artilleros, ve distribuciones de puntos con multiplicadores y tu impacto en la clasificación.',
     wn_cc_fix:'🔧 <strong>Fix Cálculo Penalización CC</strong>: Corregido un error por el que la penalización de −5 pts por cambio de campeón no se aplicaba correctamente en el ranking KO. Todos los jugadores afectados se muestran y ordenan ahora correctamente. El modal de fase KO aparece exactamente una vez por jugador.',
     wn_champ_penalty:'⚠️ <strong>Penalización Cambio de Campeón</strong>: Los jugadores que cambiaron su pronóstico de campeón reciben una <strong>deducción de −5 pts</strong> y máximo +5 pts de bonus. Se han añadido los pronósticos KO faltantes de Adriel Fernandes.',
@@ -9590,7 +9617,10 @@ const WN_I18N={
 };
 // Icon map für WN-Keys — Reihenfolge & Icons für v1.12
 const WN_ITEMS = [
-  // v2.0.60 — KO-Simulator
+  // v2.0.63t — KO-Simulator fully released
+  { key: 'wn_sim_v63', icon: '⚡', highlight: true },
+  { divider: true },
+  // v2.0.60 — KO-Simulator (previous)
   { key: 'wn_ko_sim', icon: '🎮', highlight_red: true },
   { divider: true },
   // v2.0.47 — CC Penalty Bug Fix + KO Modal fix
@@ -9642,6 +9672,7 @@ const WN_ITEMS = [
 
 function openWhatsNew(){
   try {
+    if(document.getElementById('simOverlay')?.classList.contains('active'))return;
     // Entferne vorhandene Instanz
     const ex = document.getElementById('_wnModal');
     if(ex) ex.remove();
@@ -9840,10 +9871,11 @@ function _applyWnLang(){
     }).join('');
   }
 }
+let _wnTimerId=null;
 function checkWhatsNew(){
   if(localStorage.getItem(WN_STORAGE_KEY)!==WN_VERSION){
     document.getElementById('wnDot').classList.add('visible');
-    setTimeout(()=>{if(!document.getElementById('whatsNewOverlay').classList.contains('active'))openWhatsNew();},1200);
+    _wnTimerId=setTimeout(()=>{if(!document.getElementById('whatsNewOverlay').classList.contains('active'))openWhatsNew();},1200);
   }
 }
 
@@ -10188,18 +10220,14 @@ function _renderKOSimulator(){
 }
 
 function openSimulator(){
-  console.log('[SIM] openSimulator called, PHASE=',typeof PHASE!=='undefined'?PHASE:'undef');
+  if(typeof _wnTimerId!=='undefined'&&_wnTimerId){clearTimeout(_wnTimerId);_wnTimerId=null;}
   if(typeof PHASE!=='undefined'&&PHASE==='KO'){
-    console.log('[SIM] KO branch — init');
     _simLb=_lastLb||[];
-    try{_koSimInit();}catch(e){console.error('[SIM] _koSimInit threw:',e);return;}
-    console.log('[SIM] KO_SIM_STATE slots after init:',Object.keys(KO_SIM_STATE).length);
+    try{_koSimInit();}catch(e){console.error('[SIM] _koSimInit error:',e);return;}
     const overlay=document.getElementById('simOverlay');
-    console.log('[SIM] overlay found:',!!overlay,overlay?.id);
     if(!overlay){console.error('simOverlay not found');return;}
     overlay.classList.add('active');
-    console.log('[SIM] overlay.active added, classList:',overlay.className);
-    try{_renderKOSimulator();console.log('[SIM] _renderKOSimulator done');}catch(e){console.error('_renderKOSimulator error:',e);}
+    try{_renderKOSimulator();}catch(e){console.error('_renderKOSimulator error:',e);}
     return;
   }
   try{
