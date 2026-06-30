@@ -1345,6 +1345,13 @@
   <div class="section-title">📝 Changelog</div>
 
 <div class="card" style="margin-bottom:14px;">
+  <div class="card-title">v2.0.59 — 30.06.2026 (Fix)</div>
+  <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
+    <li>🐛 <strong>Meine Gruppen — Letztes Spiel KO-Fix</strong> — Im Gruppen-Tab wurden Gruppenspiele statt KO-Spiele angezeigt. <code>renderGroupLatestGame()</code> nutzt jetzt bei <code>PHASE=KO</code> korrekt <code>KO_GAMES</code>.</li>
+  </ul>
+</div>
+
+<div class="card" style="margin-bottom:14px;">
   <div class="card-title">v2.0.58 — 30.06.2026 (Fix)</div>
   <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
     <li>🐛 <strong>KO Game Detail Panel — null:null Fix</strong> — Spieler ohne KO-Tipps (z.B. Victor Morales) wurden im Spiele-Tab fälschlicherweise mit <code>null:null</code> und Punkten angezeigt. Filter und Scoring-Logik korrigiert.</li>
@@ -6806,6 +6813,55 @@ function renderGroupLatestGame(members, lb) {
   let html = '';
   const EIGHT_HOURS = 8 * 60 * 60 * 1000;
 
+  // ── KO-Phase: KO_GAMES statt ALL_GAMES ──────────────────────────────────────
+  if (typeof PHASE !== 'undefined' && PHASE === 'KO') {
+    // Last finished KO slot
+    const koFin = KO_GAMES.filter(kg => kg.status === 'FT' && kg.home && kg.away);
+    koFin.sort((a, b) => new Date(a.date || 0) - new Date(b.date || 0));
+    if (koFin.length) {
+      const _koGrp = arr => {
+        const groups = [];
+        for (const kg of arr) {
+          const t = new Date(kg.date || 0).getTime();
+          const last = groups[groups.length - 1];
+          if (!last || t - new Date(last[0].date || 0).getTime() > EIGHT_HOURS) groups.push([kg]);
+          else last.push(kg);
+        }
+        return groups;
+      };
+      const lastSlot = _koGrp(koFin).slice(-1)[0] || [];
+      if (lastSlot.length) {
+        html += `<div style="font-size:0.8rem; font-weight:700; color:var(--muted); text-transform:uppercase; margin-bottom:6px;">📋 Letztes Spiel</div>`;
+        html += lastSlot.map(kg => renderKOTipBlock(kg, lb)).join('<hr style="margin:8px 0; border:none; border-top:1px solid #eee;">');
+      }
+    }
+    // Live KO slot
+    const koLive = KO_GAMES.filter(kg => kg.status === 'LIVE');
+    if (koLive.length) {
+      html += `<hr style="margin:14px 0; border:none; border-top:2px solid var(--red); opacity:.3;"><div style="font-size:0.8rem; font-weight:700; color:var(--red); text-transform:uppercase; margin-bottom:6px;">🔴 Live</div>`;
+      html += koLive.map(kg => renderKOTipBlock(kg, lb)).join('<hr style="margin:8px 0; border:none; border-top:1px dashed rgba(231,76,60,.3);">');
+    }
+    // Next upcoming KO slot
+    const nowTs = Date.now();
+    const koUp = KO_GAMES.filter(kg => kg.status !== 'FT' && kg.status !== 'LIVE' && kg.home && kg.away);
+    koUp.sort((a, b) => new Date(a.date || 0) - new Date(b.date || 0));
+    if (koUp.length) {
+      const nextKoSlot = [];
+      const refT = new Date(koUp[0].date || 0).getTime();
+      for (const kg of koUp) {
+        if (new Date(kg.date || 0).getTime() - refT <= EIGHT_HOURS) nextKoSlot.push(kg);
+        else break;
+      }
+      const koStr = koUp[0].date ? ` · ${fmtKickoff(koUp[0].date)}` : '';
+      html += `<hr style="margin:14px 0; border:none; border-top:1px solid #eee;"><div style="font-size:0.8rem; font-weight:700; color:var(--muted); text-transform:uppercase; margin-bottom:6px;">⏰ Nächste Spiele${koStr}</div>`;
+      html += nextKoSlot.map(kg => renderKOTipBlock(kg, lb)).join('<hr style="margin:8px 0; border:none; border-top:1px solid #eee;">');
+    }
+    if (!html) html = `<div class="empty-state">${T('no_finished')}</div>`;
+    document.getElementById('groupLatestGame').innerHTML = html;
+    return;
+  }
+
+  // ── Gruppenphase: bisherige Logik ───────────────────────────────────────────
   // Last finished slot
   const finished = ALL_GAMES.filter(g => getActual(g)?.status === 'FT');
   const finGroups = groupByKickoff(finished, EIGHT_HOURS);
@@ -9386,8 +9442,8 @@ function switchTab(tabId) {
 }
 
 // ═══════ WHAT'S NEW ═══════
-const BUILD_VERSION = 'v2.0.58';
-const BUILD_DATE    = '30.06.2026 15:17';
+const BUILD_VERSION = 'v2.0.59';
+const BUILD_DATE    = '30.06.2026 15:23';
 (function(){ var _hb = document.getElementById('headerVersionBadge'); if(_hb) _hb.textContent = BUILD_VERSION; })();
 
 
