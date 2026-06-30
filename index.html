@@ -528,7 +528,7 @@
   #tab-group { }
 
   /* SIMULATOR */
-  #simOverlay{display:none;position:fixed;inset:0;z-index:2000;background:#f0f4f8;color:#1a2340;overflow:auto;flex-direction:column;}
+  #simOverlay{display:none;position:fixed;inset:0;z-index:9500;background:#f0f4f8;color:#1a2340;overflow:auto;flex-direction:column;width:100vw;height:100vh;}
   #simOverlay.active{display:flex;}
   .sim-header{display:flex;align-items:center;gap:12px;padding:12px 16px;background:#1a2340;color:white;border-bottom:2px solid #2c3e6b;flex-shrink:0;}
   .sim-header h2{font-size:1rem;font-weight:800;margin:0;color:white;}
@@ -760,190 +760,6 @@
 /* ═══════════════════════════════════════════════════════
    KO LAUNCH MODAL — v2.0.35
    ═══════════════════════════════════════════════════════ */
-#ko-launch-overlay {
-  display: none;
-  position: fixed;
-  inset: 0;
-  z-index: 9000;
-  background: rgba(0,0,0,0.72);
-  backdrop-filter: blur(4px);
-  justify-content: center;
-  align-items: center;
-  padding: 16px;
-}
-#ko-launch-box {
-  background: linear-gradient(135deg, #1a2340 0%, #0d1b2a 100%);
-  border: 2px solid var(--accent, #f7b731);
-  border-radius: 18px;
-  max-width: 420px;
-  width: 100%;
-  max-height: 90vh;
-  overflow-y: auto;
-  padding: 28px 24px 20px;
-  position: relative;
-  color: #fff;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.8);
-  animation: kolSlideIn 0.4s cubic-bezier(0.34,1.56,0.64,1) both;
-}
-@keyframes kolSlideIn {
-  from { opacity:0; transform: scale(0.85) translateY(30px); }
-  to   { opacity:1; transform: scale(1)   translateY(0);     }
-}
-.kol-trophy { font-size: 3rem; text-align: center; margin-bottom: 8px; }
-.kol-title { text-align:center; font-size:1.5rem; margin:0 0 6px; color: var(--accent, #f7b731); }
-.kol-subtitle { text-align:center; font-size:0.88rem; color:#aac; margin:0 0 18px; }
-.kol-section-title { font-size:0.8rem; text-transform:uppercase; letter-spacing:1px; color:#aac; margin:14px 0 8px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:4px; }
-.kol-mult-grid { display:grid; gap:5px; }
-.kol-mult-row { display:flex; justify-content:space-between; align-items:center; font-size:0.9rem; padding:4px 0; }
-.kol-mult-badge { background:var(--blue,#1a73e8); color:#fff; border-radius:8px; padding:2px 10px; font-weight:700; font-size:0.9rem; }
-.kol-mult-badge.kol-special { background:#9b59b6; }
-.kol-mult-badge.kol-final { background:var(--accent,#f7b731); color:#1a2340; }
-.kol-stat-line { font-size:0.9rem; padding:3px 0; color:#dde; }
-.kol-my-row { font-size:0.9rem; padding:3px 0; display:flex; gap:6px; align-items:center; }
-.kol-footer { text-align:center; margin-top:18px; }
-.kol-close-btn { background:var(--accent,#f7b731); color:#1a2340; border:none; border-radius:10px; padding:10px 28px; font-size:1rem; font-weight:700; cursor:pointer; transition:transform 0.1s; }
-.kol-close-btn:hover { transform:scale(1.04); }
-#ko-launch-overlay.active { display: flex; }
-
-.ko-launch-box {
-  background: var(--card-bg, #fff);
-  border-radius: 18px;
-  max-width: 420px;
-  width: 100%;
-  padding: 28px 24px 22px;
-  position: relative;
-  overflow: hidden;
-  box-shadow: 0 24px 60px rgba(0,0,0,0.35);
-  animation: koModalIn 0.45s cubic-bezier(0.34,1.56,0.64,1) both;
-}
-@keyframes koModalIn {
-  from { opacity:0; transform: scale(0.78) translateY(30px); }
-  to   { opacity:1; transform: scale(1)    translateY(0); }
-}
-
-/* Konfetti */
-.ko-confetti-piece {
-  position: absolute;
-  top: -16px;
-  width: 9px;
-  height: 9px;
-  border-radius: 2px;
-  opacity: 0;
-  animation: koConfettiFall linear forwards;
-}
-@keyframes koConfettiFall {
-  0%   { opacity:1; transform: translateY(0)   rotate(0deg); }
-  100% { opacity:0; transform: translateY(520px) rotate(720deg); }
-}
-
-/* Header */
-.ko-launch-header { text-align: center; margin-bottom: 16px; }
-.ko-launch-trophy {
-  font-size: 3rem;
-  display: block;
-  margin-bottom: 6px;
-  animation: koTrophyPop 0.6s 0.3s cubic-bezier(0.34,1.56,0.64,1) both;
-}
-@keyframes koTrophyPop {
-  from { transform: scale(0) rotate(-20deg); opacity:0; }
-  to   { transform: scale(1) rotate(0deg);   opacity:1; }
-}
-.ko-launch-title {
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: var(--text, #1a1a2e);
-  margin: 0 0 3px;
-  animation: koFadeUp 0.5s 0.5s both;
-}
-.ko-launch-subtitle {
-  font-size: 0.8rem;
-  color: var(--text-muted, #888);
-  margin: 0;
-  animation: koFadeUp 0.5s 0.65s both;
-}
-
-/* Multiplier row */
-.ko-mult-row {
-  display: flex;
-  justify-content: center;
-  gap: 6px;
-  margin: 14px 0 16px;
-  flex-wrap: wrap;
-}
-.ko-mult-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  background: var(--accent, #e63946);
-  color: #fff;
-  border-radius: 10px;
-  padding: 6px 10px;
-  min-width: 46px;
-  opacity: 0;
-  animation: koMultPop 0.4s cubic-bezier(0.34,1.56,0.64,1) both;
-}
-.ko-mult-x    { font-size: 1.05rem; font-weight: 800; line-height: 1.2; }
-.ko-mult-label{ font-size: 0.58rem; font-weight: 600; opacity: .85; line-height: 1.2; }
-
-/* Stats list */
-.ko-stats-list {
-  border-top: 1px solid var(--border, #eee);
-  padding-top: 12px;
-  margin-bottom: 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 7px;
-}
-.ko-stat-row {
-  font-size: 0.83rem;
-  color: var(--text, #333);
-  opacity: 0;
-  animation: koFadeUp 0.5s both;
-  line-height: 1.4;
-}
-
-/* Personal section */
-.ko-personal-section {
-  border-top: 1px solid var(--border, #eee);
-  padding-top: 12px;
-  margin-bottom: 14px;
-}
-.ko-personal-label {
-  font-size: 0.7rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: .06em;
-  color: var(--accent, #e63946);
-  margin-bottom: 6px;
-  opacity: 0;
-  animation: koFadeUp 0.5s both;
-}
-.ko-personal-row {
-  font-size: 0.83rem;
-  color: var(--text, #333);
-  line-height: 1.5;
-  opacity: 0;
-  animation: koFadeUp 0.5s both;
-}
-
-/* CTA button */
-.ko-launch-cta {
-  display: block;
-  width: 100%;
-  padding: 12px;
-  background: var(--accent, #e63946);
-  color: #fff;
-  border: none;
-  border-radius: 12px;
-  font-size: 1rem;
-  font-weight: 700;
-  cursor: pointer;
-  opacity: 0;
-  animation: koFadeUp 0.5s both;
-  transition: transform .12s, box-shadow .12s;
-}
-.ko-launch-cta:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(230,57,70,.4); }
-.ko-launch-cta:active { transform: translateY(0); }
 
 @keyframes koFadeUp {
   from { opacity:0; transform: translateY(12px); }
@@ -1344,6 +1160,15 @@
 <div class="page">
   <div class="section-title">📝 Changelog</div>
 
+<div class="card" style="margin-bottom:14px;">
+  <div class="card-title">v2.0.66 — 30. Juni 2026 (Fix)</div>
+  <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
+    <li>⚡ <strong>Simulator Fix (Root Cause)</strong> — <code>document.body.appendChild(overlay)</code> löst Stacking-Context-Problem: simOverlay lag innerhalb von <code>.page</code> und war trotz <code>display:flex</code> unsichtbar.</li>
+    <li>🔢 <strong>simOverlay z-index</strong> — 2000 → 9500 für sichere Darstellung über allen Page-Elementen.</li>
+    <li>🗑️ <strong>KO-Launch-Modal entfernt</strong> — CSS, HTML, JS und alle Aufrufe vollständig entfernt.</li>
+    <li>📣 <strong>What's New</strong> — Duplikat <code>wn_ko_sim</code> entfernt; KO-Simulator erscheint jetzt nur einmal als Top-Eintrag.</li>
+  </ul>
+</div>
 <div class="card" style="margin-bottom:14px;">
           <div class="card-title">v2.0.64 — 30. Juni 2026 (Fix)</div>
           <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
@@ -9522,13 +9347,13 @@ function switchTab(tabId) {
 }
 
 // ═══════ WHAT'S NEW ═══════
-const BUILD_VERSION='v2.0.65';
-const BUILD_DATE='30.06.2026 22:30';
+const BUILD_VERSION='v2.0.66';
+const BUILD_DATE='30.06.2026 23:45';
 (function(){ var _hb = document.getElementById('headerVersionBadge'); if(_hb) _hb.textContent = BUILD_VERSION; })();
 
 
 
-const WN_VERSION = 'v2.0.64';
+const WN_VERSION = 'v2.0.66';
 const WN_STORAGE_KEY = window.location.pathname.includes('staging') ? 'wnSeen_staging' : 'wnSeen_live';
 (function(){ const old = localStorage.getItem('wnSeen'); if(old && !localStorage.getItem(WN_STORAGE_KEY)) localStorage.setItem(WN_STORAGE_KEY, old); })();
 const WN_I18N={
@@ -9648,9 +9473,7 @@ const WN_I18N={
 const WN_ITEMS = [
   // v2.0.63 — KO-Simulator fully released
   { key: 'wn_sim_v63', icon: '⚡', highlight: true },
-  { divider: true },
-  // v2.0.60 — KO-Simulator (previous)
-  { key: 'wn_ko_sim', icon: '🎮', highlight_red: true },
+
   { divider: true },
   // v2.0.47 — CC Penalty Bug Fix + KO Modal fix
   { key: 'wn_cc_fix', icon: '🔧', highlight: true },
@@ -9759,110 +9582,6 @@ function closeWhatsNew(){
 }
 
 // ═══════ KO LAUNCH MODAL ═══════
-function checkKoLaunch(){
-  if(typeof PHASE === 'undefined' || PHASE !== 'KO') return;
-  if(!USER || !USER.player) return;
-  const key = 'ko_launch_seen_kophase2026';
-  if(localStorage.getItem(key)) return;
-  localStorage.setItem(key, '1');
-  setTimeout(openKoLaunch, 800);
-}
-function openKoLaunch(){
-  const existing = document.getElementById('_kolModal');
-  if(existing) existing.remove();
-
-  // Sprache: USER.lang > setupLang-Select > localStorage > 'de'
-  const _kl = document.getElementById('setupLang');
-  const lang = (USER&&USER.lang)||(_kl&&_kl.value)||localStorage.getItem('userLang')||'de';
-
-  // i18n-Texte
-  const _KOI18N = {
-    de:{ title:'KO-Phase gestartet!', sub:'Die Gruppenphase ist Geschichte \u2014 jetzt wird es ernst.',
-         multLabel:'Punkte-Multiplikatoren',
-         rounds:[['Achtelfinale','\u00d72','#1a73e8'],['Viertelfinale','\u00d73','#1a73e8'],['Halbfinale','\u00d74','#1a73e8'],['Spiel um Platz 3','\u00d75','#9b59b6'],['Finale','\u00d77','#f7b731']],
-         community:'Community-Favoriten', stimmen:'Stimmen', myTips:'Deine Tipps',
-         champ:'Champion', ts1:'TS1', also:'tippen ihn auch', btn:"Los geht\u2019s! \ud83d\ude80" },
-    en:{ title:'KO Phase Started!', sub:'Group stage is history \u2014 now it gets serious.',
-         multLabel:'Points Multipliers',
-         rounds:[['Round of 16','\u00d72','#1a73e8'],['Quarter-Finals','\u00d73','#1a73e8'],['Semi-Finals','\u00d74','#1a73e8'],['3rd Place','\u00d75','#9b59b6'],['Final','\u00d77','#f7b731']],
-         community:'Community Favourites', stimmen:'votes', myTips:'Your Tips',
-         champ:'Champion', ts1:'TS1', also:'also bet on them', btn:'Let\u2019s go! \ud83d\ude80' },
-    es:{ title:'\u00a1Fase KO Iniciada!', sub:'La fase de grupos es historia \u2014 ahora empieza en serio.',
-         multLabel:'Multiplicadores de Puntos',
-         rounds:[['Octavos','\u00d72','#1a73e8'],['Cuartos','\u00d73','#1a73e8'],['Semifinales','\u00d74','#1a73e8'],['3er Puesto','\u00d75','#9b59b6'],['Final','\u00d77','#f7b731']],
-         community:'Favoritos de la Comunidad', stimmen:'votos', myTips:'Tus Pron\u00f3sticos',
-         champ:'Campe\u00f3n', ts1:'TS1', also:'tambi\u00e9n lo eligieron', btn:'\u00a1Vamos! \ud83d\ude80' }
-  };
-  const tx = _KOI18N[lang] || _KOI18N['de'];
-
-  // Stats berechnen
-  let champLine = '', ts1Line = '', myChampLine = '', myTs1Line = '', myTs2Line = '';
-  try {
-    const parts = Object.values(ALL_PARTICIPANTS);
-    const total = parts.length;
-    const cMap = {}, tMap = {}, t2Map = {};
-    parts.forEach(p => {
-      const c = p.champion||''; const t = p.ts1||''; const t2 = p.ts2||'';
-      if(c)  cMap[c] =(cMap[c] ||0)+1;
-      if(t)  tMap[t] =(tMap[t] ||0)+1;
-      if(t2) t2Map[t2]=(t2Map[t2]||0)+1;
-    });
-    const topC = Object.entries(cMap).sort((a,b)=>b[1]-a[1])[0];
-    const topT = Object.entries(tMap).sort((a,b)=>b[1]-a[1])[0];
-    if(topC) champLine = '\ud83d\udc51 ' + topC[0] + ' &mdash; ' + topC[1] + '/' + total + ' ' + tx.stimmen;
-    if(topT) ts1Line   = '\u26bd ' + topT[0]   + ' &mdash; ' + topT[1] + '/' + total + ' ' + tx.stimmen;
-    const myPart = (USER&&USER.player&&ALL_PARTICIPANTS[USER.player]) || {};
-    const mc = myPart.champion || '?';
-    const mt = myPart.ts1      || '?';
-    const mt2= myPart.ts2      || '?';
-    myChampLine = mc  + ' (' + (cMap[mc]  ||0) + ' ' + tx.also + ')';
-    myTs1Line   = mt  + ' (' + (tMap[mt]  ||0) + ' ' + tx.also + ')';
-    myTs2Line   = mt2 + ' (' + (t2Map[mt2]||0) + ' ' + tx.also + ')';
-  } catch(e){ console.warn('KO modal stats:', e); }
-
-  // Overlay erstellen
-  const ov = document.createElement('div');
-  ov.id = '_kolModal';
-  ov.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.78);display:flex;align-items:center;justify-content:center;z-index:2147483647;padding:16px;box-sizing:border-box;font-family:inherit;';
-
-  // Konfetti
-  let confetti = '';
-  const cols = ['#f7b731','#3498db','#e74c3c','#2ecc71','#9b59b6','#e67e22'];
-  for(let i=0;i<18;i++){
-    const c=cols[i%cols.length], left=Math.round(Math.random()*90)+5;
-    const delay=(Math.random()*0.8).toFixed(2), dur=(1.2+Math.random()*0.8).toFixed(2);
-    confetti+=`<div style="position:absolute;top:-12px;left:${left}%;width:8px;height:8px;background:${c};border-radius:2px;animation:_kolFall ${dur}s ${delay}s ease-in forwards;opacity:1;"></div>`;
-  }
-
-  // Runden
-  const roundsHtml = tx.rounds.map(([r,m,c])=>
-    `<div style="display:flex;justify-content:space-between;align-items:center;font-size:.9rem;padding:3px 0">` +
-    `<span>${r}</span><span style="background:${c};color:${c==='#f7b731'?'#1a2340':'#fff'};border-radius:8px;padding:2px 10px;font-weight:700">${m}</span></div>`
-  ).join('');
-
-  const sectionLabel = (txt) => `<div style="font-size:.75rem;text-transform:uppercase;letter-spacing:1px;color:#aac;border-bottom:1px solid rgba(255,255,255,.1);padding-bottom:4px;margin-bottom:8px">${txt}</div>`;
-
-  ov.innerHTML =
-    `<div style="background:linear-gradient(135deg,#1a2340,#0d1b2a);border:2px solid #f7b731;border-radius:18px;max-width:420px;width:100%;max-height:90vh;overflow-y:auto;padding:28px 24px 22px;color:#fff;box-shadow:0 20px 60px rgba(0,0,0,.85);position:relative;">` +
-    confetti +
-    `<div style="text-align:center;font-size:2.8rem;margin-bottom:8px">\ud83c\udfc6</div>` +
-    `<h2 style="text-align:center;font-size:1.45rem;margin:0 0 6px;color:#f7b731">${tx.title}</h2>` +
-    `<p style="text-align:center;font-size:.87rem;color:#aac;margin:0 0 18px">${tx.sub}</p>` +
-    sectionLabel(tx.multLabel) +
-    `<div style="display:grid;gap:4px;margin-bottom:16px">${roundsHtml}</div>` +
-    (champLine||ts1Line ? sectionLabel(tx.community) + (champLine?`<div style="font-size:.88rem;padding:3px 0;color:#dde">${champLine}</div>`:'') + (ts1Line?`<div style="font-size:.88rem;padding:3px 0;color:#dde;margin-bottom:12px">${ts1Line}</div>`:'') : '') +
-    (myChampLine ? sectionLabel(tx.myTips) + `<div style="font-size:.88rem;padding:2px 0">\ud83c\udfc6 ${tx.champ}: <strong>${myChampLine}</strong></div><div style="font-size:.88rem;padding:2px 0">\u26bd ${tx.ts1}: <strong>${myTs1Line}</strong></div><div style="font-size:.88rem;padding:2px 0;margin-bottom:14px">\u26bd TS2: <strong>${myTs2Line}</strong></div>` : '') +
-    `<div style="text-align:center;margin-top:4px"><button onclick="document.getElementById('_kolModal').remove()" style="background:#f7b731;color:#1a2340;border:none;border-radius:10px;padding:10px 32px;font-size:1rem;font-weight:700;cursor:pointer">${tx.btn}</button></div>` +
-    `</div>` +
-    `<style>@keyframes _kolFall{0%{opacity:1;transform:translateY(0) rotate(0deg)}100%{opacity:0;transform:translateY(120px) rotate(360deg)}}</style>`;
-
-  document.body.appendChild(ov);
-}
-
-function closeKoLaunch(){
-  const e = document.getElementById('_kolModal');
-  if(e) e.remove();
-}
 function _applyWnLang(){
   const d = WN_I18N[USER.lang||'en'] || WN_I18N.en;
   const titleEl   = document.getElementById('wnTitle');
@@ -10260,6 +9979,7 @@ function openSimulator(){
     try{_koSimInit();}catch(e){console.error('[SIM] _koSimInit error:',e);return;}
     const overlay=document.getElementById('simOverlay');
     if(!overlay){console.error('simOverlay not found');return;}
+    document.body.appendChild(overlay);
     overlay.classList.add('active');
     try{_renderKOSimulator();}catch(e){console.error('_renderKOSimulator error:',e);}
     return;
@@ -10505,40 +10225,6 @@ window.addEventListener('resize',_chkLandscape);
     <div class="wn-footer">
       <button class="wn-got-it" id="wnGotIt" onclick="closeWhatsNew()">Got it ✓</button>
       <button class="wn-changelog" id="wnChangelogBtn" onclick="closeWhatsNew();switchTab('changelog')">📝 Changelog</button>
-    </div>
-  </div>
-</div>
-<!-- KO LAUNCH MODAL -->
-<div id="ko-launch-overlay">
-  <div id="ko-launch-box">
-    <div class="kol-confetti" id="kolConfetti"></div>
-    <div class="kol-header">
-      <div class="kol-trophy">🏆</div>
-      <h2 class="kol-title" data-i18n="kol_title">KO-Phase gestartet!</h2>
-      <p class="kol-subtitle" data-i18n="kol_subtitle">Die Gruppenphase ist Geschichte — jetzt wird es ernst.</p>
-    </div>
-    <div class="kol-multiplier-section">
-      <h3 class="kol-section-title" data-i18n="kol_mult_title">Punkte-Multiplikatoren</h3>
-      <div class="kol-mult-grid">
-        <div class="kol-mult-row"><span data-i18n="ko_mult_r16">Achtelfinale</span><span class="kol-mult-badge">×2</span></div>
-        <div class="kol-mult-row"><span data-i18n="ko_mult_qf">Viertelfinale</span><span class="kol-mult-badge">×3</span></div>
-        <div class="kol-mult-row"><span data-i18n="ko_mult_sf">Halbfinale</span><span class="kol-mult-badge">×4</span></div>
-        <div class="kol-mult-row"><span data-i18n="ko_mult_3p">Spiel um Platz 3</span><span class="kol-mult-badge kol-special">×5</span></div>
-        <div class="kol-mult-row"><span data-i18n="ko_mult_f">Finale</span><span class="kol-mult-badge kol-final">×6</span></div>
-      </div>
-    </div>
-    <div class="kol-stats-section">
-      <h3 class="kol-section-title" data-i18n="kol_community_title">Community-Favoriten</h3>
-      <div id="kol-community-champ" class="kol-stat-line"></div>
-      <div id="kol-community-ts1"  class="kol-stat-line"></div>
-    </div>
-    <div class="kol-personal-section">
-      <h3 class="kol-section-title" data-i18n="kol_my_title">Deine Tipps</h3>
-      <div class="kol-my-row"><span data-i18n="kol_my_champ">Champion:</span> <strong id="kol-my-champ"></strong></div>
-      <div class="kol-my-row"><span data-i18n="kol_my_ts1">TS1:</span> <strong id="kol-my-ts1"></strong></div>
-    </div>
-    <div class="kol-footer">
-      <button class="kol-close-btn" onclick="closeKoLaunch()" data-i18n="kol_close">Los geht&#39;s! 🚀</button>
     </div>
   </div>
 </div>
