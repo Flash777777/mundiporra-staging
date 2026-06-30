@@ -5984,8 +5984,21 @@ function renderLastNextMatch() {
     const koFin  = KO_GAMES.filter(g => g.status === 'FT');
     const koLive = KO_GAMES.filter(g => g.status === 'LIVE');
     const koUp   = KO_GAMES.filter(g => g.status === 'pre');
-    // Analog Gruppenphase: alle Spiele des letzten KO-Spieltags (8h-Fenster)
-    const koFinGroups = groupByKickoff(koFin, 8 * 60 * 60 * 1000);
+    // Gruppenlogik für KO-Spiele direkt via kg.date (8h-Fenster)
+    const _koGroupBy = (games, windowMs) => {
+      if (!games.length) return [];
+      const sorted = [...games].sort((a,b) => new Date(a.date||0) - new Date(b.date||0));
+      const groups = []; let cur = [sorted[0]];
+      for (let i = 1; i < sorted.length; i++) {
+        const prev = new Date(sorted[i-1].date||0).getTime();
+        const curr = new Date(sorted[i].date||0).getTime();
+        if (prev > 0 && curr > 0 && (curr - prev) <= windowMs) cur.push(sorted[i]);
+        else { groups.push(cur); cur = [sorted[i]]; }
+      }
+      groups.push(cur);
+      return groups;
+    };
+    const koFinGroups = _koGroupBy(koFin, 8 * 60 * 60 * 1000);
     const lastKOSlot  = koFinGroups[koFinGroups.length - 1] || [];
     const lastTEl = document.getElementById('lastMatchTitle');
     if (lastKOSlot.length) {
@@ -6003,8 +6016,11 @@ function renderLastNextMatch() {
       if (titleEl2) titleEl2.textContent = '🔴 Live';
       contEl2.innerHTML = koLive.map(g => matchCardKOLive(g)).join('');
     } else if (koUp.length > 0) {
-      if (titleEl2) titleEl2.textContent = T('next_single');
-      contEl2.innerHTML = matchCardKOUpcoming(koUp[0]);
+      const koUpGroups = _koGroupBy(koUp, 8 * 60 * 60 * 1000);
+      const nextKOSlot = koUpGroups[0] || [];
+      if (titleEl2) titleEl2.textContent = nextKOSlot.length > 1
+        ? `${T('next_multi')}${nextKOSlot.length})` : T('next_single');
+      contEl2.innerHTML = nextKOSlot.map(g => matchCardKOUpcoming(g)).join('');
     } else {
       if (titleEl2) titleEl2.textContent = T('tournament_complete');
       contEl2.innerHTML = '<div class="empty-state" style="padding:16px;text-align:center;font-size:1.1rem;">' + T('all_finished') + '</div>';
@@ -9156,8 +9172,8 @@ function switchTab(tabId) {
 }
 
 // ═══════ WHAT'S NEW ═══════
-const BUILD_VERSION = 'v2.0.53';
-const BUILD_DATE    = '30.06.2026 07:00';
+const BUILD_VERSION = 'v2.0.54';
+const BUILD_DATE    = '30.06.2026 07:30';
 (function(){ var _hb = document.getElementById('headerVersionBadge'); if(_hb) _hb.textContent = BUILD_VERSION; })();
 
 
