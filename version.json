@@ -1,1 +1,5 @@
-{"version":"v2.0.62t","notify":false}
+{
+  "version": "v2.0.63t",
+  "notify": true,
+  "message": "Neues Update: KO-Simulator Live! Bitte Seite neu laden."
+}
