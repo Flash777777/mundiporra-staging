@@ -3885,7 +3885,6 @@ window.addEventListener('DOMContentLoaded', () => {
     document.getElementById('setupModal').style.display = 'none';
   }
   initDashboard();
-  checkKoLaunch();
   setInterval(refreshDashboard, 60000);
 
   // Live countdown tick — updates .cd-val every second without full re-render
@@ -8340,7 +8339,6 @@ async function initDashboard() {
   updatePersonaHeader();
   _simInit();
   checkWhatsNew();
-  checkKoLaunch(); // KO Launch Modal
   checkVersionJson();
   await refreshDashboard(); // await ensures classification pts ready before first render
   setTimeout(runSanityChecks, 500);
