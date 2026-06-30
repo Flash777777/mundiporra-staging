@@ -1345,6 +1345,12 @@
   <div class="section-title">📝 Changelog</div>
 
 <div class="card" style="margin-bottom:14px;">
+          <div class="card-title">v2.0.62t — 30. Juni 2026 (Debug-Trace)</div>
+          <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
+            <li>🔍 <strong>Simulator Trace</strong> — Console-Logs in <code>openSimulator()</code> zur Diagnose des KO-Simulator-Bugs.</li>
+          </ul>
+        </div>
+        <div class="card" style="margin-bottom:14px;">
           <div class="card-title">v2.0.61 — 30. Juni 2026 (Fix)</div>
           <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
             <li>🔔 <strong>What&#x27;s New Modal i18n Fix</strong> — <code>wn_ko_sim</code>, <code>wn_cc_fix</code>, <code>wn_champ_penalty</code> in <code>WN_I18N</code> für alle 3 Sprachen nachgetragen. Modal zeigte vorher Rohkeys statt Texte.</li>
@@ -9464,8 +9470,8 @@ function switchTab(tabId) {
 }
 
 // ═══════ WHAT'S NEW ═══════
-const BUILD_VERSION = 'v2.0.61';
-const BUILD_DATE    = '30.06.2026 19:30';
+const BUILD_VERSION = 'v2.0.62t';
+const BUILD_DATE    = '30.06.2026 20:00';
 (function(){ var _hb = document.getElementById('headerVersionBadge'); if(_hb) _hb.textContent = BUILD_VERSION; })();
 
 
@@ -10182,13 +10188,18 @@ function _renderKOSimulator(){
 }
 
 function openSimulator(){
+  console.log('[SIM] openSimulator called, PHASE=',typeof PHASE!=='undefined'?PHASE:'undef');
   if(typeof PHASE!=='undefined'&&PHASE==='KO'){
+    console.log('[SIM] KO branch — init');
     _simLb=_lastLb||[];
-    _koSimInit();
+    try{_koSimInit();}catch(e){console.error('[SIM] _koSimInit threw:',e);return;}
+    console.log('[SIM] KO_SIM_STATE slots after init:',Object.keys(KO_SIM_STATE).length);
     const overlay=document.getElementById('simOverlay');
+    console.log('[SIM] overlay found:',!!overlay,overlay?.id);
     if(!overlay){console.error('simOverlay not found');return;}
     overlay.classList.add('active');
-    try{_renderKOSimulator();}catch(e){console.error('_renderKOSimulator error:',e);}
+    console.log('[SIM] overlay.active added, classList:',overlay.className);
+    try{_renderKOSimulator();console.log('[SIM] _renderKOSimulator done');}catch(e){console.error('_renderKOSimulator error:',e);}
     return;
   }
   try{
