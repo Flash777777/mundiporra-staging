@@ -6191,6 +6191,82 @@ function calcKOPointDist(slot, s1, s2, mult) {
   };
 }
 
+// ── renderKOTipBlock: Tip-Grid für ein abgeschlossenes KO-Spiel ────────────
+function renderKOTipBlock(kg, lb) {
+  const slot   = kg.slot;
+  const mult   = kg.multiplier || 1;
+  const sc1    = kg.homeScore90 ?? kg.homeScore;
+  const sc2    = kg.awayScore90 ?? kg.awayScore;
+  const myGroups = getMyGroups();
+  const groupMemberSet = new Set();
+  for (const g of myGroups) for (const m of (GROUP_DATA[g] || [])) groupMemberSet.add(m);
+
+  const scoreLabel = `${kg.home} ${sc1}–${sc2} ${kg.away} <span class="pill pill-green">FT</span> <span style="font-size:.72rem;color:var(--muted);">${kg.roundLabel || kg.round} ×${mult}</span>`;
+
+  const ctx = getContextPlayers(lb);
+  const sortedCtx = lb ? [...ctx].sort((a,b)=>{const ra=lb.findIndex(p=>p.name===a),rb=lb.findIndex(p=>p.name===b);return(ra<0?9999:ra)-(rb<0?9999:rb);}) : ctx;
+
+  const cards = sortedCtx.map(name => {
+    const tip = KO_PREDICTIONS[name]?.slots?.[slot];
+    if (!tip || tip.s1 == null || tip.s2 == null) return '';
+    const isYou = name === USER.player;
+    const _sg = getSharedGroups(name);
+
+    // Scoring: pairingOk prüfen + calcResultPtsKO
+    const predT1 = (typeof normalizeTeamKO === 'function') ? normalizeTeamKO(tip.t1) : (tip.t1||'').toUpperCase();
+    const predT2 = (typeof normalizeTeamKO === 'function') ? normalizeTeamKO(tip.t2) : (tip.t2||'').toUpperCase();
+    const actT1  = (typeof normalizeTeamKO === 'function') ? normalizeTeamKO(kg.home) : (kg.home||'').toUpperCase();
+    const actT2  = (typeof normalizeTeamKO === 'function') ? normalizeTeamKO(kg.away) : (kg.away||'').toUpperCase();
+    const t1ok = !!(predT1 && (predT1===actT1||predT1===actT2));
+    const t2ok = !!(predT2 && (predT2===actT1||predT2===actT2));
+    const pairingOk = t1ok && t2ok && predT1 !== predT2;
+
+    let rawPts = 0, cls = 'wrong';
+    if (pairingOk && sc1 != null && sc2 != null) {
+      rawPts = (typeof calcResultPtsKO === 'function') ? calcResultPtsKO(tip.s1, tip.s2, sc1, sc2) : 0;
+    }
+    const effectivePts = rawPts * mult;
+    cls = rawPts === 3 ? 'correct-exact' : rawPts === 2 ? 'correct-diff' : rawPts === 1 ? 'correct-1x2' : 'wrong';
+    const ptsLabel = pairingOk ? (effectivePts + 'pts') : '✗';
+
+    const _rank = lb ? (lb.find(p => p.name === name)?.rank || 0) : 0;
+    const rankHtml = _rank > 0 ? `<span class="rank-badge">#${_rank}</span>` : '';
+    const groupTagHtml = _sg.length ? `<span class="group-tag">${_sg[0]}${_sg.length>1?' +'+(_sg.length-1):''}</span>` : '';
+    return `<div class="player-tip-card ${cls}">
+      <div class="tip-player-name">${rankHtml}${name}${isYou?`<span class="you-tag">${T('you_tag')}</span>`:''}
+        ${!isYou&&_sg.length?groupTagHtml:''}</div>
+      <div class="tip-score">${tip.s1} : ${tip.s2}</div>
+      <div class="tip-pts">${ptsLabel}</div>
+    </div>`;
+  }).filter(Boolean).join('');
+
+  // Punkteverteilung (KO-Version mit Multiplikator-Labels)
+  let _ptDistHtml = '';
+  if (sc1 != null && sc2 != null) {
+    const _dist = calcKOPointDist(slot, sc1, sc2, mult);
+    if (_dist && _dist.total > 0) {
+      const _sl = sc1 + ':' + sc2;
+      _ptDistHtml = `<hr style="border:none;border-top:1px solid #f0f0f0;margin:10px 0 8px;">
+        <div style="font-size:.6rem;color:#ccc;font-weight:700;text-transform:uppercase;letter-spacing:.07em;text-align:center;margin-bottom:6px;">${T('pts_dist_label')} ${_sl}</div>
+        <div style="display:flex;gap:5px;">
+        ${[{l:_dist.lbl3,n:_dist.p3,p:_dist.pct3,c:'#00c853'},{l:_dist.lbl2,n:_dist.p2,p:_dist.pct2,c:'#ff8c00'},{l:_dist.lbl1,n:_dist.p1,p:_dist.pct1,c:'#2979ff'},{l:'0 Pkt',n:_dist.p0,p:_dist.pct0,c:'#e74c3c'}]
+        .map(({l,n,p,c})=>`<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;border:1.5px solid ${c};border-radius:8px;padding:6px 4px 5px;position:relative;overflow:hidden;">
+          <div style="position:absolute;bottom:0;left:0;right:0;background:${c};opacity:.18;height:${Math.min(p*.8,80)}%;border-radius:0 0 6px 6px;"></div>
+          <span style="font-size:.6rem;font-weight:800;color:${c};text-transform:uppercase;letter-spacing:.03em;position:relative;">${l}</span>
+          <span style="font-size:.95rem;font-weight:900;line-height:1;color:${c};position:relative;">${n}</span>
+          <span style="font-size:.57rem;color:var(--muted);position:relative;">${p}%</span>
+        </div>`).join('')}
+        </div>`;
+    }
+  }
+
+  return `<div style="margin-bottom:12px;">
+    <div style="font-size:0.85rem; font-weight:700; margin-bottom:6px;">${scoreLabel}</div>
+    <div class="game-sum-grid">${cards || '<div style="color:var(--muted);font-size:.8rem;">Keine Tipps gefunden</div>'}</div>
+    ${_ptDistHtml}
+  </div>`;
+}
+
 function calcPointDist(gameId, s1, s2) {
   const gidStr = String(gameId);
   let p3 = 0, p2 = 0, p1 = 0, p0 = 0;
@@ -6313,19 +6389,15 @@ function renderLatestGameSummary(lb) {
       document.getElementById('latestGameSummaryContent').innerHTML = `<div class="empty-state">${T('no_finished')}</div>`;
       return;
     }
-    const ctx = getContextPlayers(lb);
     // Label: "Game 73: GERMANY 2-1 PARAGUAY | Game 76: BRAZIL 0-0 JAPAN"
     const label = lastSlot.length > 1
       ? lastSlot.map(kg => `Game ${kg.id}: ${kg.home} ${kg.homeScore}-${kg.awayScore} ${kg.away}`).join(' | ')
       : `Game ${lastSlot[0].id}: ${lastSlot[0].home} ${lastSlot[0].homeScore}-${lastSlot[0].awayScore} ${lastSlot[0].away}`;
     document.getElementById('latestGameSummaryTitle').textContent = `📋 ${T('latest_game_summary')} — ${label}`;
-    // KO-Game-Adapter → renderGameTipBlock erwartet game.team1/team2 + actual.s1/s2/status
+    // KO-Tip-Grid via renderKOTipBlock (liest KO_PREDICTIONS, Multiplikator-aware)
     document.getElementById('latestGameSummaryContent').innerHTML =
-      lastSlot.map(kg => {
-        const gameAdapt = { id: kg.id, team1: kg.home, team2: kg.away };
-        const actualAdapt = { s1: kg.homeScore, s2: kg.awayScore, status: 'FT' };
-        return renderGameTipBlock(gameAdapt, actualAdapt, ctx, false, lb);
-      }).join('<hr style="margin:12px 0; border:none; border-top:1px solid #eee;">');
+      lastSlot.map(kg => renderKOTipBlock(kg, lb))
+        .join('<hr style="margin:12px 0; border:none; border-top:1px solid #eee;">');
     return;
   }
 
