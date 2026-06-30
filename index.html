@@ -1345,9 +1345,19 @@
   <div class="section-title">📝 Changelog</div>
 
 <div class="card" style="margin-bottom:14px;">
-          <div class="card-title">v2.0.63t — 30. Juni 2026 (Feature + Fix)</div>
+          <div class="card-title">v2.0.63 — 30. Juni 2026 (Bug-Fix)</div>
           <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
-            <li>⚡ <strong>WN_VERSION v2.0.63t</strong> — What's New Modal erscheint erneut mit neuem KO-Simulator-Eintrag (⚡) als oberstem Item.</li>
+            <li>🐛 <strong>ReferenceError lang</strong> — <code>renderKOTipBlock</code>: <code>lang</code> nicht im Scope → ersetzt durch <code>USER.lang||'de'</code>.</li>
+            <li>🐛 <strong>Header ⚡-Button unsichtbar</strong> — <code>_simHasGames</code> prüfte <code>status==='pre'</code>; nach ESPN-Update <code>STATUS_SCHEDULED</code> → Filter auf negatives Matching umgestellt.</li>
+            <li>🐛 <strong>Nächste Spiele verschwunden</strong> — <code>renderLastNextMatch</code> + <code>renderUpcomingGamesSummary</code>: <code>status==='pre'</code> traf nach ESPN-Sync nicht mehr zu → Fix auf <code>!== FT/HT</code>.</li>
+            <li>✨ <strong>Live + Upcoming gleichzeitig</strong> — Bei laufenden KO-Spielen werden jetzt bis zu 4 nächste Spiele darunter angezeigt.</li>
+            <li>🏷️ <strong>Versioning</strong> — <code>t</code>-Suffix entfernt → korrekte Version v2.0.63.</li>
+          </ul>
+        </div>
+        <div class="card" style="margin-bottom:14px;">
+          <div class="card-title">v2.0.62 —
+          <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
+            <li>⚡ <strong>WN_VERSION v2.0.63</strong> — What's New Modal erscheint erneut mit neuem KO-Simulator-Eintrag (⚡) als oberstem Item.</li>
             <li>🔧 <strong>WN-Timer Fix</strong> — <code>openSimulator()</code> cancelt den auto-openWhatsNew-Timer; <code>openWhatsNew()</code> öffnet nicht wenn Simulator bereits aktiv ist.</li>
             <li>🐛 <strong>KO-7 Fix</strong> — "Nächste Spiele" verschwand wenn ein Spiel LIVE war oder Teams noch nicht feststehen. Filter korrigiert: <code>kg.date</code> statt <code>kg.home&&kg.away</code>.</li>
             <li>🃏 <strong>renderKOTipBlock</strong> — Upcoming-Games zeigen jetzt eine Fixture-Card (⏰ Anstoss + Runde) statt leerem Block.</li>
@@ -6060,7 +6070,7 @@ function renderLastNextMatch() {
   if (typeof PHASE !== 'undefined' && PHASE === 'KO') {
     const koFin  = KO_GAMES.filter(g => g.status === 'FT');
     const koLive = KO_GAMES.filter(g => g.status === 'LIVE');
-    const koUp   = KO_GAMES.filter(g => g.status === 'pre');
+    const koUp   = KO_GAMES.filter(g => g.status !== 'FT' && g.status !== 'LIVE' && g.status !== 'HT');
     // Gruppenlogik für KO-Spiele direkt via kg.date (8h-Fenster)
     const _koGroupBy = (games, windowMs) => {
       if (!games.length) return [];
@@ -6091,7 +6101,11 @@ function renderLastNextMatch() {
     const contEl2  = document.getElementById('nextMatchContent');
     if (koLive.length > 0) {
       if (titleEl2) titleEl2.textContent = '🔴 Live';
-      contEl2.innerHTML = koLive.map(g => matchCardKOLive(g)).join('');
+      const _upHtml = koUp.length > 0
+        ? '<hr style="margin:10px 0;border:none;border-top:1px solid var(--border);">' +
+          koUp.slice(0,4).map(g => matchCardKOUpcoming(g)).join('<hr style="margin:8px 0;border:none;border-top:1px solid var(--border);">')
+        : '';
+      contEl2.innerHTML = koLive.map(g => matchCardKOLive(g)).join('') + _upHtml;
     } else if (koUp.length > 0) {
       const koUpGroups = _koGroupBy(koUp, 8 * 60 * 60 * 1000);
       const nextKOSlot = koUpGroups[0] || [];
@@ -6262,7 +6276,7 @@ function renderKOTipBlock(kg, lb) {
   // Upcoming fixture guard (teams/score not yet known)
   if(sc1==null&&sc2==null){
     const hLabel=kg.home||'TBD';const aLabel=kg.away||'TBD';
-    const kickoff=kg.date?new Date(kg.date).toLocaleString(lang,{weekday:'short',day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}):'';
+    const _loc=(USER&&USER.lang)||'de';const kickoff=kg.date?new Date(kg.date).toLocaleString(_loc,{weekday:'short',day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}):'';
     return `<div style="margin-bottom:12px;padding:8px 10px;border-radius:8px;border:1px solid var(--border);background:var(--card-bg);">
       <div style="font-size:.82rem;font-weight:700;margin-bottom:2px;">${hLabel} vs ${aLabel} <span style="font-size:.7rem;font-weight:400;color:var(--muted);">${kg.roundLabel||kg.round||''} ×${mult}</span></div>
       ${kickoff?'<div style="font-size:.75rem;color:var(--muted);">⏰ '+kickoff+'</div>':''}
@@ -6521,7 +6535,7 @@ function renderUpcomingGamesSummary(lb) {
   const now = Date.now();
   const EIGHT_HOURS = 8 * 60 * 60 * 1000;
   if (typeof PHASE !== 'undefined' && PHASE === 'KO') {
-    const koUp = KO_GAMES.filter(g => g.status === 'pre' || g.status === 'LIVE');
+    const koUp = KO_GAMES.filter(g => g.status !== 'FT' && g.status !== 'HT');
     koUp.sort((a, b) => new Date(a.date||0) - new Date(b.date||0));
     if (!koUp.length) {
       document.getElementById('upcomingGamesSummaryContent').innerHTML = '<div class="empty-state">' + T('all_finished') + '</div>';
@@ -8475,7 +8489,7 @@ async function refreshDashboard() {
   if (_sbEl) _sbEl.textContent = (typeof PHASE !== 'undefined' && PHASE === 'KO') ? T('stage_ko') : T('stage_group');
   document.getElementById('lastUpdated').textContent = T('updated_prefix') + ' ' + new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
   // Simulator: update header btn + re-render if open; auto-restore FT games
-  const _simHasGames = (typeof PHASE!=='undefined'&&PHASE==='KO') ? KO_GAMES.some(g=>g.status==='LIVE'||(g.status==='pre'&&g.date&&new Date(g.date).getTime()>Date.now()-4*3600000)) : ALL_GAMES.some(g=>{const a=getActual(g);return a?.status==='LIVE'||(a?.status!=='FT'&&getKickoffISO(g)&&new Date(getKickoffISO(g)).getTime()>Date.now()-4*3600000);});
+  const _simHasGames = (typeof PHASE!=='undefined'&&PHASE==='KO') ? KO_GAMES.some(g=>g.status==='LIVE'||((g.status==='pre'||g.status==='STATUS_SCHEDULED'||g.status!=='FT')&&g.date&&new Date(g.date).getTime()>Date.now()-4*3600000)) : ALL_GAMES.some(g=>{const a=getActual(g);return a?.status==='LIVE'||(a?.status!=='FT'&&getKickoffISO(g)&&new Date(getKickoffISO(g)).getTime()>Date.now()-4*3600000);});
   const _simBtn2=document.getElementById('simHeaderBtn'); if(_simBtn2) _simBtn2.classList.toggle('visible',_simHasGames);
   for(const g of ALL_GAMES){const a=getActual(g);if(a?.status==='FT'&&SIM_STATE[g.id]?.dirty){SIM_STATE[g.id]={s1:a.s1,s2:a.s2,dirty:false};try{sessionStorage.setItem('sim_'+g.id,JSON.stringify(SIM_STATE[g.id]));}catch(e){}}}
   if(document.getElementById('simOverlay')?.classList.contains('active')){_simLb=_lastLb;if(typeof PHASE!=='undefined'&&PHASE==='KO'){try{_renderKOSimulator();}catch(e){console.error('_renderKOSimulator refresh err:',e);}}else{_renderSimulator();}}
@@ -9493,18 +9507,18 @@ function switchTab(tabId) {
 }
 
 // ═══════ WHAT'S NEW ═══════
-const BUILD_VERSION = 'v2.0.63t';
-const BUILD_DATE    = '30.06.2026 02:00';
+const BUILD_VERSION = 'v2.0.63';
+const BUILD_DATE    = '30.06.2026 04:00';
 (function(){ var _hb = document.getElementById('headerVersionBadge'); if(_hb) _hb.textContent = BUILD_VERSION; })();
 
 
 
-const WN_VERSION = 'v2.0.63t';
+const WN_VERSION = 'v2.0.63';
 const WN_STORAGE_KEY = window.location.pathname.includes('staging') ? 'wnSeen_staging' : 'wnSeen_live';
 (function(){ const old = localStorage.getItem('wnSeen'); if(old && !localStorage.getItem(WN_STORAGE_KEY)) localStorage.setItem(WN_STORAGE_KEY, old); })();
 const WN_I18N={
   en:{
-    // v2.0.63t
+    // v2.0.63
     wn_sim_v63:'⚡ <strong>KO-Simulator Live!</strong> Simulate remaining KO rounds — set scores per game, adjust scorer goal counts (0/1/2/3…) with multiplier-based scoring and see your rank impact in real time.',
     // v2.0.60
     wn_ko_sim:'🎮 <strong>KO-Simulator is back!</strong> Simulate remaining KO-round outcomes, toggle scorer goals, see point distributions with multipliers and your rank impact.',
@@ -9617,7 +9631,7 @@ const WN_I18N={
 };
 // Icon map für WN-Keys — Reihenfolge & Icons für v1.12
 const WN_ITEMS = [
-  // v2.0.63t — KO-Simulator fully released
+  // v2.0.63 — KO-Simulator fully released
   { key: 'wn_sim_v63', icon: '⚡', highlight: true },
   { divider: true },
   // v2.0.60 — KO-Simulator (previous)
