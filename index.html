@@ -5819,7 +5819,7 @@ function matchCardKOLive(kg) {
   const live = (kg.espnId && _koLive[kg.espnId]) ? _koLive[kg.espnId] : null;
   const s1 = live?.homeScore ?? kg.homeScore ?? 0;
   const s2 = live?.awayScore ?? kg.awayScore ?? 0;
-  const liveLabel = live?.clock ? live.clock + '\'' : 'LIVE';
+  const liveLabel = live ? (fmtLiveStatus({status:'LIVE', statusLabel: live.statusLabel, clock: live.clock}) || 'LIVE') : 'LIVE';
   const htHtml = (live?.ht1 != null && live?.ht2 != null)
     ? `<span style="font-size:0.7rem;color:#888;margin-left:6px;">(HZ: ${live.ht1}:${live.ht2})</span>` : '';
 
@@ -9302,8 +9302,8 @@ function switchTab(tabId) {
 }
 
 // ═══════ WHAT'S NEW ═══════
-const BUILD_VERSION = 'v2.0.56';
-const BUILD_DATE    = '30.06.2026 15:00';
+const BUILD_VERSION = 'v2.0.57';
+const BUILD_DATE    = '30.06.2026 18:00';
 (function(){ var _hb = document.getElementById('headerVersionBadge'); if(_hb) _hb.textContent = BUILD_VERSION; })();
 
 
