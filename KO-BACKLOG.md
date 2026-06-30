@@ -6,6 +6,12 @@
 
 ---
 
+## 🟡 Offen
+
+| # | Bug/Task | Beschreibung | Prio |
+|---|---|---|---|
+| KO-DBG-1 | **Debug-Logs entfernen** | Console ist voll mit `[KO-LIVE]` / `[KO-DBG]` Ausgaben aus `fetchKOLiveData()` und `_koInjectSimGames()`. Alle `console.log`-Zeilen mit KO-Präfix vor Go-Live entfernen. | 🟡 Mittel |
+
 ## 🔴 Bugs (offen)
 
 | # | Bug | Diagnose | Fix-Ansatz | Prio |
