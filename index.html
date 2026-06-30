@@ -1395,6 +1395,13 @@
           </ul>
         </div>
         <div class="card" style="margin-bottom:14px;">
+  <div class="card-title">v2.0.65 — 30. Juni 2026 (Bug-Fix)</div>
+  <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
+    <li>🔧 <strong>Simulator-Button Fix (final)</strong> — <code>whatsNewOverlay</code> (z-index 3000) wurde beim Öffnen des Simulators nicht geschlossen, blockierte den Simulator (z-index 2000). Fix: 'active'-Klasse wird jetzt explizit entfernt.</li>
+    <li>🎨 <strong>Scorer-Anzeige Fix</strong> — Alle Scorer-Texte im Simulator verwendeten weiße Farben (<code>rgba(255,255,255,...)</code>), waren auf dem hellen Karten-Hintergrund unsichtbar. Fix: Dunkle Farben durchgehend gesetzt.</li>
+  </ul>
+</div>
+<div class="card" style="margin-bottom:14px;">
   <div class="card-title">v2.0.59 — 30.06.2026 (Fix)</div>
   <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
     <li>🐛 <strong>Meine Gruppen — Letztes Spiel KO-Fix</strong> — Im Gruppen-Tab wurden Gruppenspiele statt KO-Spiele angezeigt. <code>renderGroupLatestGame()</code> nutzt jetzt bei <code>PHASE=KO</code> korrekt <code>KO_GAMES</code>.</li>
@@ -9515,8 +9522,8 @@ function switchTab(tabId) {
 }
 
 // ═══════ WHAT'S NEW ═══════
-const BUILD_VERSION = 'v2.0.64';
-const BUILD_DATE='30.06.2026 22:00';
+const BUILD_VERSION='v2.0.65';
+const BUILD_DATE='30.06.2026 22:30';
 (function(){ var _hb = document.getElementById('headerVersionBadge'); if(_hb) _hb.textContent = BUILD_VERSION; })();
 
 
