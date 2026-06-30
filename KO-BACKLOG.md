@@ -20,7 +20,7 @@
 | # | Feature | Beschreibung | Prio |
 |---|---|---|---|
 | KO-F1 | **KO-Simulator** | Analog zum Gruppenphase-Simulator: KO-Spielergebnisse simulieren, Auswirkung auf Rangliste live berechnen. Berücksichtigt KO-Multiplikatoren (×2 bis ×6) | 🟡 Mittel |
-| KO-F3 | **Gruppen-Zusammenfassungen: alle Punkte-Klassen anzeigen** | In den verschiedenen Spiel-/Gruppen-Zusammenfassungen werden aktuell nicht immer alle vier Punkte-Klassen (3 PKT / 2 PKT / 1 PKT / 0 PKT) angezeigt — leere Klassen werden weggelassen. Alle 4 Klassen sollen immer sichtbar sein, auch wenn eine Klasse 0 Spieler enthält | 🟢 Low |
+| ~~KO-F3~~ | **Gruppen-Ansichten: KO-Spalten analog Ranking** | ✅ **Fixed v2.0.57** — renderGroupTab() + renderGroupSummary() mit KO-Branch: zeigt GP⚽/GP🎯/GP🏅/KO⚽/KO🎯/🔴/🏆/⚠️ analog Leaderboard; Übersicht zeigt alle Gruppen | ~~🟢 Low~~ |
 
 ---
 

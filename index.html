@@ -1348,6 +1348,7 @@
   <div class="card-title">v2.0.57 — 30. Juni 2026 (Fix)</div>
   <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
     <li>🎙️ <strong>KO Live-Karte: Perioden-Label</strong> — Verlängerung, Elfmeter, Halbzeit-Pause werden jetzt in <code>matchCardKOLive()</code> korrekt angezeigt (via <code>fmtLiveStatus()</code> statt reiner Minutenanzeige)</li>
+    <li>👥 <strong>Gruppen-Ansichten: KO-Spalten</strong> — <em>Meine Gruppen</em>-Tab und <em>Gruppen-Zusammenfassung</em> im Übersicht-Tab zeigen jetzt im KO-Modus dieselben Spalten wie das Ranking (GP⚽ / GP🎯 / GP🏅 / KO⚽ / KO🎯 / 🔴 / 🏆 / ⚠️); Übersicht zeigt alle zugeordneten Gruppen statt nur die erste</li>
   </ul>
 </div>
 <div class="card" style="margin-bottom:14px;">
@@ -6505,31 +6506,80 @@ function renderUpcomingGamesSummary(lb) {
 }
 
 function renderGroupSummary(lb) {
-  const _gsGroups = getMyGroups(); const _gsGroup = USER.group || _gsGroups[0] || null;
-  if (!_gsGroup) {
+  const _gsGroups = getMyGroups();
+  const isKO = (typeof PHASE !== 'undefined' && PHASE === 'KO');
+  if (!_gsGroups.length) {
     document.getElementById('groupSummaryTitle').textContent = '👥 Group Summary';
-    document.getElementById('groupSummaryContent').innerHTML = `<div class="empty-state">${T('select_group_hint')}</div>`;
+    document.getElementById('groupSummaryContent').innerHTML = '<div class="empty-state">' + T('select_group_hint') + '</div>';
     return;
   }
-  const _gsLabel = _gsGroups.length>1&&!USER.group ? `${_gsGroup} +${_gsGroups.length-1}` : _gsGroup;
-  document.getElementById('groupSummaryTitle').textContent = `👥 ${_gsLabel} — ${T('group_summary_label')}`;
-  const members = GROUP_DATA[_gsGroup] || [];
-  const memberLb = lb.filter(p => members.includes(p.name));
-  memberLb.sort((a,b) => b.total - a.total || b.pts - a.pts);
-  const rows = memberLb.map((p, i) => {
-    const isYou = p.name === USER.player;
-    return `<tr>
-      <td class="lb-rank ${p.rank===1?'top1':p.rank===2?'top2':p.rank===3?'top3':''}">${p.rank}</td>
-      <td class="lb-name">${p.name}${isYou?`<span class="you-tag">${T('you_tag')}</span>`:""}</td>
-      <td class="lb-pts">${p.total}</td>
-      <td><span class="pill pill-green">${p.exact}×3</span></td>
-      <td><span class="pill pill-blue">${p.diff}×2</span></td>
-      <td><span class="pill pill-gold">${p.one}×1</span></td>
-    </tr>`;
+  const _gsLabel = _gsGroups.length > 1 ? (_gsGroups[0] + ' +' + (_gsGroups.length-1)) : _gsGroups[0];
+  document.getElementById('groupSummaryTitle').textContent = '👥 ' + _gsLabel + ' — ' + T('group_summary_label');
+  const fmt = v => v > 0 ? '<b>' + v + '</b>' : '<span style="color:var(--muted)">—</span>';
+  const blocks = _gsGroups.map(groupName => {
+    const members = GROUP_DATA[groupName] || [];
+    const memberLb = lb.filter(p => members.includes(p.name));
+    memberLb.sort((a,b) => b.total - a.total || b.pts - a.pts);
+    const rows = memberLb.map(p => {
+      const isYou = p.name === USER.player;
+      const youTag = isYou ? '<span class="you-tag">' + T('you_tag') + '</span>' : '';
+      const rankCls = p.rank===1?'top1':p.rank===2?'top2':p.rank===3?'top3':'';
+      if (isKO) {
+        let k = { ko_game:0, ko_scorer:0, champion:0, gp_game:0, gp_scorer:0, gp_classif:0, total:p.total||0, ko_live:0 };
+        try { k = calcTotalPointsKO(p.name); } catch(e) {}
+        const liveCell = (k.ko_live||0) > 0
+          ? '<span style="animation:pulse 1s infinite;color:var(--red)">🔴 +' + k.ko_live + '</span>'
+          : '<span style="color:var(--muted)">—</span>';
+        const ccCell = (ALL_PARTICIPANTS[p.name] && ALL_PARTICIPANTS[p.name].champion_changed)
+          ? '<span style="color:#e53935;font-weight:700">−5</span>'
+          : '<span style="color:var(--muted)">—</span>';
+        return '<tr class="' + (isYou?'lb-you':'') + '">' 
+          + '<td class="lb-rank ' + rankCls + '">' + p.rank + '</td>'
+          + '<td class="lb-name">' + p.name + youTag + '</td>'
+          + '<td class="lb-pts">' + k.total + '</td>'
+          + '<td style="font-size:.78rem;color:var(--muted)">' + fmt(k.gp_game) + '</td>'
+          + '<td style="font-size:.78rem;color:#2e7d32">' + fmt(k.gp_scorer) + '</td>'
+          + '<td style="font-size:.78rem;color:#b8860b">' + fmt(k.gp_classif) + '</td>'
+          + '<td style="font-size:.78rem;color:var(--blue-light);font-weight:' + (k.ko_game>0?700:400) + '">' + fmt(k.ko_game) + '</td>'
+          + '<td style="font-size:.78rem;color:var(--blue-light)">' + fmt(k.ko_scorer) + '</td>'
+          + '<td style="font-size:.78rem">' + liveCell + '</td>'
+          + '<td style="font-size:.78rem;color:#d4af37">' + fmt(k.champion) + '</td>'
+          + '<td style="font-size:.78rem;text-align:center">' + ccCell + '</td>'
+          + '</tr>';
+      } else {
+        const scorerCell = p.scorerPts > 0 ? '<span style="color:#2e7d32;font-weight:700">+'+p.scorerPts+'</span>' : '—';
+        const classCell = p.classificationPts > 0 ? '<span style="color:#b8860b;font-weight:700">+'+p.classificationPts+'</span>' : '—';
+        return '<tr>'
+          + '<td class="lb-rank ' + rankCls + '">' + p.rank + '</td>'
+          + '<td class="lb-name">' + p.name + youTag + '</td>'
+          + '<td class="lb-pts">' + p.total + '</td>'
+          + '<td class="lb-live-pts">' + (p.livePts > 0 ? '+'+p.livePts : '—') + '</td>'
+          + '<td style="font-size:.8rem">' + scorerCell + '</td>'
+          + '<td style="font-size:.8rem">' + classCell + '</td>'
+          + '<td><span class="pill pill-green">' + p.exact + '×3</span></td>'
+          + '<td><span class="pill pill-blue">' + p.diff + '×2</span></td>'
+          + '<td><span class="pill pill-gold">' + p.one + '×1</span></td>'
+          + '</tr>';
+      }
+    }).join('');
+    const hdrKO = '<tr><th>#</th><th>' + T('lb_player') + '</th><th>' + T('pts_col') + '</th>'
+      + '<th style="color:var(--muted);font-size:.68rem" title="GP Spielpunkte">GP⚽</th>'
+      + '<th style="color:var(--muted);font-size:.68rem" title="GP Scorer">GP🎯</th>'
+      + '<th style="color:var(--muted);font-size:.68rem" title="GP Klassif.">GP🏅</th>'
+      + '<th style="color:var(--blue-light);font-size:.68rem" title="KO Spiele">KO⚽</th>'
+      + '<th style="color:var(--blue-light);font-size:.68rem" title="KO Scorer">KO🎯</th>'
+      + '<th style="color:var(--red);font-size:.68rem" title="Live">🔴</th>'
+      + '<th style="color:#d4af37;font-size:.68rem" title="Champion">🏆</th>'
+      + '<th style="color:#e53935;font-size:.68rem" title="' + T('lb_cc_tooltip') + '">⚠️</th></tr>';
+    const hdrGP = '<tr><th>#</th><th>' + T('lb_player') + '</th><th>' + T('pts_col') + '</th>'
+      + '<th style="color:var(--red)">🔴</th><th>⚽</th><th>🏅</th>'
+      + '<th>' + T('stats_exact') + '</th><th>' + T('stats_diff') + '</th><th>1X2</th></tr>';
+    const grpTitle = _gsGroups.length > 1
+      ? '<div style="font-size:.8rem;color:var(--muted);font-weight:600;padding:8px 12px 4px">👥 ' + groupName + '</div>'
+      : '';
+    return grpTitle + '<div class="lb-wrapper"><table class="lb-table"><thead>' + (isKO ? hdrKO : hdrGP) + '</thead><tbody>' + rows + '</tbody></table></div>';
   }).join('');
-  document.getElementById('groupSummaryContent').innerHTML = `
-    <div class="lb-wrapper"><table class="lb-table"><thead><tr><th>#</th><th>${T('lb_player')}</th><th>${T('pts_col')}</th><th>${T('stats_exact')}</th><th>${T('stats_diff')}</th><th>1X2</th></tr></thead>
-    <tbody>${rows}</tbody></table></div>`;
+  document.getElementById('groupSummaryContent').innerHTML = blocks;
 }
 
 function renderKudos(lb) {
@@ -6661,66 +6711,87 @@ function renderLeaderboard(lb) {
 function renderGroupTab(lb) {
   const el = document.getElementById('groupTabContent');
   const btn = document.getElementById('groupTabBtn');
-
-  // Use getMyGroups() — works with explicit selection OR auto-detect from PLAYER_TO_GROUPS
   const myGroups = getMyGroups();
-
   if (!myGroups.length) {
     btn.textContent = T('tab_group');
-    el.innerHTML = `<div class="empty-state">${T('select_group_hint')}</div>`;
+    el.innerHTML = '<div class="empty-state">' + T('select_group_hint') + '</div>';
     return;
   }
-
-  // Collect all unique members across all my groups
   const allMemberSet = new Set();
   for (const g of myGroups) for (const m of (GROUP_DATA[g] || [])) allMemberSet.add(m);
   const allMembers = [...allMemberSet];
-
-  // Tab label: single group name or "Meine Gruppen (N)"
-  btn.textContent = myGroups.length === 1 ? `👥 ${myGroups[0]}` : `${T('tab_my_groups')} (${myGroups.length})`;
-
-  // Build one leaderboard block per group
-  const medals = ['🥇','🥈','🥉'];
+  btn.textContent = myGroups.length === 1 ? '👥 ' + myGroups[0] : T('tab_my_groups') + ' (' + myGroups.length + ')';
+  const isKO = (typeof PHASE !== 'undefined' && PHASE === 'KO');
+  const fmt = v => v > 0 ? '<b>' + v + '</b>' : '<span style="color:var(--muted)">—</span>';
   const groupBlocks = myGroups.map(groupName => {
     const members = GROUP_DATA[groupName] || [];
     const memberLb = lb.filter(p => members.includes(p.name));
     memberLb.sort((a,b) => b.total - a.total || b.pts - a.pts);
-    const rows = memberLb.map((p,i) => {
+    const rows = memberLb.map(p => {
       const isYou = p.name === USER.player;
-      const scorerCell = p.scorerPts > 0
-        ? `<span style="color:#2e7d32;font-weight:700;">+${p.scorerPts}</span>`
-        : '<span style="color:var(--muted);">—</span>';
-      const classCell = p.classificationPts > 0
-        ? `<span style="color:#7c3aed;font-weight:700;">+${p.classificationPts}</span>`
-        : '<span style="color:var(--muted);">—</span>';
-      return `<tr>
-        <td class="lb-rank ${p.rank===1?'top1':p.rank===2?'top2':p.rank===3?'top3':''}">${p.rank}</td>
-        <td class="lb-name">${p.name}${isYou?`<span class="you-tag">${T("you_tag")}</span>`:""}</td>
-        <td class="lb-pts">${p.total}</td>
-        <td class="lb-live-pts">${p.livePts > 0 ? '+'+p.livePts : '—'}</td>
-        <td style="font-size:0.8rem;">${scorerCell}</td>
-        <td style="font-size:0.8rem;">${classCell}</td>
-        <td><span class="pill pill-green">${p.exact}</span></td>
-        <td><span class="pill pill-blue">${p.diff}</span></td>
-        <td><span class="pill pill-gold">${p.one}</span></td>
-      </tr>`;
+      const youTag = isYou ? '<span class="you-tag">' + T('you_tag') + '</span>' : '';
+      const rankCls = p.rank===1?'top1':p.rank===2?'top2':p.rank===3?'top3':'';
+      if (isKO) {
+        let k = { ko_game:0, ko_scorer:0, champion:0, gp_game:0, gp_scorer:0, gp_classif:0, total:p.total||0, ko_live:0 };
+        try { k = calcTotalPointsKO(p.name); } catch(e) {}
+        const liveCell = (k.ko_live||0) > 0
+          ? '<span style="animation:pulse 1s infinite;color:var(--red)">🔴 +' + k.ko_live + '</span>'
+          : '<span style="color:var(--muted)">—</span>';
+        const ccCell = (ALL_PARTICIPANTS[p.name] && ALL_PARTICIPANTS[p.name].champion_changed)
+          ? '<span style="color:#e53935;font-weight:700">−5</span>'
+          : '<span style="color:var(--muted)">—</span>';
+        return '<tr class="' + (isYou?'lb-you':'') + '">' 
+          + '<td class="lb-rank ' + rankCls + '">' + p.rank + '</td>'
+          + '<td class="lb-name">' + p.name + youTag + '</td>'
+          + '<td class="lb-pts">' + k.total + '</td>'
+          + '<td style="font-size:.78rem;color:var(--muted)">' + fmt(k.gp_game) + '</td>'
+          + '<td style="font-size:.78rem;color:#2e7d32">' + fmt(k.gp_scorer) + '</td>'
+          + '<td style="font-size:.78rem;color:#b8860b">' + fmt(k.gp_classif) + '</td>'
+          + '<td style="font-size:.78rem;color:var(--blue-light);font-weight:' + (k.ko_game>0?700:400) + '">' + fmt(k.ko_game) + '</td>'
+          + '<td style="font-size:.78rem;color:var(--blue-light)">' + fmt(k.ko_scorer) + '</td>'
+          + '<td style="font-size:.78rem">' + liveCell + '</td>'
+          + '<td style="font-size:.78rem;color:#d4af37">' + fmt(k.champion) + '</td>'
+          + '<td style="font-size:.78rem;text-align:center">' + ccCell + '</td>'
+          + '</tr>';
+      } else {
+        const scorerCell = p.scorerPts > 0 ? '<span style="color:#2e7d32;font-weight:700">+'+p.scorerPts+'</span>' : '—';
+        const classCell = p.classificationPts > 0 ? '<span style="color:#b8860b;font-weight:700">+'+p.classificationPts+'</span>' : '—';
+        return '<tr>'
+          + '<td class="lb-rank ' + rankCls + '">' + p.rank + '</td>'
+          + '<td class="lb-name">' + p.name + youTag + '</td>'
+          + '<td class="lb-pts">' + p.total + '</td>'
+          + '<td class="lb-live-pts">' + (p.livePts > 0 ? '+'+p.livePts : '—') + '</td>'
+          + '<td style="font-size:.8rem">' + scorerCell + '</td>'
+          + '<td style="font-size:.8rem">' + classCell + '</td>'
+          + '<td><span class="pill pill-green">' + p.exact + '</span></td>'
+          + '<td><span class="pill pill-blue">' + p.diff + '</span></td>'
+          + '<td><span class="pill pill-gold">' + p.one + '</span></td>'
+          + '</tr>';
+      }
     }).join('');
-    return `
-      ${myGroups.length > 1 ? `<div class="section-title" style="margin-top:18px;">👥 ${groupName} — ${members.length} ${T('members')}</div>` : `<div class="section-title">👥 ${groupName} — ${members.length} ${T('members')}</div>`}
-      <div class="card" style="padding:0; overflow:hidden; margin-bottom:18px;">
-        <table class="lb-table">
-          <thead><tr><th>#</th><th>${T('lb_player')}</th><th>${T('pts_col')}</th><th style="color:var(--red);">🔴</th><th title="${T('grp_scorer_pts')}">⚽</th><th title="${T('grp_classpts_col')}">🏅</th><th>3pts</th><th>2pts</th><th>1pt</th></tr></thead>
-          <tbody>${rows}</tbody>
-        </table>
-      </div>`;
+    const hdrKO = '<tr><th>#</th><th>' + T('lb_player') + '</th><th>' + T('pts_col') + '</th>'
+      + '<th style="color:var(--muted);font-size:.68rem" title="GP Spielpunkte">GP⚽</th>'
+      + '<th style="color:var(--muted);font-size:.68rem" title="GP Scorer">GP🎯</th>'
+      + '<th style="color:var(--muted);font-size:.68rem" title="GP Klassif.">GP🏅</th>'
+      + '<th style="color:var(--blue-light);font-size:.68rem" title="KO Spiele">KO⚽</th>'
+      + '<th style="color:var(--blue-light);font-size:.68rem" title="KO Scorer">KO🎯</th>'
+      + '<th style="color:var(--red);font-size:.68rem" title="Live">🔴</th>'
+      + '<th style="color:#d4af37;font-size:.68rem" title="Champion">🏆</th>'
+      + '<th style="color:#e53935;font-size:.68rem" title="' + T('lb_cc_tooltip') + '">⚠️</th></tr>';
+    const hdrGP = '<tr><th>#</th><th>' + T('lb_player') + '</th><th>' + T('pts_col') + '</th>'
+      + '<th style="color:var(--red);">🔴</th><th title="' + T('grp_scorer_pts') + '">⚽</th>'
+      + '<th title="' + T('grp_classpts_col') + '">🏅</th><th>3pts</th><th>2pts</th><th>1pt</th></tr>';
+    const secTitle = myGroups.length > 1
+      ? '<div class="section-title" style="margin-top:18px;">👥 ' + groupName + ' — ' + members.length + ' ' + T('members') + '</div>'
+      : '<div class="section-title">👥 ' + groupName + ' — ' + members.length + ' ' + T('members') + '</div>';
+    return secTitle
+      + '<div class="card" style="padding:0; overflow:hidden; margin-bottom:18px;">'
+      + '<table class="lb-table"><thead>' + (isKO ? hdrKO : hdrGP) + '</thead>'
+      + '<tbody>' + rows + '</tbody></table></div>';
   }).join('');
-
-  el.innerHTML = `
-    ${groupBlocks}
-    <div class="card">
-      <div class="card-title">${T('group_latest_tip')}</div>
-      <div id="groupLatestGame"></div>
-    </div>`;
+  el.innerHTML = groupBlocks
+    + '<div class="card"><div class="card-title">' + T('group_latest_tip') + '</div>'
+    + '<div id="groupLatestGame"></div></div>';
   renderGroupLatestGame(allMembers, lb);
 }
 
