@@ -1345,6 +1345,13 @@
   <div class="section-title">📝 Changelog</div>
 
 <div class="card" style="margin-bottom:14px;">
+          <div class="card-title">v2.0.60 — 30. Juni 2026 (Feature)</div>
+          <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
+            <li>🎮 <strong>KO-Simulator (KO-F1)</strong> — Neuer KO-Simulator: slot-basiert mit Multiplikatoren, Torschützen-Toggles, Punkt-Verteilung und Rang-Delta in Echtzeit. Ersetzt Group-Simulator im KO-Modus.</li>
+            <li>🔔 <strong>What&#x27;s New Modal</strong> — WN_VERSION auf v2.0.60. wn_ko_sim mit rotem Rahmen. i18n-Keys für alle 3 Sprachen nachgetragen.</li>
+          </ul>
+        </div>
+        <div class="card" style="margin-bottom:14px;">
   <div class="card-title">v2.0.59 — 30.06.2026 (Fix)</div>
   <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
     <li>🐛 <strong>Meine Gruppen — Letztes Spiel KO-Fix</strong> — Im Gruppen-Tab wurden Gruppenspiele statt KO-Spiele angezeigt. <code>renderGroupLatestGame()</code> nutzt jetzt bei <code>PHASE=KO</code> korrekt <code>KO_GAMES</code>.</li>
@@ -2703,6 +2710,7 @@ for (const [gname, members] of Object.entries(GROUP_DATA)) {
 // ══════════════ i18n TRANSLATIONS ══════════════
 const TRANSLATIONS = {
   en: {
+    wn_ko_sim: '🎮 <strong>KO-Simulator is back!</strong> Simulate remaining KO-round outcomes, toggle scorer goals, see point distributions with multipliers and your rank impact.',
     wn_cc_fix: '🔧 <strong>CC Penalty Calculation Fix</strong>: Fixed a bug where the −5 champion change penalty was not correctly applied in the KO leaderboard ranking. All affected players are now sorted and displayed correctly. The KO phase launch modal now appears exactly once per player.',
     wn_champ_penalty: '⚠️ <strong>Champion Change Penalty</strong>: Players who changed their champion tip receive a <strong>−5 pt deduction</strong> and max +5 pts champion bonus. Missing tips for Adriel Fernandes have also been added.',
     porra_card_points: 'PTS',
@@ -3108,6 +3116,7 @@ const TRANSLATIONS = {
     // ── KO Insights (Kat. 1-5) ──
   },
   de: {
+    wn_ko_sim: '🎮 <strong>KO-Simulator ist zurück!</strong> Simuliere ausstehende KO-Runden, toggle Torschützen-Tore, sieh Punkt-Verteilungen mit Multiplikatoren und Rang-Impact.',
     wn_cc_fix: '🔧 <strong>CC Penalty Berechnungs-Fix</strong>: Fehler behoben, bei dem der −5 Punkte Abzug für Champion-Wechsel im KO-Leaderboard nicht korrekt berechnet wurde. Alle betroffenen Spieler werden jetzt korrekt sortiert und angezeigt. Das KO-Phase-Modal erscheint ab sofort genau einmal pro Spieler.',
     wn_champ_penalty: '⚠️ <strong>Champion-Wechsel Penalty</strong>: Spieler die ihren Champion-Tipp geändert haben erhalten <strong>−5 Punkte Abzug</strong> und max. +5 Pkt. Champion-Bonus. Fehlende KO-Tipps von Adriel Fernandes wurden ergänzt.',
     porra_card_points: 'PKT',
@@ -3486,6 +3495,7 @@ const TRANSLATIONS = {
     ko_personal_ts1:           '⚽ Dein TS1: <strong>{name}</strong> — {n} tippen ihn auch',
   },
   es: {
+    wn_ko_sim: '🎮 <strong>¡El Simulador ha vuelto!</strong> Simula resultados KO, activa goles de artilleros, ve distribuciones de puntos con multiplicadores y tu impacto en la clasificación.',
     wn_cc_fix: '🔧 <strong>Fix Cálculo Penalización CC</strong>: Corregido un error por el que la penalización de −5 pts por cambio de campeón no se aplicaba correctamente en el ranking KO. Todos los jugadores afectados se muestran y ordenan ahora correctamente. El modal de fase KO aparece exactamente una vez por jugador.',
     wn_champ_penalty: '⚠️ <strong>Penalización Cambio de Campeón</strong>: Los jugadores que cambiaron su pronóstico de campeón reciben una <strong>deducción de −5 pts</strong> y máximo +5 pts de bonus. Se han añadido los pronósticos KO faltantes de Adriel Fernandes.',
     porra_card_points: 'PKT',
@@ -9442,13 +9452,13 @@ function switchTab(tabId) {
 }
 
 // ═══════ WHAT'S NEW ═══════
-const BUILD_VERSION = 'v2.0.59';
-const BUILD_DATE    = '30.06.2026 15:23';
+const BUILD_VERSION = 'v2.0.60';
+const BUILD_DATE    = '30.06.2026 18:00';
 (function(){ var _hb = document.getElementById('headerVersionBadge'); if(_hb) _hb.textContent = BUILD_VERSION; })();
 
 
 
-const WN_VERSION = 'v2.0.47';
+const WN_VERSION = 'v2.0.60';
 const WN_STORAGE_KEY = window.location.pathname.includes('staging') ? 'wnSeen_staging' : 'wnSeen_live';
 (function(){ const old = localStorage.getItem('wnSeen'); if(old && !localStorage.getItem(WN_STORAGE_KEY)) localStorage.setItem(WN_STORAGE_KEY, old); })();
 const WN_I18N={
@@ -9550,6 +9560,9 @@ const WN_I18N={
 };
 // Icon map für WN-Keys — Reihenfolge & Icons für v1.12
 const WN_ITEMS = [
+  // v2.0.60 — KO-Simulator
+  { key: 'wn_ko_sim', icon: '🎮', highlight_red: true },
+  { divider: true },
   // v2.0.47 — CC Penalty Bug Fix + KO Modal fix
   { key: 'wn_cc_fix', icon: '🔧', highlight: true },
   { divider: true },
@@ -9617,7 +9630,7 @@ function openWhatsNew(){
         return;
       }
       const txt = i18n[item.key] || item.key;
-      const hl = item.highlight ? 'background:rgba(247,183,49,.12);border-radius:8px;padding:6px 8px;margin:2px 0;' : 'padding:4px 0;';
+      const hl = item.highlight_red ? 'background:rgba(239,68,68,.08);border-left:3px solid #ef4444;border-radius:8px;padding:6px 8px;margin:2px 0;padding-left:10px;' : item.highlight ? 'background:rgba(247,183,49,.12);border-radius:8px;padding:6px 8px;margin:2px 0;' : 'padding:4px 0;';
       itemsHtml += `<div style="font-size:.87rem;line-height:1.55;color:#dde;${hl}">${item.icon||''} ${txt}</div>`;
     });
 
@@ -9931,31 +9944,76 @@ function _crowdPick(gid){
   return{score:topScore,pct,count:topCount};
 }
 
-function _koInjectSimGames() {
-  // Make KO pending games available to the simulator
-  // by temporarily mapping them into the ALL_GAMES simulation state
-  // The simulator uses SIM_STATE[game.id] keyed by ALL_GAMES entries
-  // For KO mode: we do nothing special — the existing simulator
-  // just won't show GP games (all FT). This is acceptable.
-  // TODO: Full KO simulator in a future version
-}
+
+
+// ══════════════════════════════════════════════════════════════
+// KO-SIMULATOR (KO-F1) v2.0.60
+// ══════════════════════════════════════════════════════════════
+let KO_SIM_STATE = {};
+
+const _KO_TS_TEAM_PAIRS = [
+  ['julian alvarez','ARGENTINA'],['leo messi','ARGENTINA'],
+  ['raphinha','BRAZIL'],['vinicius junior','BRAZIL'],
+  ['harry kane','ENGLAND'],
+  ['kylian mbappe','FRANCE'],['michael olise','FRANCE'],
+  ['jamal musiala','GERMANY'],['kai havertz','GERMANY'],['nick woltemade','GERMANY'],
+  ['tim payne','NEW ZEALAND'],
+  ['erling haaland','NORWAY'],
+  ['cristiano ronaldo','PORTUGAL'],['goncalo ramos','PORTUGAL'],
+  ['ferran torres','SPAIN'],['lamine yamal','SPAIN'],['mikel oyarzabal','SPAIN'],
+];
+
+function _normTsName(s){if(!s)return '';return s.toLowerCase().replace(/[à-å]/g,'a').replace(/[è-ë]/g,'e').replace(/[ì-ï]/g,'i').replace(/[ò-ö]/g,'o').replace(/[ù-ü]/g,'u').replace(/ñ/g,'n').replace(/ç/g,'c').replace(/[^a-z0-9]/g,'');}
+
+function _koTsTeam(tsName){if(!tsName)return null;const key=_normTsName(tsName);const aliased=typeof SCORER_ALIASES!=='undefined'?(SCORER_ALIASES[key]||key):key;for(const[n,t]of _KO_TS_TEAM_PAIRS){if(_normTsName(n)===aliased||_normTsName(n)===key)return t;}if(typeof _buildScorerTeamMap==='function'){const dynMap=_buildScorerTeamMap();return dynMap[key]||dynMap[aliased]||null;}return null;}
+
+function _koTsForGame(kg){if(!kg||!kg.home||!kg.away)return{home:[],away:[]};const homeNorm=normalizeTeamKO(kg.home);const awayNorm=normalizeTeamKO(kg.away);const acc={};for(const[player,pred]of Object.entries(KO_PREDICTIONS)){if(!pred)continue;for(const[tsKey,tsVal]of[['ts1',pred.ts1],['ts2',pred.ts2]]){if(!tsVal)continue;const rawTeam=_koTsTeam(tsVal);if(!rawTeam)continue;const teamNorm=normalizeTeamKO(rawTeam);if(teamNorm!==homeNorm&&teamNorm!==awayNorm)continue;const canon=tsVal;if(!acc[canon])acc[canon]={teamNorm,ts1P:[],ts2P:[]};if(tsKey==='ts1')acc[canon].ts1P.push(player);else acc[canon].ts2P.push(player);}}const home=[],away=[];for(const[name,d]of Object.entries(acc)){const entry={name,ts1Pickers:d.ts1P,ts2Pickers:d.ts2P};(d.teamNorm===homeNorm?home:away).push(entry);}const byPicks=(a,b)=>(b.ts1Pickers.length+b.ts2Pickers.length)-(a.ts1Pickers.length+a.ts2Pickers.length);home.sort(byPicks);away.sort(byPicks);return{home,away};}
+
+function _koSimInit(){for(const kg of KO_GAMES){if(kg.status==='FT'||!kg.home||!kg.away)continue;const slot=kg.slot;if(KO_SIM_STATE[slot])continue;const isLive=kg.status==='LIVE';const s1=isLive?(kg.homeScore??0):0;const s2=isLive?(kg.awayScore??0):0;const tsScored={};const live=_koLive[kg.espnId];if(live&&live.scoringEvents){const{home,away}=_koTsForGame(kg);for(const ts of[...home,...away]){const normTs=_normTsName(ts.name);tsScored[ts.name]=live.scoringEvents.some(ev=>ev.evtType==='goal'&&!ev.isOG&&ev.athleteName&&_normTsName(ev.athleteName).includes(normTs.substring(0,Math.min(normTs.length,6))));}}KO_SIM_STATE[slot]={s1,s2,tsScored,active:isLive,dirty:false};}}
+
+function _koSimToggle(slot){if(!KO_SIM_STATE[slot])return;KO_SIM_STATE[slot].active=!KO_SIM_STATE[slot].active;_renderKOSimulator();}
+
+function _koSimAdj(slot,team,d){if(!KO_SIM_STATE[slot])return;const st=KO_SIM_STATE[slot];if(team===1)st.s1=Math.max(0,(st.s1||0)+d);else st.s2=Math.max(0,(st.s2||0)+d);st.dirty=true;_renderKOSimulator();}
+
+function _koSimTsToggle(slot,tsName){if(!KO_SIM_STATE[slot])return;const st=KO_SIM_STATE[slot];if(!st.tsScored)st.tsScored={};st.tsScored[tsName]=!st.tsScored[tsName];st.dirty=true;_renderKOSimulator();}
+
+function _koSimRst(slot){const kg=KO_GAMES.find(g=>g.slot===slot);if(!kg)return;const isLive=kg.status==='LIVE';const s1=isLive?(kg.homeScore??0):0;const s2=isLive?(kg.awayScore??0):0;const tsScored={};const live=_koLive[kg.espnId];if(live&&live.scoringEvents){const{home,away}=_koTsForGame(kg);for(const ts of[...home,...away]){const normTs=_normTsName(ts.name);tsScored[ts.name]=live.scoringEvents.some(ev=>ev.evtType==='goal'&&!ev.isOG&&ev.athleteName&&_normTsName(ev.athleteName).includes(normTs.substring(0,Math.min(normTs.length,6))));}}KO_SIM_STATE[slot]={s1,s2,tsScored,active:KO_SIM_STATE[slot]?.active??isLive,dirty:false};_renderKOSimulator();}
+
+function _koSimDelta(playerName){const pred=KO_PREDICTIONS[playerName];if(!pred)return{delta:0,simPts:0,liveBasePts:0};let simPts=0,liveBasePts=0;for(const[slot,st]of Object.entries(KO_SIM_STATE)){if(!st.active)continue;const kg=KO_GAMES.find(g=>g.slot===slot);if(!kg)continue;const mult=(SLOT_META[slot]&&SLOT_META[slot].multiplier)||1;const tip=pred.slots?.[slot];if(tip&&tip.s1!=null&&tip.s2!=null){const predT1=normalizeTeamKO(tip.t1),predT2=normalizeTeamKO(tip.t2);const actT1=normalizeTeamKO(kg.home),actT2=normalizeTeamKO(kg.away);const t1ok=!!(predT1&&(predT1===actT1||predT1===actT2));const t2ok=!!(predT2&&(predT2===actT1||predT2===actT2));if(t1ok&&t2ok&&predT1!==predT2){simPts+=calcResultPtsKO(tip.s1,tip.s2,st.s1,st.s2)*mult;if(kg.status==='LIVE'){const lh=kg.homeScore??0,la=kg.awayScore??0;liveBasePts+=calcResultPtsKO(tip.s1,tip.s2,lh,la)*mult;}}}if(kg.status!=='FT'){const ts1Norm=_normTsName(pred.ts1||'');const ts2Norm=_normTsName(pred.ts2||'');for(const[tsName,scored]of Object.entries(st.tsScored||{})){if(!scored)continue;const tsNorm=_normTsName(tsName);if(ts1Norm&&ts1Norm===tsNorm)simPts+=2*mult;else if(ts2Norm&&ts2Norm===tsNorm)simPts+=1*mult;}}}return{simPts,liveBasePts,delta:simPts-liveBasePts};}
+
+function _renderKOSimulator(){const lb=_simLb||[];const koGames=KO_GAMES.filter(kg=>kg.status!=='FT'&&kg.home&&kg.away).sort((a,b)=>new Date(a.date||0)-new Date(b.date||0));const gl=document.getElementById('simGamesList');if(!gl)return;if(!koGames.length){gl.innerHTML='<div style="color:rgba(255,255,255,.5);text-align:center;padding:20px;font-size:.85rem;">Keine ausstehenden KO-Spiele</div>';const wl=document.getElementById('simWinnersList');if(wl)wl.innerHTML='';const ll=document.getElementById('simLosersList');if(ll)ll.innerHTML='';const rp=document.getElementById('simRankPills');if(rp)rp.style.display='none';return;}
+gl.innerHTML=koGames.map(kg=>{const slot=kg.slot;if(!KO_SIM_STATE[slot])_koSimInit();const st=KO_SIM_STATE[slot]||{s1:0,s2:0,tsScored:{},active:false,dirty:false};const isLive=kg.status==='LIVE';const isActive=!!st.active;const mult=(SLOT_META[slot]&&SLOT_META[slot].multiplier)||1;const rl=(SLOT_META[slot]&&SLOT_META[slot].roundLabel)||kg.round||'';const dateStr=kg.date?fmtKickoff(kg.date):'';const liveEv=_koLive[kg.espnId];const liveHtml=isLive&&liveEv?'<div style="font-size:.65rem;color:#f87171;margin:3px 0 2px;">🔴 Live '+(liveEv.t1Score||0)+'–'+(liveEv.t2Score||0)+(liveEv.clock?' · '+liveEv.clock:'')+'</div>':'';
+let distHtml='';if(isActive){const d=calcKOPointDist(slot,st.s1,st.s2,mult);if(d&&d.total>0){const bars=[{l:d.lbl3||(3*mult+'pts'),n:d.p3,p:d.pct3,c:'#00c853'},{l:d.lbl2||(2*mult+'pts'),n:d.p2,p:d.pct2,c:'#ff8c00'},{l:d.lbl1||(1*mult+'pts'),n:d.p1,p:d.pct1,c:'#2979ff'},{l:'0pts',n:d.p0,p:d.pct0,c:'#e74c3c'}];distHtml='<div style="margin-top:8px;"><div style="font-size:.55rem;color:rgba(255,255,255,.35);text-align:center;margin-bottom:4px;">'+T('pts_dist_label')+' '+st.s1+':'+st.s2+' ×'+mult+'</div><div style="display:flex;gap:4px;">'+bars.map(({l,n,p,c})=>'<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;border:1.5px solid '+c+';border-radius:8px;padding:5px 3px 4px;position:relative;overflow:hidden;"><div style="position:absolute;bottom:0;left:0;right:0;background:'+c+';opacity:.15;height:'+Math.min(p*.8,80)+'%;border-radius:0 0 6px 6px;"></div><span style="font-size:.58rem;font-weight:800;color:'+c+';text-transform:uppercase;position:relative;">'+l+'</span><span style="font-size:.9rem;font-weight:900;line-height:1;color:'+c+';position:relative;">'+n+'</span><span style="font-size:.55rem;color:rgba(255,255,255,.4);position:relative;">'+p+'%</span></div>').join('')+'</div></div>';}}
+const myPred=KO_PREDICTIONS[USER.player];const myTip=myPred?.slots?.[slot];let myTipHtml='';if(myTip&&myTip.s1!=null){const predT1=normalizeTeamKO(myTip.t1),predT2=normalizeTeamKO(myTip.t2);const actT1=normalizeTeamKO(kg.home),actT2=normalizeTeamKO(kg.away);const pok=!!(predT1&&predT2&&(predT1===actT1||predT1===actT2)&&(predT2===actT1||predT2===actT2)&&predT1!==predT2);const sp=pok?calcResultPtsKO(myTip.s1,myTip.s2,st.s1,st.s2)*mult:null;const spHtml=sp!==null?' → <span style="color:#4ade80;font-weight:700;">+'+sp+' pts</span>':(!pok?' <span style="opacity:.4;font-size:.65rem;">(Team ✗)</span>':'');myTipHtml='<div style="font-size:.7rem;margin-top:5px;opacity:'+(isActive?1:.45)+';border-top:1px solid rgba(255,255,255,.07);padding-top:5px;">👤 <b>'+T('tip_yours')+'</b> '+myTip.s1+':'+myTip.s2+spHtml+'</div>';}
+const{home:homeTsArr,away:awayTsArr}=_koTsForGame(kg);const renderTsTeam=(arr,teamName)=>{if(!arr.length)return '';return '<div style="margin-top:6px;"><div style="font-size:.6rem;color:rgba(255,255,255,.4);font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;">'+teamName+'</div>'+arr.map(ts=>{const sc=!!(st.tsScored?.[ts.name]);const c1=ts.ts1Pickers.length,c2=ts.ts2Pickers.length;const summary=[c1>0?c1+'× TS1 (+'+(2*mult)+')':'',c2>0?c2+'× TS2 (+'+(1*mult)+')':''].filter(Boolean).join(' · ');const safeTs=ts.name.replace(/\/g,'\\').replace(/'/g,"\'");return '<div style="display:flex;align-items:center;gap:6px;padding:3px 0;"><button onclick="_koSimTsToggle(''+slot+'',''+safeTs+'')" style="background:'+(sc?'rgba(74,222,128,.2)':'rgba(255,255,255,.08)')+';border:1px solid '+(sc?'#4ade80':'rgba(255,255,255,.2)')+';color:'+(sc?'#4ade80':'rgba(255,255,255,.4)')+';border-radius:4px;padding:2px 6px;font-size:.62rem;cursor:pointer;pointer-events:'+(isActive?'auto':'none')+';">'+(sc?'⚽ Tor':'⬜ Tor')+'</button><span style="font-size:.7rem;color:'+(sc?'#4ade80':'rgba(255,255,255,.8)')+';">'+ts.name+'</span><span style="font-size:.6rem;color:rgba(255,255,255,.35);margin-left:auto;">'+summary+'</span></div>';}).join('')+'</div>';};
+const tsSectionHtml=(homeTsArr.length||awayTsArr.length)?'<div style="border-top:1px solid rgba(255,255,255,.1);margin-top:7px;padding-top:6px;opacity:'+(isActive?1:.45)+';">'+renderTsTeam(homeTsArr,kg.home)+renderTsTeam(awayTsArr,kg.away)+'</div>':'';
+const rstTarget=isLive&&kg.homeScore!=null?(kg.homeScore+':'+kg.awayScore):'0:0';const rstHtml=st.dirty?'<button class="sim-reset-btn" onclick="_koSimRst(''+slot+'')" style="margin-top:6px;">↺ Reset → '+rstTarget+'</button>':'';
+const togClr=isActive?'#4ade80':'rgba(255,255,255,.4)';const togBg=isActive?'rgba(74,222,128,.15)':'rgba(255,255,255,.07)';const togBd=isActive?'#4ade80':'rgba(255,255,255,.2)';
+return '<div class="sim-game-card'+(isLive?' sim-game-live':'')+'" style="opacity:'+(isActive?1:.45)+';transition:opacity .2s;"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px;"><div style="display:flex;align-items:center;gap:5px;"><span style="font-size:.6rem;color:rgba(255,255,255,.4);">'+rl+'</span><span style="font-size:.62rem;font-weight:800;color:#f59e0b;background:rgba(245,158,11,.15);padding:1px 6px;border-radius:4px;">×'+mult+'</span>'+(dateStr?'<span style="font-size:.6rem;color:rgba(255,255,255,.3);">'+dateStr+'</span>':'')+'</div><button onclick="_koSimToggle(''+slot+'')" style="background:'+togBg+';border:1px solid '+togBd+';color:'+togClr+';border-radius:6px;padding:3px 9px;font-size:.65rem;cursor:pointer;font-weight:600;">'+(isActive?'✅ aktiv':'⬜ aus')+'</button></div><div style="font-weight:700;font-size:.85rem;margin-bottom:4px;'+(isLive?'color:#f87171;':'')+'">'+kg.home+' vs '+kg.away+'</div>'+liveHtml+'<div class="sim-score-row" style="'+(isActive?'':'opacity:.35;pointer-events:none;')+'"><button class="sim-adj-btn" onclick="_koSimAdj(''+slot+'',1,-1)">−</button><span class="sim-score-val">'+st.s1+'</span><button class="sim-adj-btn" onclick="_koSimAdj(''+slot+'',1,1)">+</button><span class="sim-score-sep">:</span><button class="sim-adj-btn" onclick="_koSimAdj(''+slot+'',2,-1)">−</button><span class="sim-score-val">'+st.s2+'</span><button class="sim-adj-btn" onclick="_koSimAdj(''+slot+'',2,1)">+</button></div>'+tsSectionHtml+myTipHtml+distHtml+rstHtml+'</div>';
+}).join('');
+const activeSlots=Object.entries(KO_SIM_STATE).filter(([,st])=>st.active).map(([s])=>s);const wl=document.getElementById('simWinnersList');const ll=document.getElementById('simLosersList');const rp=document.getElementById('simRankPills');
+if(!activeSlots.length){if(wl)wl.innerHTML='<div style="opacity:.4;font-size:.75rem;padding:8px;">—</div>';if(ll)ll.innerHTML='<div style="opacity:.4;font-size:.75rem;padding:8px;">—</div>';if(rp)rp.style.display='none';return;}
+const baseRankMap={};{let _r=1;const sorted=[...lb].sort((a,b)=>(b.total||0)-(a.total||0)||b.pts-a.pts||b.exact-a.exact);sorted.forEach((p,idx)=>{if(idx>0&&(p.total||0)<(sorted[idx-1].total||0))_r=idx+1;baseRankMap[p.name]=_r;});}
+const simTotals=lb.map(p=>({name:p.name,total:(p.total||0)+_koSimDelta(p.name).delta}));simTotals.sort((a,b)=>b.total-a.total);let _rr=1;simTotals.forEach((p,idx)=>{if(idx>0&&p.total<simTotals[idx-1].total)_rr=idx+1;p.rank=_rr;});const simRankMap={};simTotals.forEach(p=>simRankMap[p.name]=p.rank);
+const allDeltas=lb.map(p=>{const{delta}=_koSimDelta(p.name);const baseRank=baseRankMap[p.name]||999;const simRank=simRankMap[p.name]||baseRank;const rankDelta=baseRank-simRank;const hasTip=activeSlots.some(slot=>{const pr=KO_PREDICTIONS[p.name];return pr?.slots?.[slot]?.s1!=null;});return{name:p.name,rank:simRank,baseRank,rankDelta,delta,hasTip};});
+const mkRow=d=>{const isYou=d.name===USER.player;const sg=typeof getSharedGroups==='function'?getSharedGroups(d.name):[];const youTag=isYou?'<span class="you-tag" style="font-size:.6rem;margin-left:3px;">'+T('you_tag')+'</span>':'';const grpTag=(!isYou&&sg.length)?'<span class="group-tag" style="font-size:.55rem;padding:1px 4px;">'+sg[0]+(sg.length>1?' +'+(sg.length-1):'')+'</span>':'';const rd=d.rankDelta||0;const arrow=rd>0?'<span style="color:#4ade80;font-size:.65rem;font-weight:700;">▲'+rd+'</span>':rd<0?'<span style="color:var(--red);font-size:.65rem;font-weight:700;">▼'+Math.abs(rd)+'</span>':'<span style="opacity:.3;font-size:.65rem;">–</span>';const dHtml=d.delta>0?'<span class="sim-player-delta pos">+'+d.delta+' pts</span>':d.delta<0?'<span class="sim-player-delta neg">'+d.delta+' pts</span>':'<span class="sim-player-delta" style="opacity:.4">±0</span>';return '<div class="sim-player-row"><span class="sim-player-rank">#'+(d.rank||'?')+' '+arrow+'</span><span class="sim-player-name">'+d.name+youTag+grpTag+'</span>'+dHtml+'</div>';};
+const withTip=allDeltas.filter(d=>d.hasTip);const winners=withTip.filter(d=>d.rankDelta>0).sort((a,b)=>a.rank-b.rank);const losers=withTip.filter(d=>d.rankDelta<0).sort((a,b)=>a.rankDelta-b.rankDelta);
+if(wl)wl.innerHTML=winners.length?winners.map(mkRow).join(''):'<div style="opacity:.4;font-size:.75rem;padding:8px;">—</div>';if(ll)ll.innerHTML=losers.length?losers.map(mkRow).join(''):'<div style="opacity:.4;font-size:.75rem;padding:8px;">—</div>';
+const me=allDeltas.find(d=>d.name===USER.player);if(me&&rp&&activeSlots.length>0){const br=me.baseRank,sr=me.rank,rd=br-sr;const delta=me.delta||0;const dc=rd>0?'up':rd<0?'down':'same';const darrow=rd>0?('↑ '+rd):rd<0?('↓ '+Math.abs(rd)):'= 0';const rclr=rd===0?'rgba(255,255,255,.45)':'#fff';const pClass=delta>0?'sim-pts-pos':delta<0?'sim-pts-neg':'sim-pts-zero';const pStr=delta>0?('+'+delta):delta<0?(''+delta):'±0';const aboveRank=sr-1;const abovePlayer=aboveRank>0?simTotals.find(p=>p.rank===aboveRank):null;const mySimTotal=simTotals.find(p=>p.name===USER.player);const gapPts=abovePlayer&&mySimTotal?(abovePlayer.total-mySimTotal.total):null;const cnt=activeSlots.length;const unit=cnt===1?(T('sim_active_unit1')||'Spiel'):(T('sim_active_unit')||'Spiele');let pillsHtml='<div class="sim-pill"><span class="sim-pill-label">'+T('sim_rank_lbl')+'</span><span class="sim-rank-from">#'+br+'</span><span class="sim-rank-sep">→</span><span class="sim-rank-to" style="color:'+rclr+'">#'+sr+'</span><span class="sim-rank-delta '+dc+'">'+darrow+'</span></div><div class="sim-pill"><span class="sim-pill-label">'+T('sim_pts_lbl')+'</span><span class="sim-pill-val '+pClass+'">'+pStr+' Pts</span></div>';if(gapPts!==null&&aboveRank>0){pillsHtml+='<div class="sim-pill"><span class="sim-pill-label">#'+aboveRank+'</span><span class="sim-pill-val sim-gap-val">−'+gapPts+' Pts</span></div>';}pillsHtml+='<div class="sim-pill active-pill"><span class="sim-active-dot"></span><span class="sim-pill-label">'+T('sim_active_lbl')+'</span><span class="sim-pill-val sim-active-val">'+cnt+' '+unit+'</span></div>';rp.innerHTML=pillsHtml;rp.style.display='flex';}else if(rp){rp.style.display='none';}}
+
 function openSimulator(){
-  // Im KO-Modus: Simulator arbeitet mit KO_GAMES (pending-Status)
-  // Der bestehende Simulator nutzt SIM_STATE + ALL_GAMES;
-  // KO-Spiele werden in SIM_GAMES injiziert
-  if (typeof PHASE !== 'undefined' && PHASE === 'KO') {
-    // Sync KO pending games into simulator game list
-    _koInjectSimGames();
-  }
-  try {
-    _simInit();
-    _simLb = _lastLb || [];
-    const overlay = document.getElementById('simOverlay');
-    if(!overlay){ console.error('simOverlay not found'); return; }
+  if(typeof PHASE!=='undefined'&&PHASE==='KO'){
+    _simLb=_lastLb||[];
+    _koSimInit();
+    const overlay=document.getElementById('simOverlay');
+    if(!overlay){console.error('simOverlay not found');return;}
     overlay.classList.add('active');
-    try { _renderSimulator(); } catch(e){ console.error('_renderSimulator error:',e); }
-  } catch(e){ console.error('openSimulator error:',e); }
+    try{_renderKOSimulator();}catch(e){console.error('_renderKOSimulator error:',e);}
+    return;
+  }
+  try{_simInit();_simLb=_lastLb||[];const overlay=document.getElementById('simOverlay');if(!overlay){console.error('simOverlay not found');return;}overlay.classList.add('active');try{_renderSimulator();}catch(e){console.error('_renderSimulator error:',e);}}catch(e){console.error('openSimulator error:',e);}
 }
+
 function closeSimulator(){document.getElementById('simOverlay').classList.remove('active');}
 function _simAdj(gid,team,d){
   // Ensure gid is treated as string key consistently
