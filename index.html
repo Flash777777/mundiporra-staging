@@ -5951,8 +5951,13 @@ function matchCardKOUpcoming(kg) {
   if (myPred && myPred.s1 != null && myPred.s2 != null) {
     myTipStr = myPred.s1 + ':' + myPred.s2;
   }
-  const dateStr = kg.date ? kg.date.substring(0,10) : '';
-  const metaStr = kg.slot + ' · ' + roundLbl + ' · ×' + mult + (dateStr ? ' · ' + dateStr : '');
+  // Uhrzeit in User-Zeitzone + Countdown (analog matchCardUpcoming Gruppenphase)
+  const kickoffTime = kg.date ? fmtKickoff(kg.date) : '';
+  const cdVal = kg.date ? fmtCountdown(kg.date) : '';
+  const cdHtml = cdVal
+    ? `<span class="cd-pill" data-kickoff="${kg.date}" style="display:inline-flex;align-items:center;gap:4px;background:linear-gradient(135deg,#1e3a5f,#2563eb);color:#fff;font-size:0.72rem;font-weight:700;padding:3px 9px;border-radius:20px;letter-spacing:.03em;">⏱ <span class="cd-val">${cdVal}</span></span>`
+    : '';
+  const metaStr = kg.slot + ' · ' + roundLbl + ' · ×' + mult + (kickoffTime ? ' · ⏰ ' + kickoffTime : '');
   // ── Community Insights ──────────────────────────────────────────────────────
   let insightsHtml = '';
   if (PHASE === 'KO' && kg.espnId && kg.slot && Object.keys(KO_PREDICTIONS).length > 0) {
@@ -5967,7 +5972,10 @@ function matchCardKOUpcoming(kg) {
   return '<div class="match-card">'
     + '<div style="display:flex;align-items:center;justify-content:space-between;padding:6px 0;gap:8px;">'
     + '<span style="font-weight:700;font-size:0.88rem;flex:1;text-align:right;">' + home + '</span>'
-    + '<span style="color:var(--muted);font-size:0.8rem;font-weight:600;padding:0 8px;">vs</span>'
+    + '<div style="display:flex;flex-direction:column;align-items:center;gap:4px;">'
+    + '<span style="color:var(--muted);font-size:0.8rem;font-weight:600;">vs</span>'
+    + cdHtml
+    + '</div>'
     + '<span style="font-weight:700;font-size:0.88rem;flex:1;">' + away + '</span>'
     + '</div>'
     + '<div class="match-meta">' + metaStr + '</div>'
@@ -9172,8 +9180,8 @@ function switchTab(tabId) {
 }
 
 // ═══════ WHAT'S NEW ═══════
-const BUILD_VERSION = 'v2.0.54';
-const BUILD_DATE    = '30.06.2026 07:30';
+const BUILD_VERSION = 'v2.0.55';
+const BUILD_DATE    = '30.06.2026 08:00';
 (function(){ var _hb = document.getElementById('headerVersionBadge'); if(_hb) _hb.textContent = BUILD_VERSION; })();
 
 
