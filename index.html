@@ -5984,11 +5984,15 @@ function renderLastNextMatch() {
     const koFin  = KO_GAMES.filter(g => g.status === 'FT');
     const koLive = KO_GAMES.filter(g => g.status === 'LIVE');
     const koUp   = KO_GAMES.filter(g => g.status === 'pre');
-    const lastKO = koFin.length ? koFin[koFin.length - 1] : null;
+    // Analog Gruppenphase: alle Spiele des letzten KO-Spieltags (8h-Fenster)
+    const koFinGroups = groupByKickoff(koFin, 8 * 60 * 60 * 1000);
+    const lastKOSlot  = koFinGroups[koFinGroups.length - 1] || [];
     const lastTEl = document.getElementById('lastMatchTitle');
-    if (lastKO) {
-      if (lastTEl) lastTEl.textContent = T('last_result');
-      document.getElementById('lastMatchContent').innerHTML = matchCardKOFinished(lastKO, _lastLb);
+    if (lastKOSlot.length) {
+      if (lastTEl) lastTEl.textContent = lastKOSlot.length > 1
+        ? `${T('last_results_multi')}${lastKOSlot.length})` : T('last_result');
+      document.getElementById('lastMatchContent').innerHTML =
+        lastKOSlot.map(g => matchCardKOFinished(g, _lastLb)).join('');
     } else {
       if (lastTEl) lastTEl.textContent = T('last_result');
       document.getElementById('lastMatchContent').innerHTML = '<div class="empty-state" style="padding:12px;color:var(--muted);font-size:0.82rem;">' + T('no_data') + '</div>';
@@ -9152,8 +9156,8 @@ function switchTab(tabId) {
 }
 
 // ═══════ WHAT'S NEW ═══════
-const BUILD_VERSION = 'v2.0.52';
-const BUILD_DATE    = '30.06.2026 01:15';
+const BUILD_VERSION = 'v2.0.53';
+const BUILD_DATE    = '30.06.2026 07:00';
 (function(){ var _hb = document.getElementById('headerVersionBadge'); if(_hb) _hb.textContent = BUILD_VERSION; })();
 
 
