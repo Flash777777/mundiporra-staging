@@ -6279,9 +6279,52 @@ function renderGameTipBlock(game, actual, contextPlayers, isLive, lb) {
 }
 
 function renderLatestGameSummary(lb) {
+  const EIGHT_HOURS = 8 * 60 * 60 * 1000;
+
+  // ── KO-Phase: letzte abgeschlossene KO-Spiele ───────────────────────────────
+  if (typeof PHASE !== 'undefined' && PHASE === 'KO') {
+    const koFin = KO_GAMES.filter(kg => kg.status === 'FT' && kg.home && kg.away);
+    koFin.sort((a, b) => new Date(a.date || 0) - new Date(b.date || 0));
+    if (!koFin.length) {
+      document.getElementById('latestGameSummaryContent').innerHTML = `<div class="empty-state">${T('no_finished')}</div>`;
+      return;
+    }
+    // 8h-Fenster: letzte Gruppe abgeschlossener Spiele
+    function _koGrpLast(arr) {
+      const groups = [];
+      for (const kg of arr) {
+        const t = new Date(kg.date || 0).getTime();
+        const last = groups[groups.length - 1];
+        if (!last || t - new Date(last[0].date || 0).getTime() > EIGHT_HOURS) groups.push([kg]);
+        else last.push(kg);
+      }
+      return groups;
+    }
+    const koGroups = _koGrpLast(koFin);
+    const lastSlot = koGroups[koGroups.length - 1] || [];
+    if (!lastSlot.length) {
+      document.getElementById('latestGameSummaryContent').innerHTML = `<div class="empty-state">${T('no_finished')}</div>`;
+      return;
+    }
+    const ctx = getContextPlayers(lb);
+    // Label: "Game 73: GERMANY 2-1 PARAGUAY | Game 76: BRAZIL 0-0 JAPAN"
+    const label = lastSlot.length > 1
+      ? lastSlot.map(kg => `Game ${kg.id}: ${kg.home} ${kg.homeScore}-${kg.awayScore} ${kg.away}`).join(' | ')
+      : `Game ${lastSlot[0].id}: ${lastSlot[0].home} ${lastSlot[0].homeScore}-${lastSlot[0].awayScore} ${lastSlot[0].away}`;
+    document.getElementById('latestGameSummaryTitle').textContent = `📋 ${T('latest_game_summary')} — ${label}`;
+    // KO-Game-Adapter → renderGameTipBlock erwartet game.team1/team2 + actual.s1/s2/status
+    document.getElementById('latestGameSummaryContent').innerHTML =
+      lastSlot.map(kg => {
+        const gameAdapt = { id: kg.id, team1: kg.home, team2: kg.away };
+        const actualAdapt = { s1: kg.homeScore, s2: kg.awayScore, status: 'FT' };
+        return renderGameTipBlock(gameAdapt, actualAdapt, ctx, false, lb);
+      }).join('<hr style="margin:12px 0; border:none; border-top:1px solid #eee;">');
+    return;
+  }
+
+  // ── Gruppenphase: bisherige Logik ───────────────────────────────────────────
   const finished = ALL_GAMES.filter(g => getActual(g)?.status === 'FT');
   // Last finished kickoff slot (parallel games share same time window)
-  const EIGHT_HOURS = 8 * 60 * 60 * 1000;
   const finGroups = groupByKickoff(finished, EIGHT_HOURS);
   const lastSlot = finGroups[finGroups.length - 1] || [];
 
@@ -9180,8 +9223,8 @@ function switchTab(tabId) {
 }
 
 // ═══════ WHAT'S NEW ═══════
-const BUILD_VERSION = 'v2.0.55';
-const BUILD_DATE    = '30.06.2026 08:00';
+const BUILD_VERSION = 'v2.0.56';
+const BUILD_DATE    = '30.06.2026 15:00';
 (function(){ var _hb = document.getElementById('headerVersionBadge'); if(_hb) _hb.textContent = BUILD_VERSION; })();
 
 
