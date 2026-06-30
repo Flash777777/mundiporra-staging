@@ -7062,7 +7062,7 @@ function showKOGameDetail(slot) {
   const _lbls = [T('tip_wrong'),T('tip_trend'),T('tip_diff'),T('tip_exact')];
   document.getElementById('gameDetailTitle').textContent = `${kg.roundLabel}: ${h1} vs ${h2}`;
   // All players with a tip for this slot
-  const allNames = Object.keys(KO_PREDICTIONS).filter(n => KO_PREDICTIONS[n]?.slots?.[slot]);
+  const allNames = Object.keys(KO_PREDICTIONS).filter(n => { const _t = KO_PREDICTIONS[n]?.slots?.[slot]; return _t && _t.s1 != null && _t.s2 != null; });
   // Sort: own tip first → rawPts DESC → rank ASC
   const sorted = [...allNames].sort((a, b) => {
     const aIsMe = a === USER?.player, bIsMe = b === USER?.player;
@@ -7070,8 +7070,8 @@ function showKOGameDetail(slot) {
     if (bIsMe) return  1;
     if (isFT || isLive) {
       const ap = KO_PREDICTIONS[a]?.slots?.[slot], bp = KO_PREDICTIONS[b]?.slots?.[slot];
-      const aPts = (ap && sc90_1d != null) ? calcResultPtsKO(ap.s1, ap.s2, sc90_1d, sc90_2d) : -1;
-      const bPts = (bp && sc90_1d != null) ? calcResultPtsKO(bp.s1, bp.s2, sc90_1d, sc90_2d) : -1;
+      const aPts = (ap && ap.s1 != null && sc90_1d != null) ? calcResultPtsKO(ap.s1, ap.s2, sc90_1d, sc90_2d) : -1;
+      const bPts = (bp && bp.s1 != null && sc90_1d != null) ? calcResultPtsKO(bp.s1, bp.s2, sc90_1d, sc90_2d) : -1;
       if (bPts !== aPts) return bPts - aPts;
     }
     const ra = lb.findIndex(p => p.name === a), rb = lb.findIndex(p => p.name === b);
@@ -7084,7 +7084,7 @@ function showKOGameDetail(slot) {
     const isMe  = name === USER?.player;
     let rawPts = null, pts = null, _c = 'var(--muted)', _bg = 'transparent', _lbl = '';
     if ((isFT || isLive) && sc90_1d != null && sc90_2d != null) {
-      rawPts = calcResultPtsKO(pred.s1, pred.s2, sc90_1d, sc90_2d);
+      rawPts = (pred.s1 != null && pred.s2 != null) ? calcResultPtsKO(pred.s1, pred.s2, sc90_1d, sc90_2d) : 0;
       pts    = rawPts * (kg.multiplier || 1);
       _c  = _cols[rawPts] || _cols[0];
       _bg = _bgs[rawPts]  || _bgs[0];
@@ -9379,8 +9379,8 @@ function switchTab(tabId) {
 }
 
 // ═══════ WHAT'S NEW ═══════
-const BUILD_VERSION = 'v2.0.57';
-const BUILD_DATE    = '30.06.2026 18:00';
+const BUILD_VERSION = 'v2.0.58';
+const BUILD_DATE    = '30.06.2026 15:17';
 (function(){ var _hb = document.getElementById('headerVersionBadge'); if(_hb) _hb.textContent = BUILD_VERSION; })();
 
 
