@@ -1313,6 +1313,13 @@
     <li>🔢 <strong>buildLeaderboard KO-Sort</strong> — Im KO-Modus nutzt <code>buildLeaderboard</code> <code>calcTotalPointsKO</code> für <code>total</code> (GP + KO + Live)</li>
   </ul>
 </div>
+<div class="card" style="margin-bottom:14px;">
+  <div class="card-title">v2.0.67 — 01. Juli 2026 (Fix)</div>
+  <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
+    <li>⚽ <strong>Musiala-Bug behoben</strong> — <code>aggregateGoalScorers_legacy()</code> filtert jetzt korrekt nach <code>evtType='goal'|'pen'</code> und <code>isOwnGoal</code> — Shootout- und Eigentor-Events werden nicht mehr als Tore gezählt</li>
+    <li>🏆 <strong>TS-Punkte mit KO-Multiplikatoren</strong> — <code>getPlayerGoalsInGame()</code> neu implementiert — Champions-Tab zeigt jetzt Phase-Breakdown: Gruppenphase (×1), R32 (×2), R16 (×3), QF (×4), HF (×5), 3P (×6), Finale (×7)</li>
+  </ul>
+</div>
 <div class="card" style="margin-bottom:14px;border-left:4px solid var(--accent);">
   <div class="card-title">v2.0.43-ko-staging — 29.06.2026 (Release)</div>
   <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
@@ -2725,6 +2732,8 @@ const TRANSLATIONS = {
     scorer_mult1: '×1 pt/goal',
     scorer_no_goals: 'no goals yet',
     scorer_pickers_label: 'Picked by',
+    phase_group: 'Group Phase',
+    total: 'Total',
     scorer_api_pending: '⏳ Tournament started Jun 11 — ESPN tracking goals. Top picks (Mbappé, Kane, etc.) have not scored yet — updates automatically.',
     scorer_api_live: '🟢 Live goals from ESPN API · Click a player to see who picked them',
     scorer_total_pts: '⚽ Total scorer points',
@@ -3506,6 +3515,8 @@ const TRANSLATIONS = {
     scorer_mult1: '×1 pt/gol',
     scorer_no_goals: 'sin goles aún',
     scorer_pickers_label: 'Elegido por',
+    phase_group: 'Fase de Grupos',
+    total: 'Total',
     scorer_api_pending: '⏳ Torneo desde el 11.6. — ESPN registra goles. Los elegidos (Mbappé, Kane, etc.) aún no han marcado — se actualiza automáticamente.',
     scorer_api_live: '🟢 Goles en vivo via ESPN API · Clic en jugador = ver quién lo eligió',
     scorer_total_pts: '⚽ Puntos goleadores totales',
@@ -4196,7 +4207,10 @@ function aggregateGoalScorers_legacy() {
     seen.add(canonical);
     for (const evt of (game.scoringEvents||[])) {
       const name = evt.athleteName;
-      if (name) goals[name] = (goals[name]||0) + 1;
+      if (!name) continue;
+      if (evt.evtType !== 'goal' && evt.evtType !== 'pen') continue;
+      if (evt.isOwnGoal) continue;
+      goals[name] = (goals[name]||0) + 1;
     }
   }
   if (Object.keys(goals).length > 0) {
@@ -4204,6 +4218,33 @@ function aggregateGoalScorers_legacy() {
     console.log('[GoalScorers] legacy comp.details:', goals);
   }
 }
+// ── getPlayerGoalsInGame: Tore eines Spielers in einem KO-Spiel ──
+// Liest scoringEvents aus liveGames anhand des kanonischen Team-Keys.
+function getPlayerGoalsInGame(playerName, kg, opts) {
+  if (!playerName || !kg || !kg.home || !kg.away) return 0;
+  opts = opts || {};
+  const canonical = [kg.home.toUpperCase(), kg.away.toUpperCase()].sort().join('-');
+  const game = liveGames[canonical] || liveGames[kg.home.toUpperCase() + '-' + kg.away.toUpperCase()] || null;
+  if (!game || !game.scoringEvents) return 0;
+  const normPick = _normTsName(playerName);
+  let count = 0;
+  for (const evt of game.scoringEvents) {
+    if (evt.evtType !== 'goal' && evt.evtType !== 'pen') continue;
+    if (opts.excludeShootout && evt.evtType === 'shootout') continue;
+    if (evt.isOwnGoal || evt.isOG) continue;
+    if (!evt.athleteName) continue;
+    const normEvt = _normTsName(evt.athleteName);
+    const resolved = (typeof SCORER_ALIASES !== 'undefined' && SCORER_ALIASES[normEvt]) || normEvt;
+    const resolvedPick = (typeof SCORER_ALIASES !== 'undefined' && SCORER_ALIASES[normPick]) || normPick;
+    if (normEvt === normPick || resolved === normPick || normEvt === resolvedPick || resolved === resolvedPick) { count++; continue; }
+    if (normEvt.includes(normPick) || (normEvt.includes(' ') && normPick.includes(normEvt))) { count++; continue; }
+    const lastPick = normPick.split(' ').pop();
+    const lastEvt  = normEvt.split(' ').pop();
+    if (lastPick.length >= 4 && lastPick === lastEvt && normPick[0] === normEvt[0]) { count++; continue; }
+  }
+  return count;
+}
+
 // Merge live scoringEvents into playerGoals using max() — shared helper
 function _mergeLiveGoals() {
   const liveGoals = {};
@@ -7274,19 +7315,49 @@ function renderChampions() {
   };
 
   const scorerRow = (p, c, pts_mult, pickersList) => {
-    const g = getPlayerGoals(p);
-    const scorerPts = g * pts_mult;
+    const totalGoals = getPlayerGoals(p);
     const pickersId = 'pickers_' + p.replace(/[^a-z0-9]/gi,'_') + '_' + pts_mult;
     const pickerNames = (pickersList[p] || []);
     const myPick = USER.player && pickerNames.includes(USER.player)
-      ? `<span style="background:#fff3cd; color:#856404; padding:1px 5px; border-radius:8px; font-size:0.7rem; margin-left:4px;">DU ✓</span>` : '';
+      ? '<span style="background:#fff3cd; color:#856404; padding:1px 5px; border-radius:8px; font-size:0.7rem; margin-left:4px;">DU ✓</span>' : '';
+
+    // Per-phase breakdown: KO-Slots, dann GP = Total - KO-Tore
+    const koBreakdown = [];
+    let koGoalsTotal = 0;
+    if (typeof getPlayerGoalsInGame === 'function') {
+      for (const kg of KO_GAMES) {
+        if (kg.status !== 'FT') continue;
+        const mult = (SLOT_META[kg.slot] && SLOT_META[kg.slot].multiplier) || 1;
+        const rl = (SLOT_META[kg.slot] && SLOT_META[kg.slot].roundLabel) || kg.slot;
+        const g = getPlayerGoalsInGame(p, kg, {excludeShootout: true}) || 0;
+        if (g > 0) {
+          koBreakdown.push({ round: rl, goals: g, mult, pts: g * pts_mult * mult });
+          koGoalsTotal += g;
+        }
+      }
+    }
+    const gpGoals = Math.max(0, totalGoals - koGoalsTotal);
+    const gpPts   = gpGoals * pts_mult;
+    const koPts   = koBreakdown.reduce((s, e) => s + e.pts, 0);
+    const totalPts = gpPts + koPts;
+
+    let breakdownHtml = '';
+    if (hasLiveGoals && totalPts > 0) {
+      const bRows = [];
+      if (gpGoals > 0) bRows.push('<div style="display:flex;justify-content:space-between;padding:2px 0;"><span>🌍 ' + T('phase_group') + '</span><span style="color:#555;">' + gpGoals + '⚽ × ' + pts_mult + ' = <b style="color:#2e7d32;">+' + gpPts + 'pts</b></span></div>');
+      for (const b of koBreakdown) {
+        bRows.push('<div style="display:flex;justify-content:space-between;padding:2px 0;"><span>🔥 ' + b.round + ' <span style="color:var(--accent);font-size:.68rem;">×' + b.mult + '</span></span><span style="color:#555;">' + b.goals + '⚽ × ' + pts_mult + ' × ' + b.mult + ' = <b style="color:#1565c0;">+' + b.pts + 'pts</b></span></div>');
+      }
+      breakdownHtml = '<div style="margin-top:6px;padding:6px 8px;background:#f9fafb;border-radius:6px;font-size:0.72rem;line-height:1.8;">' + bRows.join('') + '<div style="border-top:1px solid #e0e0e0;margin-top:4px;padding-top:4px;display:flex;justify-content:space-between;"><span style="font-weight:700;">' + T('total') + '</span><b style="color:var(--blue);">+' + totalPts + 'pts</b></div></div>';
+    }
+
     return `<div style="border-bottom:1px solid #f0f4f8;">
       <div style="display:flex; justify-content:space-between; align-items:center; padding:7px 0;
         cursor:pointer; font-size:0.85rem;"
         onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none'">
         <span style="flex:1; font-weight:600;">${p}${myPick} ${goalBadge(p)}</span>
         <span style="color:#666; font-size:0.75rem; margin:0 8px;">${c}× · ×${pts_mult}pts</span>
-        ${hasLiveGoals && scorerPts > 0 ? `<span style="background:#e3f2fd; color:var(--blue); padding:2px 8px; border-radius:10px; font-size:0.78rem; font-weight:700;">+${scorerPts}pts</span>` : ''}
+        ${hasLiveGoals && totalPts > 0 ? `<span style="background:#e3f2fd; color:var(--blue); padding:2px 8px; border-radius:10px; font-size:0.78rem; font-weight:700;">+${totalPts}pts</span>` : ''}
         <span style="color:var(--muted); font-size:0.7rem; margin-left:6px;">▾</span>
       </div>
       <div id="${pickersId}" style="display:none; padding:6px 0 10px 0; font-size:0.75rem; color:#555; line-height:1.7;">
@@ -7294,6 +7365,7 @@ function renderChampions() {
         ${pickerNames.map(n => n === USER.player
           ? `<span style="background:#fff3cd; color:#856404; padding:1px 5px; border-radius:6px; font-weight:700;">${n}</span>`
           : `<span>${n}</span>`).join(' · ')}
+        ${breakdownHtml}
       </div>
     </div>`;
   };
