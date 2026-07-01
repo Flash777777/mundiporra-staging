@@ -1161,6 +1161,13 @@
   <div class="section-title">📝 Changelog</div>
 
 <div class="card" style="margin-bottom:14px;">
+  <div class="card-title">v2.0.72 — 01. Juli 2026 (Fix)</div>
+  <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
+    <li>🎯 <strong>Torschützen-Fix (Elfmeterschießen)</strong> — <code>_mergeLiveGoals</code> Korrektur-Pass subtrahiert Shootout-Tore nur noch wenn ESPN-Stats den Wert über den gefilterten Live-Events-Zähler hinaus aufgebläht haben. Verhindert Überkorrektur bei Spielern deren Wert bereits korrekt über Live-Events gesetzt wurde (Musiala: 1 statt 0).</li>
+  </ul>
+</div>
+
+<div class="card" style="margin-bottom:14px;">
   <div class="card-title">v2.0.71 — 01. Juli 2026 (Fix)</div>
   <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
     <li>🥅 <strong>Shootout-Fix v2</strong> — ESPN <code>/statistics</code>-Endpoint zählt Shootout-Tore mit. Neuer Korrektur-Pass in <code>_mergeLiveGoals</code> subtrahiert Shootout-Tore aktiv aus <code>playerGoals</code> (statt nur MAX-Merge). Musiala zeigt jetzt korrekt 1 Tor.</li>
@@ -9459,7 +9466,7 @@ function switchTab(tabId) {
 }
 
 // ═══════ WHAT'S NEW ═══════
-const BUILD_VERSION='v2.0.71';
+const BUILD_VERSION='v2.0.72';
 const BUILD_DATE    = '01.07.2026 12:00';
 (function(){ var _hb = document.getElementById('headerVersionBadge'); if(_hb) _hb.textContent = BUILD_VERSION; })();
 
