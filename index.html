@@ -1161,6 +1161,12 @@
   <div class="section-title">📝 Changelog</div>
 
 <div class="card" style="margin-bottom:14px;">
+  <div class="card-title">v2.0.70 — 01. Juli 2026 (Fix)</div>
+  <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
+    <li>🥅 <strong>Shootout-Elfmeter-Fix</strong> — Elfmetertore im Elfmeterschießen (z.B. Musiala vs Paraguay) werden nicht mehr als Torschützen-Punkte gezählt. Reguläre Elfmeter (z.B. Harry Kane vs Kroatien) zählen weiterhin. Technisch: <code>isPEN</code>-Flag in <code>parseESPNEvents</code> + Filter in <code>_mergeLiveGoals</code>.</li>
+  </ul>
+</div>
+<div class="card" style="margin-bottom:14px;">
   <div class="card-title">v2.0.69 — 01. Juli 2026 (Fix + Release)</div>
   <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
     <li>🐛 <strong>Musiala Shootout-Fix</strong> — Penalty-Shootout-Tore nicht mehr als reguläre Tore gezählt</li>
@@ -4163,13 +4169,13 @@ function parseESPNEvents(events, target) {
     if ((target[key]?.status === 'FT' || target[key]?.status === 'LIVE') && st === 'NS') continue;
     // Don't overwrite a FT result with LIVE (race condition: game already finished)
     if (target[key]?.status === 'FT' && st === 'LIVE') continue;
-    target[key] = {s1, s2, status: st, clock, statusLabel, date: ev.date || comp.date || null, pos1, pos2, rc1, rc2, ht1, ht2, scoringEvents};
+    target[key] = {s1, s2, status: st, clock, statusLabel, date: ev.date || comp.date || null, pos1, pos2, rc1, rc2, ht1, ht2, scoringEvents, isPEN: (statusType === 'STATUS_FINAL_PEN')};
     // Also store reversed key so home/away order doesn't matter
     const keyRev = `${name2}-${name1}`;
     if (keyRev !== key) {
       if ((target[keyRev]?.status === 'FT' || target[keyRev]?.status === 'LIVE') && st === 'NS') {} 
       else if (target[keyRev]?.status === 'FT' && st === 'LIVE') {}
-      else target[keyRev] = {s1: s2, s2: s1, status: st, clock, statusLabel, date: ev.date || comp.date || null, pos1: pos2, pos2: pos1, rc1: rc2, rc2: rc1, ht1: ht2, ht2: ht1, scoringEvents, _rev: true};
+      else target[keyRev] = {s1: s2, s2: s1, status: st, clock, statusLabel, date: ev.date || comp.date || null, pos1: pos2, pos2: pos1, rc1: rc2, rc2: rc1, ht1: ht2, ht2: ht1, scoringEvents, isPEN: (statusType === 'STATUS_FINAL_PEN'), _rev: true};
     }
   }
 }
@@ -4239,6 +4245,7 @@ function aggregateGoalScorers_legacy() {
       if (!name) continue;
       if (evt.evtType !== 'goal' && evt.evtType !== 'pen') continue;
       if (evt.isOwnGoal) continue;
+      if (evt.isPen && game.isPEN) continue; // Shootout-Elfmeter zählen nicht
       if (evt.isPen && evt.isShootout) continue; // Shootout-Pens nicht zählen
       goals[name] = (goals[name]||0) + 1;
     }
@@ -9432,17 +9439,19 @@ function switchTab(tabId) {
 }
 
 // ═══════ WHAT'S NEW ═══════
-const BUILD_VERSION='v2.0.69';
-const BUILD_DATE    = '01.07.2026 19:30';
+const BUILD_VERSION='v2.0.70';
+const BUILD_DATE    = '01.07.2026 21:00';
 (function(){ var _hb = document.getElementById('headerVersionBadge'); if(_hb) _hb.textContent = BUILD_VERSION; })();
 
 
 
-const WN_VERSION = 'v2.0.69';
+const WN_VERSION = 'v2.0.70';
 const WN_STORAGE_KEY = window.location.pathname.includes('staging') ? 'wnSeen_staging' : 'wnSeen_live';
 (function(){ const old = localStorage.getItem('wnSeen'); if(old && !localStorage.getItem(WN_STORAGE_KEY)) localStorage.setItem(WN_STORAGE_KEY, old); })();
 const WN_I18N={
   en:{
+    // v2.0.70
+    wn_shootout_fix:'🥅 <strong>Shootout Goals Fixed</strong>: Penalty shootout goals no longer count as scorer points — only regular time & extra time goals count (e.g. Harry Kane\'s penalty ✅, Musiala\'s shootout ❌).',
     // v2.0.69
     wn_ts_mult:'🏆 <strong>TS Points with KO Multipliers!</strong> Scorer bonus points are now multiplied by KO round: Group Phase ×1 / R32 ×2 / R16 ×3 / QF ×4 / SF ×5 / 3rd ×6 / Final ×7. The Champions tab shows a detailed breakdown per phase. Also fixed: Musiala &amp; Co. shootout goals no longer counted as regular goals.',
     // v2.0.63
@@ -9483,6 +9492,8 @@ const WN_I18N={
     wn_fetch:'⚡ <strong>8× faster reload</strong>: weekly batch fetching replaces 38 daily requests. Scorer data straight from match events.',
   },
   de:{
+    // v2.0.70
+    wn_shootout_fix:'🥅 <strong>Shootout-Fix</strong>: Elfmetertore im Elfmeterschießen zählen nicht mehr als Torschützen-Punkte — nur Tore in regulärer Spielzeit & Verlängerung (Harry Kanes Elfmeter ✅, Musialas Shootout-Tor ❌).',
     // v2.0.69
     wn_ts_mult:'🏆 <strong>TS-Punkte mit KO-Multiplikatoren!</strong> Torschützen-Bonuspunkte werden jetzt nach KO-Runde multipliziert: Gruppenphase ×1 / R32 ×2 / R16 ×3 / QF ×4 / HF ×5 / 3P ×6 / Finale ×7. Der Champions-Tab zeigt einen detaillierten Breakdown pro Phase. Außerdem behoben: Shootout-Tore von Musiala &amp; Co. werden nicht mehr als reguläre Tore gezählt.',
     // v2.0.60
@@ -9522,7 +9533,8 @@ const WN_I18N={
     wn_fetch:'⚡ <strong>8× schnellerer Reload</strong>: Wöchentliche Batches statt 38 täglicher Requests. Torschützen direkt aus Match-Events.',
   },
   es:{
-
+    // v2.0.70
+    wn_shootout_fix:'🥅 <strong>Fix: Goles en Tandas</strong>: Los goles en la tanda de penaltis ya no cuentan como puntos de goleador — solo goles en tiempo reglamentario y prórroga (penalti de Kane ✅, tanda de Musiala ❌).',
     // v2.0.67
     wn_ts_mult:'🏆 <strong>¡Puntos TS con Multiplicadores KO!</strong> Los puntos de goleadores ahora se multiplican por ronda KO: Grupos ×1 / R32 ×2 / R16 ×3 / QF ×4 / SF ×5 / 3P ×6 / Final ×7. La pestaña Campeones muestra el desglose detallado. Corregido: conteo erróneo de Musiala.',    // v2.0.60
     wn_sim_v63:'⚡ <strong>¡Simulador KO en Vivo!</strong> Simula las rondas KO restantes — ajusta marcadores, goles de goleadores (0/1/2/3…) con multiplicadores y ve el impacto en tu clasificación en tiempo real.',
@@ -9562,6 +9574,9 @@ const WN_I18N={
 };
 // Icon map für WN-Keys — Reihenfolge & Icons für v1.12
 const WN_ITEMS = [
+  // v2.0.70 — Shootout-Elfmeter-Fix
+  { key: 'wn_shootout_fix', icon: '🥅', highlight: true },
+  { divider: true },
   // v2.0.67 — TS-Multiplikatoren + Musiala-Fix
   { key: 'wn_ts_mult', icon: '🏆', highlight: true },
   { divider: true },
