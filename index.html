@@ -1161,6 +1161,14 @@
   <div class="section-title">📝 Changelog</div>
 
 <div class="card" style="margin-bottom:14px;">
+  <div class="card-title">v2.0.77 — 01. Juli 2026 (Fix)</div>
+  <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
+    <li>🔧 <strong>Header-Badge BUILD_VERSION</strong> — Fix: BUILD_VERSION-Replace verwendete falsches Regex-Pattern; Header zeigt jetzt korrekt v2.0.77.</li>
+    <li>🔧 <strong>Detail-Panel: korrekte Paarungs-Filterung</strong> — <code>_dFindTip()</code> Fallback auf <code>null</code> geändert wenn Teams bekannt; verhindert dass alle ~149 Tipper als "korrekte Paarung" gezählt werden.</li>
+  </ul>
+</div>
+
+<div class="card" style="margin-bottom:14px;">
   <div class="card-title">v2.0.76 — 01. Juli 2026 (Fix)</div>
   <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
     <li>🔧 <strong>KO Insights: Team-basierte Slot-Suche</strong> — <code>_findTipByTeams()</code> sucht Spieler-Tipps über normalisierte Teamnamen statt über fixen ESPN-ID→Slot-Key-Match. Gilt für alle KO-Runden (R16 → Finale).</li>
@@ -7229,7 +7237,7 @@ function showKOGameDetail(slot) {
       if (!t || t.s1 == null || t.s2 == null) continue;
       if (_dPairingOk(t)) return t;
     }
-    return pdata.slots[slot] || null;
+    return null; // v2.0.77: kein Fallback wenn Teams bekannt — keine Paarung gefunden
   };
   // Gesamtzahl: alle die in dieser Runde irgendeinen Tipp abgegeben haben
   const _dTotalTippers = Object.keys(KO_PREDICTIONS).filter(n => {
@@ -9609,8 +9617,8 @@ function switchTab(tabId) {
 }
 
 // ═══════ WHAT'S NEW ═══════
-const BUILD_VERSION='v2.0.75';
-const BUILD_DATE    = '01.07.2026 21:00';
+const BUILD_VERSION='v2.0.77';
+const BUILD_DATE    = '01.07.2026 21:30';
 (function(){ var _hb = document.getElementById('headerVersionBadge'); if(_hb) _hb.textContent = BUILD_VERSION; })();
 
 
