@@ -1161,6 +1161,18 @@
   <div class="section-title">📝 Changelog</div>
 
 <div class="card" style="margin-bottom:14px;">
+  <div class="card-title">v2.0.67 — 01. Juli 2026 (Feature + Fix)</div>
+  <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
+    <li>🏆 <strong>TS-Punkte mit KO-Multiplikatoren</strong> — Torschützen-Punkte werden jetzt nach KO-Runde multipliziert: Gruppenphase ×1 / R32 ×2 / R16 ×3 / QF ×4 / HF ×5 / 3P ×6 / Finale ×7</li>
+    <li>📊 <strong>Phase-Breakdown im Champions-Tab</strong> — Detaillierter Punkteaufschluss pro Runde für TS1 und TS2 (Option B)</li>
+    <li>🐛 <strong>Musiala-Bug behoben</strong> — <code>aggregateGoalScorers_legacy()</code> filtert jetzt korrekt: nur <code>evtType=goal|pen</code>, keine Eigentore, keine Shootout-Events</li>
+    <li>🆕 <strong><code>getPlayerGoalsInGame()</code></strong> — Neue Hilfsfunktion für per-Spiel-Torsuche mit Alias-Matching</li>
+    <li>🌍 <strong>i18n</strong> — Keys <code>phase_group</code> &amp; <code>total</code> in EN/DE/ES angelegt</li>
+    <li>🔔 <strong>What's New Modal</strong> — WN_VERSION → v2.0.67, Update-Banner aktiv (notify: true)</li>
+  </ul>
+</div>
+
+<div class="card" style="margin-bottom:14px;">
   <div class="card-title">v2.0.66 — 30. Juni 2026 (Fix)</div>
   <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
     <li>⚡ <strong>Simulator Fix (Root Cause)</strong> — <code>document.body.appendChild(overlay)</code> löst Stacking-Context-Problem: simOverlay lag innerhalb von <code>.page</code> und war trotz <code>display:flex</code> unsichtbar.</li>
