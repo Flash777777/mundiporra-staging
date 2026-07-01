@@ -4313,7 +4313,8 @@ function _mergeLiveGoals() {
     for (const evt of (game.scoringEvents || [])) {
       if ((evt.evtType !== 'goal' && evt.evtType !== 'pen') || !evt.isPen || evt.isOwnGoal) continue;
       const name = evt.athleteName;
-      if (name && playerGoals[name] > 0) playerGoals[name] = Math.max(0, playerGoals[name] - 1);
+      const groundTruth = liveGoals[name] || 0;
+      if ((playerGoals[name] || 0) > groundTruth) playerGoals[name] = Math.max(groundTruth, playerGoals[name] - 1);
     }
   }
 }
@@ -9459,7 +9460,7 @@ function switchTab(tabId) {
 
 // ═══════ WHAT'S NEW ═══════
 const BUILD_VERSION='v2.0.71';
-const BUILD_DATE    = '01.07.2026 22:00';
+const BUILD_DATE    = '01.07.2026 12:00';
 (function(){ var _hb = document.getElementById('headerVersionBadge'); if(_hb) _hb.textContent = BUILD_VERSION; })();
 
 
