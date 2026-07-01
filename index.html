@@ -9430,6 +9430,10 @@ const WN_STORAGE_KEY = window.location.pathname.includes('staging') ? 'wnSeen_st
 (function(){ const old = localStorage.getItem('wnSeen'); if(old && !localStorage.getItem(WN_STORAGE_KEY)) localStorage.setItem(WN_STORAGE_KEY, old); })();
 const WN_I18N={
   en:{
+    // v2.0.67
+    wn_ts_mult:'🏆 <strong>TS-Punkte mit KO-Multiplikatoren!</strong> Torschützen-Punkte werden jetzt nach KO-Runde multipliziert: Gruppenphase ×1 / R32 ×2 / R16 ×3 / QF ×4 / HF ×5 / 3P ×6 / Finale ×7. Champions-Tab zeigt detaillierten Breakdown pro Phase. Außerdem: Zählfehler bei Musiala &amp; Co. behoben (Shootout/Eigentore gefiltert).',
+    // v2.0.67
+    wn_ts_mult:'🏆 <strong>TS-Punkte mit KO-Multiplikatoren!</strong> Torschützen-Bonuspunkte werden jetzt nach KO-Runde multipliziert: Gruppenphase ×1 / R32 ×2 / R16 ×3 / QF ×4 / HF ×5 / 3P ×6 / Finale ×7. Der Champions-Tab zeigt einen detaillierten Breakdown pro Phase. Außerdem behoben: Falschzählung von Shooter-Events bei Musiala &amp; Co.',
     // v2.0.63
     wn_sim_v63:'⚡ <strong>KO-Simulator Live!</strong> Simulate remaining KO rounds — set scores per game, adjust scorer goal counts (0/1/2/3…) with multiplier-based scoring and see your rank impact in real time.',
     // v2.0.60
@@ -9505,7 +9509,9 @@ const WN_I18N={
     wn_fetch:'⚡ <strong>8× schnellerer Reload</strong>: Wöchentliche Batches statt 38 täglicher Requests. Torschützen direkt aus Match-Events.',
   },
   es:{
-    // v2.0.60
+
+    // v2.0.67
+    wn_ts_mult:'🏆 <strong>¡Puntos TS con Multiplicadores KO!</strong> Los puntos de goleadores ahora se multiplican por ronda KO: Grupos ×1 / R32 ×2 / R16 ×3 / QF ×4 / SF ×5 / 3P ×6 / Final ×7. La pestaña Campeones muestra el desglose detallado. Corregido: conteo erróneo de Musiala.',    // v2.0.60
     wn_sim_v63:'⚡ <strong>¡Simulador KO en Vivo!</strong> Simula las rondas KO restantes — ajusta marcadores, goles de goleadores (0/1/2/3…) con multiplicadores y ve el impacto en tu clasificación en tiempo real.',
     wn_ko_sim:'🎮 <strong>¡El Simulador ha vuelto!</strong> Simula resultados KO, activa goles de artilleros, ve distribuciones de puntos con multiplicadores y tu impacto en la clasificación.',
     wn_cc_fix:'🔧 <strong>Fix Cálculo Penalización CC</strong>: Corregido un error por el que la penalización de −5 pts por cambio de campeón no se aplicaba correctamente en el ranking KO. Todos los jugadores afectados se muestran y ordenan ahora correctamente. El modal de fase KO aparece exactamente una vez por jugador.',
@@ -9543,6 +9549,9 @@ const WN_I18N={
 };
 // Icon map für WN-Keys — Reihenfolge & Icons für v1.12
 const WN_ITEMS = [
+  // v2.0.67 — TS-Multiplikatoren + Musiala-Fix
+  { key: 'wn_ts_mult', icon: '🏆', highlight: true },
+  { divider: true },
   // v2.0.63 — KO-Simulator fully released
   { key: 'wn_sim_v63', icon: '⚡', highlight: true },
 
