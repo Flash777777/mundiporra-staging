@@ -1,6 +1,6 @@
 # ÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¯ÃÂÃÂ¸ÃÂÃÂ Mundiporra Dashboard ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ Component Registry
 > Technische Vollreferenz inkl. Render-Chain fÃÂÃÂÃÂÃÂ¼r Claude
-> Stand: v2.0.72 · Repo: `Flash777777/mundiporra-staging` + `mundiporra-dashboard`
+> Stand: v2.0.74 · Repo: `Flash777777/mundiporra-staging` + `mundiporra-dashboard`
 > ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ ÃÂÃÂ¯ÃÂÃÂ¸ÃÂÃÂ PFLICHT: Diese Datei wird bei jedem Push zu `index.html` im selben Commit aktualisiert.
 
 ---

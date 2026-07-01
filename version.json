@@ -1,1 +1,6 @@
-{"version":"v2.0.71","notify":false,"date":"01.07.2026"}
+{
+  "version": "v2.0.74",
+  "notify": true,
+  "message": "GP-Scorer Doppelzählung behoben",
+  "date": "2026-07-01"
+}
