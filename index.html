@@ -1161,6 +1161,13 @@
   <div class="section-title">📝 Changelog</div>
 
 <div class="card" style="margin-bottom:14px;">
+  <div class="card-title">v2.0.73 — 01. Juli 2026 (Fix)</div>
+  <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
+    <li>🎯 <strong>Champions-Tab Torattribution Fix</strong> — <code>getPlayerGoalsInGame</code> prüfte <code>evtType==='shootout'</code> (existiert nie); korrigiert zu <code>evt.isPen && game.isPEN</code> analog zu <code>_mergeLiveGoals</code>. Shootout-Tore werden jetzt korrekt aus der KO-Breakdown ausgeschlossen (Musiala: Gruppenphase ×1 statt Ronda 32 ×2).</li>
+  </ul>
+</div>
+
+<div class="card" style="margin-bottom:14px;">
   <div class="card-title">v2.0.72 — 01. Juli 2026 (Fix)</div>
   <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
     <li>🎯 <strong>Torschützen-Fix (Elfmeterschießen)</strong> — <code>_mergeLiveGoals</code> Korrektur-Pass subtrahiert Shootout-Tore nur noch wenn ESPN-Stats den Wert über den gefilterten Live-Events-Zähler hinaus aufgebläht haben. Verhindert Überkorrektur bei Spielern deren Wert bereits korrekt über Live-Events gesetzt wurde (Musiala: 1 statt 0).</li>
@@ -4279,7 +4286,7 @@ function getPlayerGoalsInGame(playerName, kg, opts) {
   let count = 0;
   for (const evt of game.scoringEvents) {
     if (evt.evtType !== 'goal' && evt.evtType !== 'pen') continue;
-    if (opts.excludeShootout && evt.evtType === 'shootout') continue;
+    if (opts.excludeShootout && evt.isPen && game.isPEN) continue;
     if (evt.isOwnGoal || evt.isOG) continue;
     if (!evt.athleteName) continue;
     const normEvt = _normTsName(evt.athleteName);
@@ -9466,7 +9473,7 @@ function switchTab(tabId) {
 }
 
 // ═══════ WHAT'S NEW ═══════
-const BUILD_VERSION='v2.0.72';
+const BUILD_VERSION='v2.0.73';
 const BUILD_DATE    = '01.07.2026 12:00';
 (function(){ var _hb = document.getElementById('headerVersionBadge'); if(_hb) _hb.textContent = BUILD_VERSION; })();
 
