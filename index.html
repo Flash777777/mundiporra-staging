@@ -1161,6 +1161,12 @@
   <div class="section-title">📝 Changelog</div>
 
 <div class="card" style="margin-bottom:14px;">
+  <div class="card-title">v2.0.71 — 01. Juli 2026 (Fix)</div>
+  <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
+    <li>🥅 <strong>Shootout-Fix v2</strong> — ESPN <code>/statistics</code>-Endpoint zählt Shootout-Tore mit. Neuer Korrektur-Pass in <code>_mergeLiveGoals</code> subtrahiert Shootout-Tore aktiv aus <code>playerGoals</code> (statt nur MAX-Merge). Musiala zeigt jetzt korrekt 1 Tor.</li>
+  </ul>
+</div>
+<div class="card" style="margin-bottom:14px;">
   <div class="card-title">v2.0.70 — 01. Juli 2026 (Fix)</div>
   <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
     <li>🥅 <strong>Shootout-Elfmeter-Fix</strong> — Elfmetertore im Elfmeterschießen (z.B. Musiala vs Paraguay) werden nicht mehr als Torschützen-Punkte gezählt. Reguläre Elfmeter (z.B. Harry Kane vs Kroatien) zählen weiterhin. Technisch: <code>isPEN</code>-Flag in <code>parseESPNEvents</code> + Filter in <code>_mergeLiveGoals</code>.</li>
@@ -4289,13 +4295,26 @@ function _mergeLiveGoals() {
     for (const evt of (game.scoringEvents || [])) {
       if (evt.evtType !== 'goal' && evt.evtType !== 'pen') continue;
       if (evt.isOwnGoal) continue;
+      if (evt.isPen && game.isPEN) continue; // Shootout-Elfmeter zählen nicht
       const name = evt.athleteName;
       if (!name) continue;
       liveGoals[name] = (liveGoals[name] || 0) + 1;
     }
   }
+  // MAX-Merge: liveGoals kann nur erhöhen, nicht korrigieren
   for (const [name, liveCount] of Object.entries(liveGoals)) {
     if (liveCount > (playerGoals[name] || 0)) playerGoals[name] = liveCount;
+  }
+  // Korrektur-Pass: Shootout-Tore aus ESPN-Statistiken herausrechnen
+  // (ESPN /statistics zählt Shootout-Tore mit → aktiv subtrahieren)
+  for (const [key, game] of Object.entries(liveGames)) {
+    if (key.endsWith('_rev') || game._rev) continue;
+    if (!game.isPEN) continue;
+    for (const evt of (game.scoringEvents || [])) {
+      if ((evt.evtType !== 'goal' && evt.evtType !== 'pen') || !evt.isPen || evt.isOwnGoal) continue;
+      const name = evt.athleteName;
+      if (name && playerGoals[name] > 0) playerGoals[name] = Math.max(0, playerGoals[name] - 1);
+    }
   }
 }
 function aggregateGoalScorers(){
@@ -9439,8 +9458,8 @@ function switchTab(tabId) {
 }
 
 // ═══════ WHAT'S NEW ═══════
-const BUILD_VERSION='v2.0.70';
-const BUILD_DATE    = '01.07.2026 21:00';
+const BUILD_VERSION='v2.0.71';
+const BUILD_DATE    = '01.07.2026 22:00';
 (function(){ var _hb = document.getElementById('headerVersionBadge'); if(_hb) _hb.textContent = BUILD_VERSION; })();
 
 
