@@ -1161,6 +1161,14 @@
   <div class="section-title">📝 Changelog</div>
 
 <div class="card" style="margin-bottom:14px;">
+  <div class="card-title">v2.0.69 — 01. Juli 2026 (Fix + Release)</div>
+  <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
+    <li>🐛 <strong>Musiala Shootout-Fix</strong> — Penalty-Shootout-Tore nicht mehr als reguläre Tore gezählt</li>
+    <li>🌐 <strong>What's New Lokalisierung</strong> — <code>wn_ts_mult</code> korrekt in EN/DE/ES; EN-Duplikat entfernt</li>
+    <li>🧹 <strong>Debug-Logs entfernt</strong> — alle console.log bereinigt (inkl. KO-DBG-1)</li>
+  </ul>
+</div>
+<div class="card" style="margin-bottom:14px;">
   <div class="card-title">v2.0.68 — 01. Juli 2026 (Debug)</div>
   <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
     <li>🔍 <strong>Musiala-Debug</strong> — Console-Logging in renderChampions(), _mergeLiveGoals(), aggregateGoalScorers_legacy() zur Root-Cause-Analyse des 2. Tores</li>
@@ -4141,7 +4149,8 @@ function parseESPNEvents(events, target) {
           const min   = det.clock?.displayValue || null;
           const isOG  = !!det.ownGoal;
           const isPen = !!det.penaltyKick;
-          scoringEvents.push({ athleteName, side, min, evtType: 'goal', isOG, isPen });
+          const isShootout = (statusType === 'STATUS_SHOOTOUT');
+          scoringEvents.push({ athleteName, side, min, evtType: 'goal', isOG, isPen, isShootout });
         }
       }
     }
@@ -4230,15 +4239,12 @@ function aggregateGoalScorers_legacy() {
       if (!name) continue;
       if (evt.evtType !== 'goal' && evt.evtType !== 'pen') continue;
       if (evt.isOwnGoal) continue;
+      if (evt.isPen && evt.isShootout) continue; // Shootout-Pens nicht zählen
       goals[name] = (goals[name]||0) + 1;
     }
   }
   if (Object.keys(goals).length > 0) {
     playerGoals = goals;
-    console.log('[GoalScorers] legacy comp.details — alle Tore:');
-    for (const [n, g] of Object.entries(goals)) {
-      console.log('  >', n, '=', g, 'Tor(e)');
-    }
   }
 }
 // ── getPlayerGoalsInGame: Tore eines Spielers in einem KO-Spiel ──
@@ -4279,7 +4285,6 @@ function _mergeLiveGoals() {
       const name = evt.athleteName;
       if (!name) continue;
       liveGoals[name] = (liveGoals[name] || 0) + 1;
-      console.log('[_mergeLiveGoals] Tor:', name, '| Spiel:', key, '| min:', evt.min || '?', '| evtType:', evt.evtType);
     }
   }
   for (const [name, liveCount] of Object.entries(liveGoals)) {
@@ -4490,7 +4495,6 @@ async function fetchESPN() {
   // ESPN accepts ?dates=YYYYMMDDYYYYMMDD for date ranges → ~8 requests vs. ~38 daily.
   // parseESPNEvents protects LIVE/FT entries from being overwritten by NS.
   const dateParams = getESPNDateParams();
-  console.log(`[ESPN] Fetching ${dateParams.length} date params (weekly batches + recent days):`, dateParams);
   await Promise.all(dateParams.map(async (dateParam) => {
     try {
       const r = await fetch(`${BASE}?dates=${dateParam}&limit=100`, {signal: AbortSignal.timeout(10000)});
@@ -7269,8 +7273,7 @@ function _renderGruppenUI(container,groups){
     g.teams.forEach((t,ti)=>{
       const rank=ti+1;
       const teamPts = calcTeamClassificationPoints(USER.player, t.name) || 0;
-      console.log('[DEBUG] teamPts for', t.name, ':', teamPts, '| USER:', USER.player, '| cache:', !!_grupClassCache);
-      const teamPtsDisplay = teamPts > 0 ? '<span style="color:#7c3aed;font-weight:700;margin-left:4px;">🏅 ' + teamPts + '</span>' : '';
+          const teamPtsDisplay = teamPts > 0 ? '<span style="color:#7c3aed;font-weight:700;margin-left:4px;">🏅 ' + teamPts + '</span>' : '';
       let bg,ic;
       if(rank<=2){bg='#e8f5e9';ic='✅';} 
       else if(rank===3){
@@ -7294,18 +7297,6 @@ function _renderGruppenUI(container,groups){
 }
 
 function renderChampions() {
-  // === DEBUG v2.0.68 ===
-  console.log('[Champions DEBUG] playerGoals hat', Object.keys(playerGoals).length, 'Eintraege');
-  const _dbgMK = Object.keys(playerGoals).find(k => k.toLowerCase().includes('musiala'));
-  if (_dbgMK) { console.log('[Champions DEBUG] Musiala in playerGoals:', _dbgMK, '=', playerGoals[_dbgMK], 'Tor(e)'); }
-  else { console.log('[Champions DEBUG] Kein Musiala in playerGoals'); }
-  const _dbgMusG = typeof getPlayerGoals === 'function' ? getPlayerGoals('Jamal Musiala') : '?';
-  console.log('[Champions DEBUG] getPlayerGoals(Jamal Musiala) =', _dbgMusG);
-  for (const [_k, _g] of Object.entries(liveGames)) {
-    const _m = (_g.scoringEvents||[]).filter(e => e.athleteName && e.athleteName.toLowerCase().includes('musiala'));
-    if (_m.length) console.log('[Champions DEBUG] liveGames['+_k+'] Musiala-Events:', JSON.stringify(_m));
-  }
-  // === END DEBUG ===
   const allPreds = ALL_PREDICTIONS;
   const champCount = {};
   const champNames = {};
@@ -8752,7 +8743,8 @@ async function fetchKOLiveData() {
               const detTeamId = String(det.team?.id||'');
               const side = detTeamId===String(t1?.team?.id)?1:detTeamId===String(t2?.team?.id)?2:0;
               const min = det.clock?.displayValue||null;
-              scoringEvents.push({athleteName,side,min,evtType:'goal',isOG:!!det.ownGoal,isPen:!!det.penaltyKick});
+              const _isSO = (status === 'STATUS_SHOOTOUT');
+              scoringEvents.push({athleteName,side,min,evtType:'goal',isOG:!!det.ownGoal,isPen:!!det.penaltyKick,isShootout:_isSO});
             }
           }
         }
@@ -8785,8 +8777,7 @@ async function fetchKOLiveData() {
     // ── Schritt 2: Für ET/PEN-Spiele den 90-min Score via /summary holen ────
     // linescores-Schema: [H1, H2, ET1, ET2, (PEN)] → 90-min = H1 + H2
     if (aetPenIds.length > 0) {
-      console.log('[KO] ET/PEN Spiele gefunden, hole 90-min Scores:', aetPenIds);
-      await Promise.all(aetPenIds.map(async evId => {
+        await Promise.all(aetPenIds.map(async evId => {
         try {
           const res  = await fetch(`${SUMMARY}?event=${evId}`, {signal: AbortSignal.timeout(8000)});
           if (!res.ok) return;
@@ -8804,8 +8795,7 @@ async function fetchKOLiveData() {
             const s90_2 = ls2[0] + ls2[1];
             _koLive[evId].t1Score90 = String(s90_1);
             _koLive[evId].t2Score90 = String(s90_2);
-            console.log(`[KO] ${evId}: Endstand ${_koLive[evId].t1Score}:${_koLive[evId].t2Score} → 90-min ${s90_1}:${s90_2}`);
-          }
+              }
         } catch(e) { console.warn('[KO] Summary-Fetch fehlgeschlagen für', evId, e); }
       }));
     }
@@ -8950,12 +8940,6 @@ function _koSlotInsights(espnId, slotKey, t1obj, t2obj) {
   const t2Known = !_isPlh(normA2);
   // DEBUG v2.0.38-dbg
   if (slotKey && (slotKey==='R3204'||slotKey==='R3206'||slotKey==='R3212'||slotKey==='R3201')) {
-    console.log('[KO-DBG] slot='+slotKey+' espnId='+espnId+
-      ' koGame='+JSON.stringify(koGame?.home||null)+
-      ' rawT1='+rawT1+' rawT2='+rawT2+
-      ' normA1='+normA1+' normA2='+normA2+
-      ' t1Known='+t1Known+' t2Known='+t2Known+
-      ' t1obj.n='+(t1obj?.n||'?')+' live.t1Name='+(live?.t1Name||'?'));
   }
   if (!t1Known && !t2Known) return null;
 
@@ -9263,7 +9247,6 @@ function parseKOExcel(excelData) {
       else warnings.push('Kein ESPN-ID für Slot ' + slot);
     });
   }
-  console.log('[KO] SLOT_TO_ESPN_MAP:', Object.keys(SLOT_TO_ESPN_MAP).length, 'Einträge');
 
   // ── 2. KO_GAMES befüllen ──────────────────────────────────────────────────
   KO_GAMES.length = 0;
@@ -9301,7 +9284,6 @@ function parseKOExcel(excelData) {
     });
     stats.gamesBuilt++;
   }
-  console.log('[KO] KO_GAMES:', KO_GAMES.length, 'Spiele aufgebaut');
 
   // ── 3. KO_PREDICTIONS befüllen ──────────────────────────────────────────
   for (const k of Object.keys(KO_PREDICTIONS)) delete KO_PREDICTIONS[k];
@@ -9340,9 +9322,7 @@ function parseKOExcel(excelData) {
     };
     stats.players++;
   }
-  console.log('[KO] KO_PREDICTIONS:', stats.players, 'Spieler,', stats.slots, 'Slot-Tipps');
   if (warnings.length) console.warn('[KO] Warnungen:', warnings);
-  console.log('[KO] ✅ parseKOExcel abgeschlossen:', stats);
   return { ok:true, stats, warnings };
 }
 
@@ -9370,7 +9350,6 @@ function refreshKOGamesFromLive() {
     if (!live) continue;
     // Debug: ESPN-Status für KO-Live-Diagnose loggen
     const _espnStatus = live._espnStatus || '?';
-    console.log('[KO-LIVE] slot='+game.slot+' espnId='+game.espnId+' isLive='+live.isLive+' isFinal='+live.isFinal+' isScheduled='+(live.isScheduled||false)+' status='+_espnStatus+' score='+live.t1Score+':'+live.t2Score);
     if (live.isFinal) {
       game.status = 'FT';
       // .home/.away: nur aktualisieren wenn aktueller Wert ein Platzhalter ist
@@ -9453,21 +9432,19 @@ function switchTab(tabId) {
 }
 
 // ═══════ WHAT'S NEW ═══════
-const BUILD_VERSION='v2.0.68';
-const BUILD_DATE    = '01.07.2026 18:30';
+const BUILD_VERSION='v2.0.69';
+const BUILD_DATE    = '01.07.2026 19:30';
 (function(){ var _hb = document.getElementById('headerVersionBadge'); if(_hb) _hb.textContent = BUILD_VERSION; })();
 
 
 
-const WN_VERSION = 'v2.0.67';
+const WN_VERSION = 'v2.0.69';
 const WN_STORAGE_KEY = window.location.pathname.includes('staging') ? 'wnSeen_staging' : 'wnSeen_live';
 (function(){ const old = localStorage.getItem('wnSeen'); if(old && !localStorage.getItem(WN_STORAGE_KEY)) localStorage.setItem(WN_STORAGE_KEY, old); })();
 const WN_I18N={
   en:{
-    // v2.0.67
-    wn_ts_mult:'🏆 <strong>TS-Punkte mit KO-Multiplikatoren!</strong> Torschützen-Punkte werden jetzt nach KO-Runde multipliziert: Gruppenphase ×1 / R32 ×2 / R16 ×3 / QF ×4 / HF ×5 / 3P ×6 / Finale ×7. Champions-Tab zeigt detaillierten Breakdown pro Phase. Außerdem: Zählfehler bei Musiala &amp; Co. behoben (Shootout/Eigentore gefiltert).',
-    // v2.0.67
-    wn_ts_mult:'🏆 <strong>TS-Punkte mit KO-Multiplikatoren!</strong> Torschützen-Bonuspunkte werden jetzt nach KO-Runde multipliziert: Gruppenphase ×1 / R32 ×2 / R16 ×3 / QF ×4 / HF ×5 / 3P ×6 / Finale ×7. Der Champions-Tab zeigt einen detaillierten Breakdown pro Phase. Außerdem behoben: Falschzählung von Shooter-Events bei Musiala &amp; Co.',
+    // v2.0.69
+    wn_ts_mult:'🏆 <strong>TS Points with KO Multipliers!</strong> Scorer bonus points are now multiplied by KO round: Group Phase ×1 / R32 ×2 / R16 ×3 / QF ×4 / SF ×5 / 3rd ×6 / Final ×7. The Champions tab shows a detailed breakdown per phase. Also fixed: Musiala &amp; Co. shootout goals no longer counted as regular goals.',
     // v2.0.63
     wn_sim_v63:'⚡ <strong>KO-Simulator Live!</strong> Simulate remaining KO rounds — set scores per game, adjust scorer goal counts (0/1/2/3…) with multiplier-based scoring and see your rank impact in real time.',
     // v2.0.60
@@ -9506,6 +9483,8 @@ const WN_I18N={
     wn_fetch:'⚡ <strong>8× faster reload</strong>: weekly batch fetching replaces 38 daily requests. Scorer data straight from match events.',
   },
   de:{
+    // v2.0.69
+    wn_ts_mult:'🏆 <strong>TS-Punkte mit KO-Multiplikatoren!</strong> Torschützen-Bonuspunkte werden jetzt nach KO-Runde multipliziert: Gruppenphase ×1 / R32 ×2 / R16 ×3 / QF ×4 / HF ×5 / 3P ×6 / Finale ×7. Der Champions-Tab zeigt einen detaillierten Breakdown pro Phase. Außerdem behoben: Shootout-Tore von Musiala &amp; Co. werden nicht mehr als reguläre Tore gezählt.',
     // v2.0.60
     wn_sim_v63:'⚡ <strong>KO-Simulator Live!</strong> Simuliere verbleibende KO-Runden — setze Ergebnisse pro Spiel, passe Torschützen-Tore (0/1/2/3…) mit Multiplikatoren an und sieh deinen Rang-Impact in Echtzeit.',
     wn_ko_sim:'🎮 <strong>KO-Simulator ist zurück!</strong> Simuliere ausstehende KO-Runden, toggle Torschützen-Tore, sieh Punkt-Verteilungen mit Multiplikatoren und Rang-Impact.',
