@@ -1161,6 +1161,16 @@
   <div class="section-title">📝 Changelog</div>
 
 <div class="card" style="margin-bottom:14px;">
+  <div class="card-title">v2.0.76 — 01. Juli 2026 (Fix)</div>
+  <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
+    <li>🔧 <strong>KO Insights: Team-basierte Slot-Suche</strong> — <code>_findTipByTeams()</code> sucht Spieler-Tipps über normalisierte Teamnamen statt über fixen ESPN-ID→Slot-Key-Match. Gilt für alle KO-Runden (R16 → Finale).</li>
+    <li>🔄 <strong>Bidirektionaler Paarungs-Check</strong> — Home/Away-Reihenfolge in KO_PREDICTIONS vs. ESPN wird korrekt ignoriert.</li>
+    <li>🌍 <strong>Ländernamen-Mapping erweitert</strong> — <code>normalizeTeamKO()</code> mit ESPN-Alias-Map (Ivory Coast → CÔTE D'IVOIRE, United States → USA, Türkiye → TURKIYE, etc.).</li>
+    <li>📊 <strong>showKOGameDetail team-basiert</strong> — Spieler-Liste zeigt alle Tipper mit korrekter Paarung, unabhängig vom Slot-Key.</li>
+  </ul>
+</div>
+
+<div class="card" style="margin-bottom:14px;">
   <div class="card-title">v2.0.75 — 01. Juli 2026 (Fix)</div>
   <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
     <li>🔧 <strong>KO Insights Root-Cause-Fix</strong> — <code>_normESPN()</code> lieferte 3-Letter-Codes ("CAN") statt Vollnamen ("CANADA"); KO_PREDICTIONS enthält Vollnamen → 0 Paarungstreffer. Fix: Fallback in <code>_koSlotInsights()</code> auf <code>normalizeTeamKO()</code> umgestellt.</li>
@@ -2537,6 +2547,36 @@ const GP_CLASS_TOTALS = {
 };
 function normalizeTeamKO(name) {
   if (!name) return '';
+  // v2.0.76: ESPN-Alias-Map vor Normalisierung — ESPN-Namen auf KO_PREDICTIONS-Namen mappen
+  const _espnAlias = {
+    'ivory coast':                      "COTE D'IVOIRE",
+    "cote d'ivoire":                    "COTE D'IVOIRE",
+    'south korea':                      'KOREA REP.',
+    'korea':                            'KOREA REP.',
+    'republic of korea':                'KOREA REP.',
+    'usa':                              'USA',
+    'united states':                    'USA',
+    'u.s.':                             'USA',
+    'us':                               'USA',
+    'türkiye':                          'TURKIYE',
+    'turkey':                           'TURKIYE',
+    'cape verde':                       'CABO VERDE',
+    'bosnia and herzegovina':           'BOSNIA-HERZ.',
+    'bosnia-herzegovina':               'BOSNIA-HERZ.',
+    'bosnia & herzegovina':             'BOSNIA-HERZ.',
+    'bosnia':                           'BOSNIA-HERZ.',
+    'north macedonia':                  'N. MACEDONIA',
+    'trinidad and tobago':              'TRINIDAD & TOB.',
+    'central african republic':         'CENT. AF. REP.',
+    'dominican republic':               'DOMINICAN REP.',
+    'dr congo':                         'CONGO DR',
+    'democratic republic of the congo': 'CONGO DR',
+    'congo dr':                         'CONGO DR',
+    'republic of ireland':              'IRELAND',
+  };
+  const lower = name.trim().toLowerCase();
+  if (_espnAlias[lower]) return _espnAlias[lower];
+  // Accent-strip + uppercase
   return name.trim().toUpperCase()
     .replace(/[\u00C0-\u00C5]/g,'A').replace(/[\u00C8-\u00CB]/g,'E')
     .replace(/[\u00CC-\u00CF]/g,'I').replace(/[\u00D2-\u00D6]/g,'O')
@@ -7179,14 +7219,28 @@ function showKOGameDetail(slot) {
     if (!p1 || !p2) return false;
     return (p1 === _dActualT1 && p2 === _dActualT2) || (p1 === _dActualT2 && p2 === _dActualT1);
   };
-  // Gesamtzahl aller Tipps für diesen Slot
+  // v2.0.76: Team-basierte _dFindTip — sucht bidirektional über alle Runden-Slots
+  const _dRoundPrefix = slot ? slot.replace(/\d+$/, '') : '';
+  const _dFindTip = (pdata) => {
+    if (!pdata?.slots) return null;
+    if (!_dTeamsKnown) return pdata.slots[slot] || null;
+    for (const [sk, t] of Object.entries(pdata.slots)) {
+      if (!sk.startsWith(_dRoundPrefix)) continue;
+      if (!t || t.s1 == null || t.s2 == null) continue;
+      if (_dPairingOk(t)) return t;
+    }
+    return pdata.slots[slot] || null;
+  };
+  // Gesamtzahl: alle die in dieser Runde irgendeinen Tipp abgegeben haben
   const _dTotalTippers = Object.keys(KO_PREDICTIONS).filter(n => {
-    const _t = KO_PREDICTIONS[n]?.slots?.[slot]; return _t && _t.s1 != null && _t.s2 != null;
+    const slots = KO_PREDICTIONS[n]?.slots || {};
+    return Object.entries(slots).some(([sk, t]) =>
+      sk.startsWith(_dRoundPrefix) && t && t.s1 != null && t.s2 != null);
   }).length;
   // Nur Spieler mit korrekter Paarung (oder alle wenn Teams noch unbekannt)
   const allNames = Object.keys(KO_PREDICTIONS).filter(n => {
-    const _t = KO_PREDICTIONS[n]?.slots?.[slot];
-    return _t && _t.s1 != null && _t.s2 != null && _dPairingOk(_t);
+    const _t = _dFindTip(KO_PREDICTIONS[n]);
+    return _t && _t.s1 != null && _t.s2 != null;
   });
   // Sort: own tip first → rawPts DESC → rank ASC
   const sorted = [...allNames].sort((a, b) => {
@@ -7203,7 +7257,7 @@ function showKOGameDetail(slot) {
     return (ra < 0 ? 9999 : ra) - (rb < 0 ? 9999 : rb);
   });
   const rows = sorted.map(name => {
-    const pred = KO_PREDICTIONS[name]?.slots?.[slot];
+    const pred = _dFindTip(KO_PREDICTIONS[name]);
     if (!pred) return '';
     const rank  = lb.findIndex(p => p.name === name);
     const isMe  = name === USER?.player;
@@ -9041,16 +9095,30 @@ function _koSlotInsights(espnId, slotKey, t1obj, t2obj) {
   const resultCounts = {};
   const pairingPlayers = [];
 
-  // Hilfsfunktion: Prediction für einen Player per espnId suchen
-  // (slotKey im Prediction-Objekt kann 'TEST', 'R32_USA' etc. sein —
-  //  entscheidend ist, ob SLOT_TO_ESPN_MAP[k] === espnId)
-  const _findTipByEspnId = (pdata) => {
+  // v2.0.76: Team-basierte Slot-Suche (bidirektional, alle KO-Runden)
+  // Alle Slots mit passendem Runden-Prefix nach Teampaarung durchsuchen —
+  // unabhängig davon in welchem Slot (R161–R168 etc.) der Spieler getippt hat.
+  const _roundPrefix = slotKey ? slotKey.replace(/\d+$/, '') : '';
+  const _findTipByTeams = (pdata) => {
     if (!pdata?.slots) return null;
+    if (!t1Known && !t2Known) return pdata.slots[slotKey] || null;
+    for (const [sk, t] of Object.entries(pdata.slots)) {
+      if (!sk.startsWith(_roundPrefix)) continue;
+      if (!t || t.t1 == null || t.t2 == null) continue;
+      const p1 = normalizeTeamKO(t.t1 || ''), p2 = normalizeTeamKO(t.t2 || '');
+      const matches = (t1Known && t2Known)
+        ? (p1 === normA1 && p2 === normA2) || (p1 === normA2 && p2 === normA1)
+        : (t1Known  && (p1 === normA1 || p2 === normA1)) ||
+          (t2Known  && (p1 === normA2 || p2 === normA2));
+      if (matches) return t;
+    }
+    // Fallback ESPN-ID-basiert (R32 + exakte Slot-Matches)
     for (const [sk, t] of Object.entries(pdata.slots)) {
       if (SLOT_TO_ESPN_MAP[sk] === espnId) return t;
     }
-    return pdata.slots[slotKey] || null; // Fallback: direkter slotKey-Match
+    return pdata.slots[slotKey] || null;
   };
+  const _findTipByEspnId = _findTipByTeams; // Alias für userTip-Lookup
 
   for (const [playerName, pdata] of Object.entries(KO_PREDICTIONS)) {
     const tip = _findTipByEspnId(pdata);
@@ -9542,7 +9610,7 @@ function switchTab(tabId) {
 
 // ═══════ WHAT'S NEW ═══════
 const BUILD_VERSION='v2.0.75';
-const BUILD_DATE    = '01.07.2026 19:30';
+const BUILD_DATE    = '01.07.2026 21:00';
 (function(){ var _hb = document.getElementById('headerVersionBadge'); if(_hb) _hb.textContent = BUILD_VERSION; })();
 
 
