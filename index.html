@@ -1162,6 +1162,13 @@
   <div class="section-title">📝 Changelog</div>
 
 <div class="card" style="margin-bottom:14px;">
+  <div class="card-title">v2.0.83 — 02. Juli 2026 (Fix)</div>
+  <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
+    <li>🔧 <strong>Changelog-Tab: fehlende schließende Divs behoben</strong> — drei kaputte Stellen (v2.0.62, v2.0.46/45/44, v1.23.17) sorgten dafür, dass der Changelog-Tab nie sauber schloss. Dadurch landeten Sanity-Modal, Force-Reload-Modal, Porra-Card-Modal, KO-Simulator- und What's-New-Overlay fälschlich innerhalb des Changelog-Tabs und waren unsichtbar, solange dieser nicht aktiv war. Alle Modals liegen jetzt korrekt direkt unter <code>&lt;body&gt;</code>.</li>
+  </ul>
+</div>
+
+<div class="card" style="margin-bottom:14px;">
   <div class="card-title">v2.0.82 — 02. Juli 2026 (Fix)</div>
   <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
     <li>🔧 <strong>Survivor-Status-Karte verbreitert</strong> — belegt jetzt 2 Spalten im KPI-Grid statt 1, damit die drei Status-Infos (Slots/Torschützen/Champion) besser lesbar nebeneinander stehen.</li>
@@ -1313,7 +1320,7 @@
           </ul>
         </div>
         <div class="card" style="margin-bottom:14px;">
-          <div class="card-title">v2.0.62 —
+          <div class="card-title">v2.0.62 — 30. Juni 2026 (Feature + Fix)</div>
           <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
             <li>⚡ <strong>WN_VERSION v2.0.63</strong> — What's New Modal erscheint erneut mit neuem KO-Simulator-Eintrag (⚡) als oberstem Item.</li>
             <li>🔧 <strong>WN-Timer Fix</strong> — <code>openSimulator()</code> cancelt den auto-openWhatsNew-Timer; <code>openWhatsNew()</code> öffnet nicht wenn Simulator bereits aktiv ist.</li>
@@ -1415,7 +1422,6 @@
   </ul>
 </div>
 <div class="card" style="margin-bottom:14px;border-left:3px solid #ccc;">
-  <div class="card" style="margin-bottom:14px;">
   <div class="card-title">v2.0.46 — 28. Juni 2026 (Feature)</div>
   <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
     <li>⚠️ <strong>Champion Change Penalty</strong> — 13 Spieler die ihren Champion geändert haben erhalten −5 Punkte Abzug und max. +5 statt +10 Pkt. Champion-Bonus. Korrigierte Länder: Adriel (POR→ESP), Agustín (ESP→FRA), Álvaro (POR→ESP), Eduardo Sánchez (POR→BRA) u.a.</li>
@@ -1430,7 +1436,8 @@
     <li>🔧 <strong>UTF-8 Encoding-Repair</strong> — Double-Encoding-Bug behoben: alle Emojis, Umlaute und Sonderzeichen werden jetzt korrekt gerendert</li>
   </ul>
 </div>
-<div class="card-title">v2.0.44-ko-staging — 28. Juni 2026 (Fix)</div>
+<div class="card" style="margin-bottom:14px;border-left:3px solid #ccc;">
+  <div class="card-title">v2.0.44-ko-staging — 28. Juni 2026 (Fix)</div>
   <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
     <li>🔴 <strong>KO Live-Punkte in Rangliste</strong> — Laufende KO-Spiele fließen vorläufig in die Ranglisten-Sortierung ein (Multiplikator gilt sofort)</li>
     <li>📊 <strong>🔴-Spalte in KO-Rangliste</strong> — Neue Spalte zeigt vorläufige Live-Punkte pro Spieler (analog Gruppenphase)</li>
@@ -1718,13 +1725,6 @@
   </ul>
 </div>
 <div class="card" style="margin-bottom:14px;">
-  <div class="card" style="margin-bottom:14px;">
-  <div class="card" style="margin-bottom:14px;">
-  <div class="card" style="margin-bottom:14px;">
-  <div class="card" style="margin-bottom:14px;">
-  <div class="card" style="margin-bottom:14px;">
-  <div class="card" style="margin-bottom:14px;">
-  <div class="card" style="margin-bottom:14px;">
           <div class="card-title">v1.23.17 — 25. Juni 2026 (Silent Fix)</div>
           <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
             <li>🎮 <strong>Simulator baseRankMap Fix</strong> — Ausgangsrang stimmt jetzt mit der echten Rangliste überein: Rang-Increment nur noch bei sinkendem <code>total</code>, nicht mehr bei <code>pts</code>/<code>exact</code>-Differenz bei gleichem Total</li>
@@ -4803,6 +4803,14 @@ function runSanityChecks() {
 
 function openSanity(){ openSanityModal(); }
 function openSanityModal() {
+  // Gleicher Fix wie bei openSimulator(): ein noch offenes What's-New-Modal (z-index MAX)
+  // blockiert sonst jeden Klick auf darunterliegende Elemente, inkl. des Sanity-Badges.
+  if (typeof _wnTimerId !== 'undefined' && _wnTimerId) { clearTimeout(_wnTimerId); _wnTimerId = null; }
+  const _wnOvEl = document.getElementById('whatsNewOverlay');
+  if (_wnOvEl && _wnOvEl.classList.contains('active')) { _wnOvEl.classList.remove('active'); }
+  const _existingWn = document.getElementById('_wnModal');
+  if (_existingWn) _existingWn.remove();
+
   const badge = document.getElementById('sanity-badge');
   if (!badge || !badge._checks) return;
   const tbody = document.getElementById('sanityTableBody');
@@ -9734,8 +9742,8 @@ function switchTab(tabId) {
 }
 
 // ═══════ WHAT'S NEW ═══════
-const BUILD_VERSION='v2.0.82';
-const BUILD_DATE    = '02.07.2026 17:06';
+const BUILD_VERSION='v2.0.83';
+const BUILD_DATE    = '02.07.2026 20:26';
 (function(){ var _hb = document.getElementById('headerVersionBadge'); if(_hb) _hb.textContent = BUILD_VERSION; })();
 
 

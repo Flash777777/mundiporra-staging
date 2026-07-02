@@ -1,6 +1,6 @@
 # ⚙️ Mundiporra Dashboard — Component Registry
 > Technische Vollreferenz inkl. Render-Chain für Claude
-> Stand: v2.0.82 · Repo: `Flash777777/mundiporra-staging` + `mundiporra-dashboard`
+> Stand: v2.0.83 · Repo: `Flash777777/mundiporra-staging` + `mundiporra-dashboard`
 > ⚠️ PFLICHT: Diese Datei wird bei jedem Push zu `index.html` im selben Commit aktualisiert.
 
 ---
