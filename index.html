@@ -1161,6 +1161,16 @@
   <div class="section-title">📝 Changelog</div>
 
 <div class="card" style="margin-bottom:14px;">
+  <div class="card-title">v2.0.80 — 02. Juli 2026 (Fix)</div>
+  <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
+    <li>🔧 <strong>Platzhalter-Erkennung für "Round X N Winner/Loser"-Labels</strong> — <code>_espnIsReal()</code> erkannte nur das Präfix-Format "winner of ...", nicht ESPNs tatsächliches Suffix-Format ("Round of 32 11 Winner", "Semifinal 1 Loser" fürs Spiel um Platz 3). Dadurch wurden noch unbestimmte KO-Paarungen fälschlich als feststehend behandelt.</li>
+    <li>🔧 <strong>Bracket-Karte: Verlierer-Codes bei Platzhalter-Abbrevs ergänzt</strong> — Regex deckte bisher nur Sieger-Codes ("RD16 W1") ab, nicht die Verlierer-Codes ("SF L1"/"SF L2") fürs Spiel um Platz 3 — führte dort zum falschen "Closed"-Badge trotz noch offener Paarung.</li>
+    <li>🔧 <strong>Bester erreichbarer Rang / offene Slots: Paarungs-Prüfung nachgezogen</strong> — <code>isSlotOpen()</code> (Basis für Best-Rank, offene Slots, Max-Punkte-Projektion) prüfte bisher nur, ob die getippten Teams noch nicht ausgeschieden sind — jetzt zählt bei bereits feststehender echter Paarung nur noch der exakte Team-Match, analog zum Open/Closed-Badge.</li>
+    <li>🔧 <strong>KO-Simulator: Torschützen-Tore-Minus-Button bei 0 deaktiviert</strong> — Klicks auf "−" verpufften bei 0 bisher wirkungslos ohne sichtbares Feedback; nachträgliches Ausgleichen mit "+"-Klicks führte zu Phantom-Punkten in der Rang-Simulation. Gleiche Absicherung jetzt auch für die Ergebnis-Score-Buttons.</li>
+  </ul>
+</div>
+
+<div class="card" style="margin-bottom:14px;">
   <div class="card-title">v2.0.79 — 02. Juli 2026 (Fix)</div>
   <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
     <li>🔧 <strong>KO Bracket-Karte: Open/Closed-Badge = "noch Spiel-Punkte möglich?"</strong> — Bei falscher Paarung wird jetzt ein "🔒 Closed"-Badge angezeigt (statt komplett ausgeblendeter Tipp-Zeile). Bei bereits beendetem Spiel wechselt das Badge von "Open" auf "Closed", auch bei korrekter Paarung, da keine weiteren Punkte mehr erreichbar sind — Tipp und verdiente Punkte bleiben sichtbar.</li>
@@ -8639,10 +8649,41 @@ function buildEliminatedTeams() {
   return eliminated;
 }
 
-// isSlotOpen: Sind BEIDE vorhergesagten Teams dieses Tippers noch im Turnier?
+// Platzhalter-Abbrevs von ESPN: "RD16 W1", "SF L1" etc. (Sieger- UND Verlierer-Codes,
+// z.B. für das Spiel um Platz 3). Gemeinsam mit _buildKOMatchCard() genutzt.
+const _koPlhAbbrev = /RD32|RD16|QF\s?[WL]|SF\s?[WL]/i;
+
+// _koActualTeams: Ermittelt, ob die ECHTEN Teams eines KO-Slots schon feststehen —
+// zentrale, leichtgewichtige Stelle (ohne den teuren Alle-Spieler-Loop aus
+// _koSlotInsights), damit isSlotOpen() unten performant bleibt.
+function _koActualTeams(slot) {
+  const espnId = SLOT_TO_ESPN_MAP[slot];
+  if (!espnId) return { t1Known: false, t2Known: false, normA1: '', normA2: '' };
+  const g = KO_BRACKET_DATA.games[espnId];
+  const live = _koLive[espnId] || null;
+  const koGame = KO_GAMES.find(gg => String(gg.espnId) === String(espnId));
+  const t1obj = (live?.t1Abbrev && !_koPlhAbbrev.test(live.t1Abbrev)) ? {a:live.t1Abbrev,n:live.t1Name} : g?.t1;
+  const t2obj = (live?.t2Abbrev && !_koPlhAbbrev.test(live.t2Abbrev)) ? {a:live.t2Abbrev,n:live.t2Name} : g?.t2;
+  const rawT1 = koGame?.home || (live?.t1Name && _espnIsReal(live.t1Name) ? normalizeTeamKO(live.t1Name) : '') || t1obj?.n || t1obj?.name || '';
+  const rawT2 = koGame?.away || (live?.t2Name && _espnIsReal(live.t2Name) ? normalizeTeamKO(live.t2Name) : '') || t2obj?.n || t2obj?.name || '';
+  const normA1 = normalizeTeamKO(rawT1);
+  const normA2 = normalizeTeamKO(rawT2);
+  const isPlh = s => !s || s === '?' || s === 'TBD' || /^[12][A-L]$/.test(s) || s === '3RD';
+  return { t1Known: !isPlh(normA1), t2Known: !isPlh(normA2), normA1, normA2 };
+}
+
+// isSlotOpen: Kann dieser Tipper für diesen Slot noch Spiel-Punkte erreichen?
+// Stehen die ECHTEN Teams schon fest, zählt nur die exakte Paarung (sonst kann der
+// Tipp nie mehr punkten, egal ob die eigenen Teams noch leben — siehe calcKOPoints()
+// pairingOk). Stehen sie noch nicht fest, zählt die bisherige Eliminierungs-Prüfung.
 function isSlotOpen(playerName, slot) {
   const tip = KO_PREDICTIONS[playerName]?.slots?.[slot];
   if (!tip || !tip.t1 || !tip.t2) return false; // kein Tipp → kein offener Slot (keine Punkte möglich)
+  const actual = _koActualTeams(slot);
+  if (actual.t1Known && actual.t2Known) {
+    const p1 = normalizeTeamKO(tip.t1), p2 = normalizeTeamKO(tip.t2);
+    return (p1 === actual.normA1 && p2 === actual.normA2) || (p1 === actual.normA2 && p2 === actual.normA1);
+  }
   return !ELIMINATED_TEAMS.has(normalizeTeamKO(tip.t1)) &&
          !ELIMINATED_TEAMS.has(normalizeTeamKO(tip.t2));
 }
@@ -9278,10 +9319,10 @@ function _buildKOMatchCard(espnId, compact) {
   // 90-min Score für Scoring im Bracket-Tip-Badge
   const s90_b1 = live?.t1Score90 ?? s1;
   const s90_b2 = live?.t2Score90 ?? s2;
-  // Override static teams with live data if available
-  const t1 = (live?.t1Abbrev && !/RD32|RD16|QFW|SFW/.test(live.t1Abbrev))
+  // Override static teams with live data if available (_koPlhAbbrev: siehe isSlotOpen weiter oben)
+  const t1 = (live?.t1Abbrev && !_koPlhAbbrev.test(live.t1Abbrev))
     ? {a:live.t1Abbrev,cc:live.t1Cc,n:live.t1Name} : g.t1;
-  const t2 = (live?.t2Abbrev && !/RD32|RD16|QFW|SFW/.test(live.t2Abbrev))
+  const t2 = (live?.t2Abbrev && !_koPlhAbbrev.test(live.t2Abbrev))
     ? {a:live.t2Abbrev,cc:live.t2Cc,n:live.t2Name} : g.t2;
   const cls = compact ? 'ko-match' : 'ko-match-mobile';
   const liveCls = isLive ? ' live' : '';
@@ -9544,7 +9585,7 @@ function _espnIsReal(name) {
   const n = name.trim();
   if (!n) return false;
   if (/^(RD32W|RD16W|QFW|SFW|W\d|L\d)/i.test(n)) return false;
-  if (/winner of|loser of/i.test(n)) return false;
+  if (/\b(winner|loser)\b/i.test(n)) return false;
   if (/^(TBD|\?|3RD)$/i.test(n)) return false;
   if (/^[12][A-L]$/i.test(n)) return false;
   return true;
@@ -9648,8 +9689,8 @@ function switchTab(tabId) {
 }
 
 // ═══════ WHAT'S NEW ═══════
-const BUILD_VERSION='v2.0.79';
-const BUILD_DATE    = '02.07.2026 14:16';
+const BUILD_VERSION='v2.0.80';
+const BUILD_DATE    = '02.07.2026 15:58';
 (function(){ var _hb = document.getElementById('headerVersionBadge'); if(_hb) _hb.textContent = BUILD_VERSION; })();
 
 
@@ -10175,8 +10216,13 @@ function _renderKOSimulator(){
         var minId=reg('s',slot,ts.name,-1),plusId=reg('s',slot,ts.name,1);
         var tsColor=gc>0?'#16a34a':'rgba(15,23,42,.65)';
         var evts=isActive?'auto':'none';
+        // Bei 0 wird "−" deaktiviert: sonst verpufft der Klick wirkungslos (Math.max(0,...)-Clamp
+        // in _koSimTsAdj) ohne sichtbares Feedback — nachträgliches "+"-Klicken zum "Zurücksetzen"
+        // überschießt dann über den ursprünglichen Wert hinaus (v2.0.81-Fix).
+        var minDisabled=gc<=0;
+        var minEvts=minDisabled?'none':evts;
         return '<div style="display:flex;align-items:center;gap:5px;padding:3px 0;">'
-          +'<button onclick="_k('+minId+')" style="background:rgba(15,23,42,.06);border:1px solid rgba(15,23,42,.18);color:rgba(15,23,42,.6);border-radius:4px;padding:1px 7px;font-size:.82rem;cursor:pointer;pointer-events:'+evts+';line-height:1.4;">−</button>'
+          +'<button onclick="_k('+minId+')"'+(minDisabled?' disabled':'')+' style="background:rgba(15,23,42,.06);border:1px solid rgba(15,23,42,.18);color:rgba(15,23,42,.6);border-radius:4px;padding:1px 7px;font-size:.82rem;cursor:'+(minDisabled?'default':'pointer')+';pointer-events:'+minEvts+';line-height:1.4;opacity:'+(minDisabled?0.35:1)+';">−</button>'
           +'<span style="font-size:.75rem;min-width:14px;text-align:center;color:'+tsColor+';font-weight:700;">'+gc+'</span>'
           +'<button onclick="_k('+plusId+')" style="background:rgba(15,23,42,.06);border:1px solid rgba(15,23,42,.18);color:rgba(15,23,42,.6);border-radius:4px;padding:1px 7px;font-size:.82rem;cursor:pointer;pointer-events:'+evts+';line-height:1.4;">+</button>'
           +'<span style="font-size:.7rem;color:'+tsColor+';">'+ts.name+'</span>'
@@ -10210,11 +10256,11 @@ function _renderKOSimulator(){
       +'<div style="font-weight:700;font-size:.85rem;margin-bottom:4px;'+(isLive?'color:#f87171;':'')+'">'+kg.home+' vs '+kg.away+'</div>'
       +liveHtml
       +'<div class="sim-score-row" style="'+(isActive?'':'opacity:.35;pointer-events:none;')+'">'
-      +'<button class="sim-adj-btn" onclick="_k('+reg('a',slot,1,-1)+')">−</button>'
+      +'<button class="sim-adj-btn"'+(st.s1<=0?' disabled style="opacity:.35;"':'')+' onclick="_k('+reg('a',slot,1,-1)+')">−</button>'
       +'<span class="sim-score-val">'+st.s1+'</span>'
       +'<button class="sim-adj-btn" onclick="_k('+reg('a',slot,1,1)+')">+</button>'
       +'<span class="sim-score-sep">:</span>'
-      +'<button class="sim-adj-btn" onclick="_k('+reg('a',slot,2,-1)+')">−</button>'
+      +'<button class="sim-adj-btn"'+(st.s2<=0?' disabled style="opacity:.35;"':'')+' onclick="_k('+reg('a',slot,2,-1)+')">−</button>'
       +'<span class="sim-score-val">'+st.s2+'</span>'
       +'<button class="sim-adj-btn" onclick="_k('+reg('a',slot,2,1)+')">+</button>'
       +'</div>'
