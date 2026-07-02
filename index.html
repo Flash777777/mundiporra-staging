@@ -1161,6 +1161,14 @@
   <div class="section-title">📝 Changelog</div>
 
 <div class="card" style="margin-bottom:14px;">
+  <div class="card-title">v2.0.81 — 02. Juli 2026 (Feature)</div>
+  <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
+    <li>🏃 <strong>Neu: Survivor-Status KPI</strong> — Neue erste KPI-Karte im Overview-Tab: zeigt auf einen Blick, wie viele offene K.o.-Tipps noch punkten können (🎯), ob TS1/TS2 noch im Turnier sind (👟) und ob der Champion-Tipp noch lebt (🏆). Mit Tooltip-Erklärung.</li>
+    <li>🔧 <strong>Platzhalter-Codes zwischen 4 Stellen angeglichen</strong> — <code>_koActualTeams()</code>, <code>_koSlotInsights()</code> und <code>_koTeamRow()</code> erkannten "W1"/"L2"-Codes nicht als Platzhalter (nur <code>refreshKOGamesFromLive()</code> tat das). Aktuell ohne sichtbare Auswirkung, schließt aber eine latente Lücke für künftige Datenänderungen.</li>
+  </ul>
+</div>
+
+<div class="card" style="margin-bottom:14px;">
   <div class="card-title">v2.0.80 — 02. Juli 2026 (Fix)</div>
   <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
     <li>🔧 <strong>Platzhalter-Erkennung für "Round X N Winner/Loser"-Labels</strong> — <code>_espnIsReal()</code> erkannte nur das Präfix-Format "winner of ...", nicht ESPNs tatsächliches Suffix-Format ("Round of 32 11 Winner", "Semifinal 1 Loser" fürs Spiel um Platz 3). Dadurch wurden noch unbestimmte KO-Paarungen fälschlich als feststehend behandelt.</li>
@@ -2952,6 +2960,8 @@ const TRANSLATIONS = {
     br_method_exact: '✦ Exact',
     br_method_greedy: '~ Greedy',
     kpi_best_rank_tooltip: 'Best achievable final rank (Greedy estimate based on open KO slots)',
+    kpi_survivor: '🏃 Survivor Status',
+    kpi_survivor_tooltip: 'Open KO tips that can still score · TS1/TS2 still in the tournament · Champion pick still alive',
     ko_lb_best_rank: '↑ Max',
     lb_cc_tooltip: 'Champion changed − 5pt penalty',
     kpi_ko_games: 'KO Games left',
@@ -3346,6 +3356,8 @@ const TRANSLATIONS = {
     br_method_exact: '✦ Exakt',
     br_method_greedy: '~ Greedy',
     kpi_best_rank_tooltip: 'Bester erreichbarer Endrang (Greedy-Schätzung über offene KO-Slots)',
+    kpi_survivor: '🏃 Survivor-Status',
+    kpi_survivor_tooltip: 'Offene K.o.-Tipps, die noch punkten können · TS1/TS2 noch im Turnier · Champion-Tipp noch am Leben',
     ko_lb_best_rank: '↑ Max',
     lb_cc_tooltip: 'Champion geändert − 5 Punkte Abzug',
     kpi_ko_games: 'KO-Spiele',
@@ -3737,6 +3749,8 @@ const TRANSLATIONS = {
     br_method_exact: '✦ Exacto',
     br_method_greedy: '~ Greedy',
     kpi_best_rank_tooltip: 'Mejor clasificación final alcanzable (estimación Greedy)',
+    kpi_survivor: '🏃 Estado Superviviente',
+    kpi_survivor_tooltip: 'Pronósticos KO abiertos que aún pueden puntuar · TS1/TS2 siguen en el torneo · Campeón elegido sigue vivo',
     ko_lb_best_rank: '↑ Máx',
     lb_cc_tooltip: 'Campeón cambiado − 5 puntos de penalización',
     kpi_ko_games: 'Partidos KO',
@@ -5424,7 +5438,26 @@ function renderKPIs(lb) {
     const koScorerPts = koData.ko_scorer > 0 ? '+' + koData.ko_scorer : '—';
     const champPts    = koData.champion  > 0 ? '+' + koData.champion  : '—';
 
+    // Survivor-Status: wie viele offene K.o.-Tipps können noch punkten, leben TS1/TS2/Champion noch?
+    let survivorVal = '—';
+    if (me) {
+      const myPred = KO_PREDICTIONS[me.name];
+      const pendingSlots = myPred?.slots ? Object.keys(myPred.slots).filter(slot => {
+        const kg = KO_GAMES.find(g => g.slot === slot);
+        return !kg || kg.status !== 'FT';
+      }) : [];
+      const openCount = (() => { try { return countOpenSlotsForPlayer(me.name); } catch(e) { return 0; } })();
+      const ts1Alive = myPred?.ts1 ? isTSAlive(myPred.ts1) : null;
+      const ts2Alive = myPred?.ts2 ? isTSAlive(myPred.ts2) : null;
+      const champAlive = champInfo?.champion ? !ELIMINATED_TEAMS.has(normalizeTeamKO(champInfo.champion)) : null;
+      const icon = a => a === null ? '' : (a ? '✅' : '💀');
+      survivorVal = `🎯 ${openCount}/${pendingSlots.length}`
+        + ((ts1Alive!==null||ts2Alive!==null) ? `&nbsp; 👟 ${icon(ts1Alive)}${icon(ts2Alive)}` : '')
+        + (champAlive!==null ? `&nbsp; 🏆 ${icon(champAlive)}` : '');
+    }
+
     ALL_KPIS = [
+      { id: 'kpi_survivor',     val: survivorVal,  lbl: T('kpi_survivor'),        defaultVisible: true, tooltip: T('kpi_survivor_tooltip') },
       { id: 'kpi_rank',         val: myRank,      lbl: T('kpi_your_rank'),       defaultVisible: true  },
       { id: 'kpi_pts',          val: myPts,        lbl: T('kpi_your_pts'),        defaultVisible: true  },
       { id: 'kpi_deficit',      val: defStr,       lbl: T('kpi_deficit'),         defaultVisible: true  },
@@ -5463,7 +5496,7 @@ function renderKPIs(lb) {
     const pinned = _pinnedKPIs.includes(k.id);
     const valStr = String(k.val).replace(/<[^>]+>/g,'');
     const valCls = valStr.length > 12 ? 'kpi-val kpi-val-sm' : 'kpi-val';
-    return `<div class="kpi" id="kpicard-${k.id}">
+    return `<div class="kpi" id="kpicard-${k.id}"${k.tooltip?` title="${k.tooltip}"`:''}>
       <button class="kpi-pin-btn ${pinned?'pinned':''}" onclick="togglePin('${k.id}')" title="${pinned?'Unpin':'Pin'}">📌</button>
       <div class="${valCls}">${k.val}</div>
       <div class="kpi-lbl">${k.lbl}</div>
@@ -8668,7 +8701,8 @@ function _koActualTeams(slot) {
   const rawT2 = koGame?.away || (live?.t2Name && _espnIsReal(live.t2Name) ? normalizeTeamKO(live.t2Name) : '') || t2obj?.n || t2obj?.name || '';
   const normA1 = normalizeTeamKO(rawT1);
   const normA2 = normalizeTeamKO(rawT2);
-  const isPlh = s => !s || s === '?' || s === 'TBD' || /^[12][A-L]$/.test(s) || s === '3RD';
+  // Gehalten in Sync mit: _koSlotInsights()._isPlh, _koTeamRow() Flag-Check, refreshKOGamesFromLive()._isPlaceholder
+  const isPlh = s => !s || s === '?' || s === 'TBD' || /^[12][A-L]$/.test(s) || s === '3RD' || s === 'W' || /^[WL]\d/.test(s);
   return { t1Known: !isPlh(normA1), t2Known: !isPlh(normA2), normA1, normA2 };
 }
 
@@ -9145,7 +9179,8 @@ function _koSlotInsights(espnId, slotKey, t1obj, t2obj) {
   const rawT2 = koGame?.away || (live?.t2Name && _espnIsReal(live.t2Name) ? normalizeTeamKO(live.t2Name) : '') || t2obj?.n || t2obj?.name || '';
   const normA1 = normalizeTeamKO(rawT1);
   const normA2 = normalizeTeamKO(rawT2);
-  const _isPlh = s => !s || s === '?' || s === 'TBD' || /^[12][A-L]$/.test(s) || s === '3RD';
+  // Gehalten in Sync mit: _koActualTeams().isPlh, _koTeamRow() Flag-Check, refreshKOGamesFromLive()._isPlaceholder
+  const _isPlh = s => !s || s === '?' || s === 'TBD' || /^[12][A-L]$/.test(s) || s === '3RD' || s === 'W' || /^[WL]\d/.test(s);
   const t1Known = !_isPlh(normA1);
   const t2Known = !_isPlh(normA2);
   // DEBUG v2.0.38-dbg
@@ -9294,7 +9329,8 @@ function _koTeamRow(gTeam, live, side, compact) {
     a: live[side+'Abbrev'], cc: live[side+'Cc'], n: live[side+'Name'], score: live[side+'Score']
   } : null;
   const t = lTeam?.a ? lTeam : gTeam;
-  const flag = t.cc ? _ccToFlag(t.cc) : (t.a && t.a !== '?' && !/^[12][A-L]$/.test(t.a) && t.a !== '3RD' ? '🏳️' : '');
+  // Gehalten in Sync mit: _koActualTeams().isPlh, _koSlotInsights()._isPlh, refreshKOGamesFromLive()._isPlaceholder
+  const flag = t.cc ? _ccToFlag(t.cc) : (t.a && t.a !== '?' && t.a !== 'TBD' && !/^[12][A-L]$/.test(t.a) && t.a !== '3RD' && t.a !== 'W' && !/^[WL]\d/.test(t.a) ? '🏳️' : '');
   const name = t.n || (t.a && t.a !== '?' ? t.a : T('ko_tbd'));
   const isPlh = !t.cc && !t.n && t.a !== '?';
   const showScore = live && (live.isLive || live.isFinal);
@@ -9595,6 +9631,7 @@ function refreshKOGamesFromLive() {
   // Platzhalter-Check: Überschreiben von .home/.away NUR wenn aktueller Wert ein Platzhalter ist
   // (z.B. bei R16+ wo Quali-Teams noch nicht feststehen: '2A', 'TBD', '?', '3RD')
   // NIEMALS R32-Teams mit ESPN-displayName überschreiben (Namensformat-Konflikt: 'Ivory Coast' ≠ "CÔTE D'IVOIRE")
+  // Gehalten in Sync mit: _koActualTeams().isPlh, _koSlotInsights()._isPlh, _koTeamRow() Flag-Check
   const _isPlaceholder = v => !v || v === '?' || v === 'TBD' ||
     /^[12][A-L]$/.test(v) || v === '3RD' || v === 'W' || /^[WL]\d/.test(v);
   for (const game of KO_GAMES) {
@@ -9689,18 +9726,19 @@ function switchTab(tabId) {
 }
 
 // ═══════ WHAT'S NEW ═══════
-const BUILD_VERSION='v2.0.80';
-const BUILD_DATE    = '02.07.2026 15:58';
+const BUILD_VERSION='v2.0.81';
+const BUILD_DATE    = '02.07.2026 16:46';
 (function(){ var _hb = document.getElementById('headerVersionBadge'); if(_hb) _hb.textContent = BUILD_VERSION; })();
 
 
 
-const WN_VERSION = 'v2.0.74';
+const WN_VERSION = 'v2.0.81';
 const WN_STORAGE_KEY = window.location.pathname.includes('staging') ? 'wnSeen_staging' : 'wnSeen_live';
 (function(){ const old = localStorage.getItem('wnSeen'); if(old && !localStorage.getItem(WN_STORAGE_KEY)) localStorage.setItem(WN_STORAGE_KEY, old); })();
 const WN_I18N={
   en:{
     // v2.0.74
+    wn_survivor:'🏃 <strong>New: Survivor Status</strong>: A new KPI card shows at a glance how many of your open KO tips can still score, whether your TS1/TS2 scorer picks are still in the tournament, and if your champion pick is still alive.',
     wn_scorer_fix:'⚽ <strong>Scorer Points Fixed</strong>: Group Phase scorer points now correctly use only GP goals. KO goals are counted exclusively via KO round multipliers — no more double-counting.',
     // v2.0.70
     wn_shootout_fix:'🥅 <strong>Shootout Goals Fixed</strong>: Penalty shootout goals no longer count as scorer points — only regular time & extra time goals count (e.g. Harry Kane\'s penalty ✅, Musiala\'s shootout ❌).',
@@ -9745,6 +9783,7 @@ const WN_I18N={
   },
   de:{
     // v2.0.70
+    wn_survivor:'🏃 <strong>Neu: Survivor-Status</strong>: Eine neue KPI-Karte zeigt auf einen Blick, wie viele deiner offenen K.o.-Tipps noch punkten können, ob deine TS1/TS2-Torschützentipps noch im Turnier sind und ob dein Champion-Tipp noch lebt.',
     wn_scorer_fix:'⚽ <strong>Torschützen-Punkte korrigiert</strong>: GP-Scorerpunkte basieren jetzt ausschließlich auf Gruppenphase-Toren. KO-Tore fließen nur über die KO-Rundenmultiplikatoren ein — keine Doppelzählung mehr.',
     wn_shootout_fix:'🥅 <strong>Shootout-Fix</strong>: Elfmetertore im Elfmeterschießen zählen nicht mehr als Torschützen-Punkte — nur Tore in regulärer Spielzeit & Verlängerung (Harry Kanes Elfmeter ✅, Musialas Shootout-Tor ❌).',
     // v2.0.69
@@ -9787,6 +9826,7 @@ const WN_I18N={
   },
   es:{
     // v2.0.70
+    wn_survivor:'🏃 <strong>Nuevo: Estado Superviviente</strong>: Una nueva tarjeta KPI muestra de un vistazo cuántos de tus pronósticos KO abiertos aún pueden puntuar, si tus goleadores TS1/TS2 siguen en el torneo y si tu campeón elegido sigue vivo.',
     wn_scorer_fix:'⚽ <strong>Puntos de Goleador Corregidos</strong>: Los puntos de goleador en fase de grupos ahora usan solo goles de GP. Los goles de KO se cuentan exclusivamente vía multiplicadores KO — sin doble conteo.',
     wn_shootout_fix:'🥅 <strong>Fix: Goles en Tandas</strong>: Los goles en la tanda de penaltis ya no cuentan como puntos de goleador — solo goles en tiempo reglamentario y prórroga (penalti de Kane ✅, tanda de Musiala ❌).',
     // v2.0.67
@@ -9828,6 +9868,9 @@ const WN_I18N={
 };
 // Icon map für WN-Keys — Reihenfolge & Icons für v1.12
 const WN_ITEMS = [
+  // v2.0.81 — Survivor-Status KPI
+  { key: 'wn_survivor', icon: '🏃', highlight: true },
+  { divider: true },
   // v2.0.74 — GP-Scorer Doppelzählung Fix
   { key: 'wn_scorer_fix', icon: '⚽', highlight: true },
   { divider: true },

@@ -1,6 +1,6 @@
 # ÃÂÃÂÃÂÃÂ°ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂºÃÂÃÂÃÂÃÂ¯ÃÂÃÂÃÂÃÂ¸ÃÂÃÂÃÂÃÂ Mundiporra Dashboard ÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ UI Map
 > Kanonische Komponentennamen fÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¼r Patrick ÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ Claude Kommunikation
-> Stand: v2.0.80 · Repo: `Flash777777/mundiporra-staging` + `mundiporra-dashboard`
+> Stand: v2.0.81 · Repo: `Flash777777/mundiporra-staging` + `mundiporra-dashboard`
 
 **Konvention:** `Kanonischer Name` ÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ `fn()` / `#id` / `.class`
 Wenn Patrick "X" sagt ÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ Claude adressiert exakt den Code hinter "X". Keine Interpretation.
