@@ -1161,6 +1161,13 @@
   <div class="section-title">📝 Changelog</div>
 
 <div class="card" style="margin-bottom:14px;">
+  <div class="card-title">v2.0.79 — 02. Juli 2026 (Fix)</div>
+  <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
+    <li>🔧 <strong>KO Bracket-Karte: Open/Closed-Badge = "noch Spiel-Punkte möglich?"</strong> — Bei falscher Paarung wird jetzt ein "🔒 Closed"-Badge angezeigt (statt komplett ausgeblendeter Tipp-Zeile). Bei bereits beendetem Spiel wechselt das Badge von "Open" auf "Closed", auch bei korrekter Paarung, da keine weiteren Punkte mehr erreichbar sind — Tipp und verdiente Punkte bleiben sichtbar.</li>
+  </ul>
+</div>
+
+<div class="card" style="margin-bottom:14px;">
   <div class="card-title">v2.0.78 — 02. Juli 2026 (Fix)</div>
   <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
     <li>🔧 <strong>KO Bracket-Karte: Open/Closed-Badge korrigiert</strong> — Tipp-Anzeige und Open/Closed-Badge nutzten bisher den rohen Slot-Key statt eines Team-Namens-Abgleichs; dadurch konnte ein Tipp für eine völlig andere Paarung fälschlich als "Open" angezeigt werden. Jetzt zählt sobald die echten Teams feststehen ausschließlich der Team-Namens-Match (analog zu den Community-Insights).</li>
@@ -9292,30 +9299,41 @@ function _buildKOMatchCard(espnId, compact) {
   // sobald die echten Teams feststehen, zählt ausschließlich der Team-Namens-Match
   // (ins.userHasPairing/ins.userTip) — nicht der rohe Slot-Key. Sonst würde hier
   // ein Tipp für eine völlig andere Paarung fälschlich als "offen" angezeigt.
+  // Open/Closed bildet ab, ob für DIESES Spiel noch Spiel-Punkte erreichbar sind:
+  // Closed = falsche Paarung getippt (kann nie punkten) ODER Spiel bereits beendet
+  // (Punkte stehen fest, nichts mehr erreichbar) ODER — bei noch unbestimmten
+  // späteren Runden — eines der getippten Teams bereits ausgeschieden.
+  const koPredicted = PHASE === 'KO' && USER?.player &&
+    KO_PREDICTIONS[USER.player]?.slots && Object.keys(KO_PREDICTIONS[USER.player].slots).length > 0;
   let tipHtml = '';
-  if (PHASE === 'KO' && USER?.player && slot) {
+  if (koPredicted && slot) {
     const teamsKnown = !!(ins && ins.t1Known && ins.t2Known);
-    const pred = teamsKnown
-      ? (ins.userHasPairing ? ins.userTip : null)
-      : KO_PREDICTIONS[USER.player]?.slots?.[slot];
-    if (pred) {
-      const tipStr = `${pred.s1 ?? '?'} : ${pred.s2 ?? '?'}`;
-      let tipCls = '', tipPts = '';
-      if (isFinal && s1 != null && s2 != null) {
-        const pts = calcResultPtsKO(pred.s1, pred.s2, parseInt(s90_b1), parseInt(s90_b2));
-        const mul = SLOT_META[slot]?.multiplier || 1;
-        const earned = pts * mul;
-        if      (pts === 3) tipCls = 'tip-exact';
-        else if (pts === 2) tipCls = 'tip-diff';
-        else if (pts === 1) tipCls = 'tip-tend';
-        else                tipCls = 'tip-wrong';
-        tipPts = `<span class="ko-tip-pts">${earned > 0 ? '+' : ''}${earned}</span>`;
+    if (teamsKnown && !ins.userHasPairing) {
+      // Falsche Paarung getippt — kann in diesem Spiel nie mehr punkten, kein Score anzeigen (gehört zu anderer Paarung)
+      tipHtml = `<div class="ko-tip-row"><span class="ko-oc-badge ko-oc-closed">🔒 ${T('ko_oc_closed')}</span></div>`;
+    } else {
+      const pred = teamsKnown ? ins.userTip : KO_PREDICTIONS[USER.player]?.slots?.[slot];
+      if (pred) {
+        const tipStr = `${pred.s1 ?? '?'} : ${pred.s2 ?? '?'}`;
+        let tipCls = '', tipPts = '';
+        if (isFinal && s1 != null && s2 != null) {
+          const pts = calcResultPtsKO(pred.s1, pred.s2, parseInt(s90_b1), parseInt(s90_b2));
+          const mul = SLOT_META[slot]?.multiplier || 1;
+          const earned = pts * mul;
+          if      (pts === 3) tipCls = 'tip-exact';
+          else if (pts === 2) tipCls = 'tip-diff';
+          else if (pts === 1) tipCls = 'tip-tend';
+          else                tipCls = 'tip-wrong';
+          tipPts = `<span class="ko-tip-pts">${earned > 0 ? '+' : ''}${earned}</span>`;
+        }
+        // Punkte für dieses Spiel noch erreichbar? Teams bekannt: solange nicht beendet (isFinal).
+        // Teams noch unbekannt: solange keines der getippten Teams eliminiert (isSlotOpen).
+        const slotOpen = teamsKnown ? !isFinal : isSlotOpen(USER.player, slot);
+        const ocBadge = slotOpen
+          ? `<span class="ko-oc-badge ko-oc-open">🟢 ${T('ko_oc_open')}</span>`
+          : `<span class="ko-oc-badge ko-oc-closed">🔒 ${T('ko_oc_closed')}</span>`;
+        tipHtml = `<div class="ko-tip-row ${tipCls}">🎯 ${tipStr}${tipPts}${ocBadge}</div>`;
       }
-      const slotOpen = teamsKnown ? !!ins.userHasPairing : isSlotOpen(USER.player, slot);
-      const ocBadge = slotOpen
-        ? `<span class="ko-oc-badge ko-oc-open">🟢 ${T('ko_oc_open')}</span>`
-        : `<span class="ko-oc-badge ko-oc-closed">🔒 ${T('ko_oc_closed')}</span>`;
-      tipHtml = `<div class="ko-tip-row ${tipCls}">🎯 ${tipStr}${tipPts}${ocBadge}</div>`;
     }
   }
   // ── Community Insights ─────────────────────────────────────────────────────
@@ -9630,8 +9648,8 @@ function switchTab(tabId) {
 }
 
 // ═══════ WHAT'S NEW ═══════
-const BUILD_VERSION='v2.0.78';
-const BUILD_DATE    = '02.07.2026 13:40';
+const BUILD_VERSION='v2.0.79';
+const BUILD_DATE    = '02.07.2026 14:16';
 (function(){ var _hb = document.getElementById('headerVersionBadge'); if(_hb) _hb.textContent = BUILD_VERSION; })();
 
 
