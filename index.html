@@ -247,6 +247,7 @@
   .kpi-val.kpi-val-sm { font-size: 0.82rem; font-weight: 600; color: var(--text); line-height: 1.3; word-break: break-word; }
   .kpi-lbl { font-size: 0.7rem; color: var(--muted); text-transform: uppercase;
     letter-spacing: 0.6px; margin-top: 4px; }
+  #kpicard-kpi_survivor { grid-column: span 2; }
 
   /* ── MATCH cards ── */
   .match-card {
@@ -1159,6 +1160,13 @@
 <div id="tab-changelog" class="tab-content">
 <div class="page">
   <div class="section-title">📝 Changelog</div>
+
+<div class="card" style="margin-bottom:14px;">
+  <div class="card-title">v2.0.82 — 02. Juli 2026 (Fix)</div>
+  <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
+    <li>🔧 <strong>Survivor-Status-Karte verbreitert</strong> — belegt jetzt 2 Spalten im KPI-Grid statt 1, damit die drei Status-Infos (Slots/Torschützen/Champion) besser lesbar nebeneinander stehen.</li>
+  </ul>
+</div>
 
 <div class="card" style="margin-bottom:14px;">
   <div class="card-title">v2.0.81 — 02. Juli 2026 (Feature)</div>
@@ -9726,8 +9734,8 @@ function switchTab(tabId) {
 }
 
 // ═══════ WHAT'S NEW ═══════
-const BUILD_VERSION='v2.0.81';
-const BUILD_DATE    = '02.07.2026 16:46';
+const BUILD_VERSION='v2.0.82';
+const BUILD_DATE    = '02.07.2026 17:06';
 (function(){ var _hb = document.getElementById('headerVersionBadge'); if(_hb) _hb.textContent = BUILD_VERSION; })();
 
 
