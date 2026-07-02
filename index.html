@@ -1161,6 +1161,13 @@
   <div class="section-title">📝 Changelog</div>
 
 <div class="card" style="margin-bottom:14px;">
+  <div class="card-title">v2.0.78 — 02. Juli 2026 (Fix)</div>
+  <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
+    <li>🔧 <strong>KO Bracket-Karte: Open/Closed-Badge korrigiert</strong> — Tipp-Anzeige und Open/Closed-Badge nutzten bisher den rohen Slot-Key statt eines Team-Namens-Abgleichs; dadurch konnte ein Tipp für eine völlig andere Paarung fälschlich als "Open" angezeigt werden. Jetzt zählt sobald die echten Teams feststehen ausschließlich der Team-Namens-Match (analog zu den Community-Insights).</li>
+  </ul>
+</div>
+
+<div class="card" style="margin-bottom:14px;">
   <div class="card-title">v2.0.77 — 01. Juli 2026 (Fix)</div>
   <ul style="margin:8px 0 0 0;padding-left:1.4em;font-size:0.85rem;line-height:1.9;">
     <li>🔧 <strong>Header-Badge BUILD_VERSION</strong> — Fix: BUILD_VERSION-Replace verwendete falsches Regex-Pattern; Header zeigt jetzt korrekt v2.0.77.</li>
@@ -9171,7 +9178,7 @@ function _koSlotInsights(espnId, slotKey, t1obj, t2obj) {
   const isSurprise = t1Known && t2Known && total >= 20 && pairingPct !== null && pairingPct < 15;
 
   return { total, t1Known, t2Known, t1QualCount, t1QualPct, t2QualCount, t2QualPct,
-           pairingCount, pairingPct, userHasPairing, tendT1, tendDraw, tendT2,
+           pairingCount, pairingPct, userHasPairing, userTip, tendT1, tendDraw, tendT2,
            topResult, pairingPlayers, isSurprise };
 }
 
@@ -9275,10 +9282,22 @@ function _buildKOMatchCard(espnId, compact) {
   const slot = PHASE === 'KO'
     ? Object.entries(SLOT_TO_ESPN_MAP).find(([,id]) => String(id) === String(espnId))?.[0]
     : null;
+  // ── Insights (einmal berechnet, für Tipp-Anzeige + Community-Insights) ──────
+  let ins = null;
+  if (PHASE === 'KO' && slot && Object.keys(KO_PREDICTIONS).length > 0) {
+    try { ins = _koSlotInsights(espnId, slot, t1, t2); } catch(e) { console.warn('[KO Insights]', e); }
+  }
   // ── User-Tipp ──────────────────────────────────────────────────────────────
+  // Kein direktes Slot-Mapping zwischen KO_PREDICTIONS und der Bracket-Struktur:
+  // sobald die echten Teams feststehen, zählt ausschließlich der Team-Namens-Match
+  // (ins.userHasPairing/ins.userTip) — nicht der rohe Slot-Key. Sonst würde hier
+  // ein Tipp für eine völlig andere Paarung fälschlich als "offen" angezeigt.
   let tipHtml = '';
   if (PHASE === 'KO' && USER?.player && slot) {
-    const pred = KO_PREDICTIONS[USER.player]?.slots?.[slot];
+    const teamsKnown = !!(ins && ins.t1Known && ins.t2Known);
+    const pred = teamsKnown
+      ? (ins.userHasPairing ? ins.userTip : null)
+      : KO_PREDICTIONS[USER.player]?.slots?.[slot];
     if (pred) {
       const tipStr = `${pred.s1 ?? '?'} : ${pred.s2 ?? '?'}`;
       let tipCls = '', tipPts = '';
@@ -9292,7 +9311,7 @@ function _buildKOMatchCard(espnId, compact) {
         else                tipCls = 'tip-wrong';
         tipPts = `<span class="ko-tip-pts">${earned > 0 ? '+' : ''}${earned}</span>`;
       }
-      const slotOpen = isSlotOpen(USER.player, slot);
+      const slotOpen = teamsKnown ? !!ins.userHasPairing : isSlotOpen(USER.player, slot);
       const ocBadge = slotOpen
         ? `<span class="ko-oc-badge ko-oc-open">🟢 ${T('ko_oc_open')}</span>`
         : `<span class="ko-oc-badge ko-oc-closed">🔒 ${T('ko_oc_closed')}</span>`;
@@ -9300,13 +9319,7 @@ function _buildKOMatchCard(espnId, compact) {
     }
   }
   // ── Community Insights ─────────────────────────────────────────────────────
-  let insightsHtml = '';
-  if (PHASE === 'KO' && slot && Object.keys(KO_PREDICTIONS).length > 0) {
-    try {
-      const ins = _koSlotInsights(espnId, slot, t1, t2);
-      if (ins) insightsHtml = _buildKOInsightsHtml(ins, t1, t2);
-    } catch(e) { console.warn('[KO Insights]', e); }
-  }
+  const insightsHtml = ins ? _buildKOInsightsHtml(ins, t1, t2) : '';
   return `<div class="${cls}${liveCls}" data-id="${espnId}">
     <div class="ko-team${t1Win?' winner':''}">` + `${_koTeamRow(t1,live,'t1',compact)}</div>
     <div class="ko-team${t2Win?' winner':''}">` + `${_koTeamRow(t2,live,'t2',compact)}</div>
@@ -9617,8 +9630,8 @@ function switchTab(tabId) {
 }
 
 // ═══════ WHAT'S NEW ═══════
-const BUILD_VERSION='v2.0.77';
-const BUILD_DATE    = '01.07.2026 21:30';
+const BUILD_VERSION='v2.0.78';
+const BUILD_DATE    = '02.07.2026 13:40';
 (function(){ var _hb = document.getElementById('headerVersionBadge'); if(_hb) _hb.textContent = BUILD_VERSION; })();
 
 
